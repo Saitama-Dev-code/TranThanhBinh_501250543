@@ -62,16 +62,18 @@
 
 Dự án sử dụng cơ sở dữ liệu MySQL/MariaDB với 5 bảng chính, được thiết kế để tối ưu hóa việc quản lý người dùng, sản phẩm và luồng đặt hàng.
 
-### 1. Bảng users (Khách hàng & Admin)
-Quản lý thông tin tài khoản đăng nhập. Phân quyền được xử lý qua cột role.
+### 1. Bảng users (Khách hàng & Admin)(Cập nhật Đăng nhập MXH & Phân quyền)
+Quản lý thông tin tài khoản đăng nhập, hỗ trợ đăng nhập truyền thống và qua mạng xã hội (Google, Facebook, Zalo). Phân quyền đa cấp độ được xử lý qua cột role.
 
 -`id` (INT, PK, Auto Increment): Mã người dùng (Khóa chính)
 -`full_name` (VARCHAR(100), Not Null): Họ và tên đầy đủ
--`email` (VARCHAR(100), Not Null, Unique): Email đăng nhập
--`password` (VARCHAR(255), Not Null): Mật khẩu (đã băm bảo mật)
+-`email` (VARCHAR(100), Nullable, Unique): Email đăng nhập (Có thể Null nếu đăng nhập bằng Zalo/Facebook không cấp quyền email)
+-`password` (VARCHAR(255), Nullable): Mật khẩu (Đã băm. Cho phép Null nếu đăng nhập bằng mạng xã hội)
 -`phone` (VARCHAR(20), Nullable): Số điện thoại liên hệ
 -`address` (TEXT, Nullable): Địa chỉ giao hàng mặc định
--`role` (TINYINT, Default 0): Phân quyền: 0 (Khách hàng), 1 (Admin)
+-`role` (TINYINT, Default 0): Phân quyền: 0 (Khách hàng), 1 (Super Admin - Toàn quyền), 2 (Quản lý sản phẩm), 3 (Quản lý đơn hàng)
+-`provider` (VARCHAR(50), Nullable): Tên nền tảng đăng nhập (VD: 'google', 'facebook', 'zalo', hoặc để Null nếu đăng ký thường)
+-`provider_id` (VARCHAR(255), Nullable): Mã ID định danh duy nhất được trả về từ Google/Facebook/Zalo
 -`reset_token` (VARCHAR(255), Nullable): Lưu token phục hồi mật khẩu
 -`created_at` (TIMESTAMP, Default Current): Thời gian tạo tài khoản
 

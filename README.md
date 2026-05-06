@@ -28,6 +28,10 @@
 ✅: Chat trực tiếp với chuyên gia tư vấn (Live Chat)
 ✅: Nhận thông báo qua email khi sản phẩm có hàng lại
 ✅: Hiển thị cảnh báo số lượng tồn kho khan hiếm (Stock Alerts)
+✅: Lọc nhạc cụ theo tiêu chí "Có sẵn để thuê"
+✅: Chọn ngày bắt đầu và ngày kết thúc thuê (Date Picker)
+✅: Tự động tính toán tổng phí thuê và tiền cọc
+✅: Xem lịch sử các hợp đồng thuê đang hoạt động/đã trả
 
 ### Admin Panel
 ✅: Dashboard thống kê (doanh thu, đơn hàng, khách hàng, sản phẩm)
@@ -40,6 +44,9 @@
 ✅: Quản lý khách hàng
 ✅: Thống kê sản phẩm bán chạy
 ✅: Thống kê doanh thu theo tháng
+✅: Quản lý hợp đồng thuê (Duyệt, Bàn giao, Đã nhận lại)
+✅: Xử lý hoàn tiền cọc cho khách khi trả nhạc cụ
+✅: Tính toán và cập nhật phí phạt nếu trả trễ hạn
 
 ## 🔧 Công nghệ sử dụng
 - **Backend**: PHP 5.6+ (Pure PHP, no famework)
@@ -87,6 +94,9 @@ Quản lý thông tin chi tiết của từng mặt hàng nhạc cụ.
 -`description` (TEXT, Nullable): Bài viết mô tả chi tiết
 -`stock` (INT, Default 0): Số lượng còn lại trong kho
 -`created_at` (TIMESTAMP, Default Current): Thời gian thêm sản phẩm
+-`is_rentable` (TINYINT, Default 0): 1 = Cho thuê, 0 = Chỉ bán
+-`rent_price_day` (DECIMAL(10,2), Nullable): Giá thuê trên 1 ngày
+-`deposit_price` (DECIMAL(10,2), Nullable): Tiền cọc bắt buộc (thường bằng 70-100% giá trị đàn)
 
 ### 4. Bảng orders (Đơn hàng)
 Lưu trữ thông tin tổng quan khi khách hàng thực hiện thanh toán.
@@ -107,3 +117,25 @@ Quản lý danh sách các sản phẩm bên trong một đơn hàng cụ thể,
 -`product_id` (INT, FK): Sản phẩm được mua (bảng products)
 -`quantity` (INT, Not Null): Số lượng mua của sản phẩm này
 -`price` (DECIMAL(10,2), Not Null): Giá sản phẩm tại thời điểm đặt hàng
+
+### 6. Bảng rentals (Hợp đồng thuê)
+Lưu trữ thông tin lịch trình và tài chính của một đợt thuê nhạc cụ.
+
+-`id` (INT, PK, Auto Increment): Mã hợp đồng thuê (Khóa chính)
+-`user_id` (INT, FK): Người thuê (Liên kết bảng users)
+-`start_date` (DATE, Not Null): Ngày bắt đầu tính phí thuê
+-`end_date` (DATE, Not Null): Ngày dự kiến trả nhạc cụ
+-`actual_return` (DATE, Nullable): Ngày trả thực tế (để tính phí trễ nếu có)
+-`total_rent_fee` (DECIMAL(10,2), Not Null): Tổng tiền phí thuê (Số ngày * Giá thuê/ngày)
+-`deposit_amount` (DECIMAL(10,2), Not Null): Tổng tiền cọc khách đã đóng
+-`status` (ENUM, Default 'pending'): Trạng thái: pending (Chờ duyệt), active (Đang thuê), returned (Đã trả), canceled (Đã hủy)
+-`created_at` (TIMESTAMP, Default Current): Ngày giờ tạo yêu cầu thuê
+
+### 7. Bảng rental_details (Chi tiết nhạc cụ thuê)
+Lưu lại danh sách các món đồ khách đem về trong một hợp đồng thuê.
+
+-`id` (INT, PK, Auto Increment): Mã chi tiết thuê (Khóa chính)
+-`rental_id` (INT, FK): Thuộc hợp đồng nào (Liên kết bảng rentals)
+-`product_id` (INT, FK): Nhạc cụ nào được thuê (Liên kết bảng products)
+-`quantity` (INT, Not Null): Số lượng thuê
+-`price_per_day` (DECIMAL(10,2), Not Null): Chốt giá thuê/ngày tại thời điểm làm hợp đồng

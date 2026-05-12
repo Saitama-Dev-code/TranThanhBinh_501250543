@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="vi" data-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TTB - Giai Điệu Của Riêng Bạn</title>
-    
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
@@ -34,30 +35,54 @@
         }
 
         body {
-            background-color: var(--bg-color); color: var(--text-color);
+            background-color: var(--bg-color);
+            color: var(--text-color);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             transition: background-color 0.4s ease, color 0.4s ease;
-            overflow-x: hidden; padding-top: 76px; position: relative;
+            overflow-x: hidden;
+            padding-top: 76px;
+            position: relative;
         }
 
         /* ==========================================================================
            2. WATERMARK & HIỆU ỨNG HẠT LƠ LỬNG (NÉ CHUỘT)
            ========================================================================== */
         .watermark {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 18vw; font-weight: 900; color: var(--watermark-color);
-            z-index: -2; pointer-events: none; user-select: none; white-space: nowrap; transition: color 0.4s ease;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18vw;
+            font-weight: 900;
+            color: var(--watermark-color);
+            z-index: -2;
+            pointer-events: none;
+            user-select: none;
+            white-space: nowrap;
+            transition: color 0.4s ease;
         }
 
         #global-parallax {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: -1; pointer-events: none; overflow: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
         }
-        
-        /* Wrapper đảm nhiệm việc lơ lửng tự nhiên của CSS */
+
         @keyframes organicFloat {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-30px); }
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-30px);
+            }
         }
 
         .note-wrapper {
@@ -65,11 +90,9 @@
             animation: organicFloat 10s ease-in-out infinite;
         }
 
-        /* Icon bên trong sẽ do JavaScript điều khiển để né chuột */
         .note-icon {
-            color: var(--text-color); 
+            color: var(--text-color);
             opacity: 0.1;
-            /* Transition để khi JS gỡ lực đẩy, icon trôi về mượt mà */
             transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
@@ -77,52 +100,150 @@
            3. NAVBAR THÔNG MINH
            ========================================================================== */
         .navbar {
-            background-color: var(--nav-bg); border-bottom: 1px solid var(--border-color);
-            backdrop-filter: blur(12px); transition: top 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55), background-color 0.4s;
-            position: fixed; width: 100%; top: 0; z-index: 1030;
+            background-color: var(--nav-bg);
+            border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(12px);
+            transition: top 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55), background-color 0.4s;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1030;
         }
-        .navbar-brand, .nav-link { color: var(--text-color) !important; font-weight: 600; }
-        
-        .navbar-brand i { transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); display: inline-block; }
-        .navbar-brand:hover i { transform: scale(1.2) rotate(-15deg); color: #3b82f6 !important; }
 
-        .nav-link { position: relative; padding-bottom: 5px; }
-        .nav-link::after {
-            content: ''; position: absolute; width: 0; height: 2px;
-            bottom: 0; left: 50%; background-color: #3b82f6;
-            transition: all 0.3s ease; transform: translateX(-50%);
+        .navbar-brand,
+        .nav-link {
+            color: var(--text-color) !important;
+            font-weight: 600;
         }
-        .nav-link:hover::after { width: 80%; }
+
+        .navbar-brand i {
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: inline-block;
+        }
+
+        .navbar-brand:hover i {
+            transform: scale(1.2) rotate(-15deg);
+            color: #3b82f6 !important;
+        }
+
+        .nav-link {
+            position: relative;
+            padding-bottom: 5px;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            background-color: #3b82f6;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover::after {
+            width: 80%;
+        }
 
         /* ==========================================================================
            4. HERO SECTION (VIDEO NỀN)
            ========================================================================== */
-        .hero-section { position: relative; height: 90vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .video-background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
-        .video-background iframe {
-            width: 100vw; height: 56.25vw; min-height: 100vh; min-width: 177.77vh;
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        .hero-section {
+            position: relative;
+            height: 90vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
         }
-        .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 1; }
-        .hero-content { position: relative; z-index: 2; color: white; }
+
+        .video-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .video-background iframe {
+            width: 100vw;
+            height: 56.25vw;
+            min-height: 100vh;
+            min-width: 177.77vh;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            color: white;
+        }
 
         /* ==========================================================================
            5. THƯƠNG HIỆU: CHẠY NGANG & NẢY KẸO DẺO
            ========================================================================== */
         .marquee-wrapper {
-            display: flex; overflow: hidden; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);
-            background: var(--card-bg); padding: 25px 0; width: 100%;
+            display: flex;
+            overflow: hidden;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            background: var(--card-bg);
+            padding: 25px 0;
+            width: 100%;
         }
-        .marquee-content { display: flex; flex-shrink: 0; animation: marqueeScroll 25s linear infinite; }
-        @keyframes marqueeScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
+        .marquee-content {
+            display: flex;
+            flex-shrink: 0;
+            animation: marqueeScroll 25s linear infinite;
+        }
+
+        @keyframes marqueeScroll {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
+        }
 
         .brand-item {
-            display: flex; align-items: center; justify-content: center; margin: 0 45px;
-            font-size: 2rem; font-weight: 800; color: var(--text-color); cursor: pointer; opacity: 0.6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 45px;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-color);
+            cursor: pointer;
+            opacity: 0.6;
             transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s, color 0.3s;
             white-space: nowrap;
         }
-        .brand-item:hover { opacity: 1; color: #3b82f6; transform: translateY(-12px) scale(1.15); }
+
+        .brand-item:hover {
+            opacity: 1;
+            color: #3b82f6;
+            transform: translateY(-12px) scale(1.15);
+        }
 
         /* ==========================================================================
            6. CARD SẢN PHẨM (CHUẨN E-COMMERCE TỐI GIẢN)
@@ -144,7 +265,6 @@
             border-color: #3b82f6;
         }
 
-        /* Khung chứa ảnh để overflow hidden nếu cần */
         .img-container {
             position: relative;
             height: 220px;
@@ -153,31 +273,30 @@
             justify-content: center;
             margin-bottom: 20px;
             z-index: 1;
+            overflow: hidden;
+            border-radius: 8px;
         }
 
-        /* Hình ảnh chỉ phóng to nhẹ bên trong khung khi hover */
         .img-container img {
-            max-height: 100%;
-            max-width: 100%;
-            object-fit: contain;
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
             transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.15));
         }
 
         .product-card-clean:hover .img-container img {
-            transform: scale(1.1); /* Phóng to 10% */
+            transform: scale(1.1);
         }
 
-        /* Tem (Badge) đỏ nổi bật giống ảnh tham khảo */
         .pickup-badge {
             position: absolute;
             top: -15px;
             left: -15px;
-            background-color: #dc2626; /* Đỏ rực */
+            background-color: #dc2626;
             color: #ffffff;
             width: 70px;
             height: 70px;
-            border-radius: 50%; /* Hình tròn đơn giản thanh lịch */
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -192,33 +311,99 @@
            7. CÁC THÀNH PHẦN KHÁC (PHỤ KIỆN, FAQ, TIN TỨC, FOOTER)
            ========================================================================== */
         .custom-card {
-            background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px;
-            transition: box-shadow 0.4s ease; cursor: pointer;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            transition: box-shadow 0.4s ease;
+            cursor: pointer;
         }
-        .custom-card:hover { box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); border-color: #3b82f6; }
-        
-        /* Hiệu ứng hover cho Icon tối giản (Chỉ to lên và đổi màu, không xoay) */
-        .simple-hover-icon { transition: transform 0.3s ease, color 0.3s ease; }
-        .custom-card:hover .simple-hover-icon { transform: scale(1.15); color: #3b82f6 !important; }
 
-        .showcase-img { border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); transition: transform 0.5s ease; width: 100%; }
-        .showcase-img:hover { transform: scale(1.02); }
-        
-        /* Kích thước ảnh bài viết Blog */
-        .blog-img { height: 220px; object-fit: cover; border-radius: 12px 12px 0 0; width: 100%; transition: transform 0.5s ease; }
-        .blog-img-wrapper { overflow: hidden; border-radius: 12px 12px 0 0; }
-        .custom-card:hover .blog-img { transform: scale(1.05); }
+        .custom-card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            border-color: #3b82f6;
+        }
 
-        .accordion-item { background-color: var(--card-bg); border-color: var(--border-color); }
-        .accordion-button { background-color: var(--card-bg); color: var(--text-color); font-weight: bold; }
-        .accordion-button:not(.collapsed) { background-color: var(--faq-bg); color: #3b82f6; box-shadow: none; }
-        .accordion-body { color: var(--text-color); opacity: 0.9; }
+        .simple-hover-icon {
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
 
-        footer { background-color: var(--card-bg); border-top: 1px solid var(--border-color); padding: 60px 0 20px 0; position: relative; z-index: 10; }
-        .footer-text { color: var(--text-color); opacity: 0.8; text-decoration: none; transition: 0.3s; }
-        .footer-text:hover { opacity: 1; color: #3b82f6; }
+        .custom-card:hover .simple-hover-icon {
+            transform: scale(1.15);
+            color: #3b82f6 !important;
+        }
+
+        .showcase-img {
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            transition: transform 0.5s ease;
+            width: 100%;
+        }
+
+        .showcase-img:hover {
+            transform: scale(1.02);
+        }
+
+        .blog-img {
+            height: 220px;
+            object-fit: cover;
+            border-radius: 12px 12px 0 0;
+            width: 100%;
+            transition: transform 0.5s ease;
+        }
+
+        .blog-img-wrapper {
+            overflow: hidden;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .custom-card:hover .blog-img {
+            transform: scale(1.05);
+        }
+
+        .accordion-item {
+            background-color: var(--card-bg);
+            border-color: var(--border-color);
+        }
+
+        .accordion-button {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            font-weight: bold;
+        }
+
+        .accordion-button:not(.collapsed) {
+            background-color: var(--faq-bg);
+            color: #3b82f6;
+            box-shadow: none;
+        }
+
+        .accordion-body {
+            color: var(--text-color);
+            opacity: 0.9;
+        }
+
+        footer {
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 60px 0 20px 0;
+            position: relative;
+            z-index: 10;
+        }
+
+        .footer-text {
+            color: var(--text-color);
+            opacity: 0.8;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .footer-text:hover {
+            opacity: 1;
+            color: #3b82f6;
+        }
     </style>
 </head>
+
 <body>
 
     <div class="watermark">TTB MUSIC</div>
@@ -250,13 +435,12 @@
             </div>
         </div>
     </nav>
-
     <section class="hero-section text-center">
         <div class="video-background">
             <iframe src="https://www.youtube.com/embed/wNCDWk8mxXs?autoplay=1&mute=1&playlist=wNCDWk8mxXs&loop=1&controls=0&disablekb=1&fs=0&modestbranding=1&playsinline=1" frameborder="0" allow="autoplay; fullscreen"></iframe>
         </div>
         <div class="hero-overlay"></div>
-        
+
         <div class="container hero-content" data-aos="zoom-in" data-aos-duration="1500">
             <span class="badge bg-primary mb-3 px-3 py-2 rounded-pill">TTB COLLECTION 2024</span>
             <h1 class="display-2 fw-bolder mb-4 text-white">Giai Điệu Của Riêng Bạn</h1>
@@ -287,7 +471,7 @@
     <section class="container mt-5 pt-5">
         <div class="row align-items-center">
             <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right" data-aos-duration="1000">
-                <img src="https://images.unsplash.com/photo-1552422535-c45813c61732?q=80&w=1000&auto=format&fit=crop" alt="Premium Piano" class="showcase-img">
+                <img src="https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?q=80&w=1000&auto=format&fit=crop" alt="Premium Piano" class="showcase-img">
             </div>
             <div class="col-lg-5 offset-lg-1" data-aos="fade-left" data-aos-duration="1000">
                 <h6 class="text-primary fw-bold text-uppercase tracking-wide mb-2">Đẳng cấp hoàng gia</h6>
@@ -307,13 +491,13 @@
             <h6 class="text-primary fw-bold text-uppercase">Bán chạy nhất</h6>
             <h2 class="display-6 fw-bold">Sản Phẩm Đang Hot Tại TTB</h2>
         </div>
-        
+
         <div class="row g-5">
             <div class="col-12 col-md-4" data-aos="fade-up" data-aos-delay="100">
                 <div class="product-card-clean">
                     <div class="pickup-badge">Pickup!</div>
                     <div class="img-container">
-                        <img src="https://freepngimg.com/thumb/guitar/2-2-guitar-png-pic.png" alt="Guitar">
+                        <img src="https://images.unsplash.com/photo-1550291652-6ea9114a47b1?q=80&w=600&auto=format&fit=crop" alt="Guitar">
                     </div>
                     <div class="text-center mt-auto">
                         <h5 class="fw-bold">Acoustic Yamaha F310</h5>
@@ -328,7 +512,7 @@
                 <div class="product-card-clean">
                     <div class="pickup-badge bg-success">Mới!</div>
                     <div class="img-container">
-                        <img src="https://freepngimg.com/thumb/piano/3-2-piano-png-file.png" alt="Piano">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR46ScgYanHHB2xG4ycGOi1boH4OPV5hEnnaQ&s" alt="Piano">
                     </div>
                     <div class="text-center mt-auto">
                         <h5 class="fw-bold">Roland Midi Keyboard</h5>
@@ -343,7 +527,7 @@
                 <div class="product-card-clean">
                     <div class="pickup-badge bg-warning text-dark">Hot!</div>
                     <div class="img-container">
-                        <img src="https://freepngimg.com/thumb/drum/1-2-drum-png.png" alt="Drum">
+                        <img src="https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?q=80&w=600&auto=format&fit=crop" alt="Drum">
                     </div>
                     <div class="text-center mt-auto">
                         <h5 class="fw-bold">Trống Pearl Roadshow</h5>
@@ -442,7 +626,7 @@
             <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
                 <div class="custom-card h-100">
                     <div class="blog-img-wrapper">
-                        <img src="https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?q=80&w=600&auto=format&fit=crop" class="blog-img" alt="Blog 2">
+                        <img src="https://images.unsplash.com/photo-1501612780327-45045538702b?q=80&w=600&auto=format&fit=crop" class="blog-img" alt="Blog 2">
                     </div>
                     <div class="p-4">
                         <span class="badge bg-success mb-2">Review</span>
@@ -454,7 +638,7 @@
             <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
                 <div class="custom-card h-100">
                     <div class="blog-img-wrapper">
-                        <img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=600&auto=format&fit=crop" class="blog-img" alt="Blog 3">
+                        <img src="https://images.unsplash.com/photo-1511192336575-5a79af67a629?q=80&w=600&auto=format&fit=crop" class="blog-img" alt="Blog 3">
                     </div>
                     <div class="p-4">
                         <span class="badge bg-warning text-dark mb-2">Sự kiện</span>
@@ -563,7 +747,7 @@
             <div class="row gy-4">
                 <div class="col-lg-4">
                     <h4 class="fw-bold mb-3"><i class="fas fa-music text-primary me-2"></i>TTB MUSIC</h4>
-                    <p class="footer-text">Hệ thống mua bán và cho thuê nhạc cụ hàng đầu, giúp bạn tự tin tỏa sáng và viết nên giai điệu của riêng mình.</p>
+                    <p class="footer-text">Hệ thống mua bán và cho thuê nhạc cụ hàng đầu, giúp bạn tự tự tin tỏa sáng và viết nên giai điệu của riêng mình.</p>
                 </div>
                 <div class="col-lg-2 offset-lg-1 col-md-4">
                     <h5 class="fw-bold mb-3">Danh mục</h5>
@@ -597,24 +781,32 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        AOS.init({ once: true, offset: 100 });
+        // Khởi chạy AOS Animation
+        AOS.init({
+            once: true,
+            offset: 100
+        });
 
-        // ================= JS: SMART NAVBAR =================
+        // JAVASCRIPT: Logic ẩn hiện Smart Navbar khi cuộn trang
         let prevScrollpos = window.pageYOffset;
         const navbar = document.getElementById("smartNavbar");
         window.onscroll = function() {
             let currentScrollPos = window.pageYOffset;
             if (currentScrollPos <= 50) {
-                navbar.style.top = "0"; navbar.style.boxShadow = "none";
+                navbar.style.top = "0";
+                navbar.style.boxShadow = "none";
             } else {
                 navbar.style.boxShadow = "0 4px 15px rgba(0,0,0,0.1)";
-                if (prevScrollpos > currentScrollPos) { navbar.style.top = "0"; } 
-                else { navbar.style.top = "-100px"; }
+                if (prevScrollpos > currentScrollPos) {
+                    navbar.style.top = "0";
+                } else {
+                    navbar.style.top = "-100px";
+                }
             }
             prevScrollpos = currentScrollPos;
         }
 
-        // ================= JS: THEME TOGGLE =================
+        // JAVASCRIPT: Logic nút Bật/Tắt Light/Dark Theme
         const themeToggleBtn = document.getElementById('theme-toggle');
         const htmlElement = document.documentElement;
         const icon = themeToggleBtn.querySelector('i');
@@ -629,31 +821,29 @@
             icon.className = newTheme === 'dark' ? 'fas fa-sun text-warning' : 'fas fa-moon text-dark';
         });
 
-        // ================= JS: PARALLAX HẠT NÉ CHUỘT =================
+        // JAVASCRIPT: Logic các hạt nốt nhạc bay và né con trỏ chuột
         const parallaxContainer = document.getElementById('global-parallax');
         const fontIcons = ['fa-music', 'fa-guitar', 'fa-headphones', 'fa-drum', 'fa-play'];
-        const notes = []; 
-        let mouseX = -1000, mouseY = -1000; // Khởi tạo chuột ở ngoài màn hình
-        
+        const notes = [];
+        let mouseX = -1000,
+            mouseY = -1000;
+
         // Sinh ra 50 hạt nền
-        for(let i = 0; i < 50; i++) {
-            // Tạo div bọc ngoài để CSS lo việc lơ lửng chậm (organicFloat)
+        for (let i = 0; i < 50; i++) {
             let wrapper = document.createElement('div');
             wrapper.className = 'note-wrapper';
             wrapper.style.left = Math.random() * 100 + 'vw';
             wrapper.style.top = Math.random() * 100 + 'vh';
             wrapper.style.animationDelay = (Math.random() * 10) + 's';
 
-            // Tạo icon bên trong để JS lo việc né chuột
             let iconElem = document.createElement('i');
             let randomIcon = fontIcons[Math.floor(Math.random() * fontIcons.length)];
             iconElem.className = `fas ${randomIcon} note-icon`;
             iconElem.style.fontSize = (Math.random() * 1.5 + 0.5) + 'rem';
-            
+
             wrapper.appendChild(iconElem);
             parallaxContainer.appendChild(wrapper);
-            
-            // Lưu object để JS tính toán
+
             notes.push({
                 wrapper: wrapper,
                 icon: iconElem,
@@ -662,49 +852,44 @@
             });
         }
 
-        // Cập nhật tọa độ chuột liên tục
+        // Cập nhật vị trí chuột
         window.addEventListener('mousemove', (e) => {
             mouseX = e.clientX;
             mouseY = e.clientY;
         });
 
-        // Vòng lặp Animation kiểm tra khoảng cách từ chuột đến từng hạt
+        // Hàm animation né chuột
         function animateRepel() {
             notes.forEach(note => {
-                // Lấy tọa độ trung tâm của hạt trên màn hình
                 let rect = note.wrapper.getBoundingClientRect();
                 let iconCenterX = rect.left + rect.width / 2;
                 let iconCenterY = rect.top + rect.height / 2;
-                
-                // Tính khoảng cách giữa chuột và hạt
+
                 let dx = iconCenterX - mouseX;
                 let dy = iconCenterY - mouseY;
                 let distance = Math.sqrt(dx * dx + dy * dy);
-                
-                const repelRadius = 150; // Bán kính tác động của chuột (150px)
+
+                const repelRadius = 150; // Khoảng cách né là 150px
 
                 if (distance < repelRadius) {
-                    // Nếu chuột lại gần -> Tính lực đẩy hạt ra xa
                     let force = (repelRadius - distance) / repelRadius;
                     let angle = Math.atan2(dy, dx);
-                    // Hạt bị đẩy tối đa 60px
                     let pushX = Math.cos(angle) * force * 60;
                     let pushY = Math.sin(angle) * force * 60;
-                    
-                    // Gán tạm thời để tắt transition khi đang bị đẩy nhanh
+
                     note.icon.style.transition = 'none';
                     note.icon.style.transform = `translate(${pushX}px, ${pushY}px)`;
                 } else {
-                    // Nếu xa chuột -> Bật lại transition để hạt từ từ trôi về vị trí (0,0)
                     note.icon.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)';
                     note.icon.style.transform = `translate(0px, 0px)`;
                 }
             });
             requestAnimationFrame(animateRepel);
         }
-        
-        // Khởi động vòng lặp
+
         animateRepel();
     </script>
+
 </body>
+
 </html>

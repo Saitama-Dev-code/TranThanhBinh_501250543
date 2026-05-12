@@ -11,7 +11,7 @@
 
     <style>
         /* ==========================================================================
-           1. CẤU HÌNH BIẾN MÀU SẮC (THEME)
+           1. BIẾN MÀU SẮC (THEME)
            ========================================================================== */
         :root[data-theme="light"] {
             --bg-color: #f8fafc;
@@ -20,6 +20,7 @@
             --border-color: #e2e8f0;
             --nav-bg: rgba(255, 255, 255, 0.85);
             --watermark-color: rgba(0, 0, 0, 0.03);
+            --faq-bg: #f1f5f9;
         }
 
         :root[data-theme="dark"] {
@@ -29,169 +30,191 @@
             --border-color: #334155;
             --nav-bg: rgba(15, 23, 42, 0.85);
             --watermark-color: rgba(255, 255, 255, 0.02);
+            --faq-bg: #334155;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: var(--bg-color); color: var(--text-color);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             transition: background-color 0.4s ease, color 0.4s ease;
-            overflow-x: hidden;
-            padding-top: 76px;
-            position: relative;
+            overflow-x: hidden; padding-top: 76px; position: relative;
         }
 
         /* ==========================================================================
-           2. HIỆU ỨNG WATERMARK & FULL-PAGE PARALLAX (HẠT BAY TOÀN TRANG)
+           2. WATERMARK & HIỆU ỨNG HẠT LƠ LỬNG (NÉ CHUỘT)
            ========================================================================== */
         .watermark {
-            position: fixed;
-            top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 18vw; font-weight: 900;
-            color: var(--watermark-color);
-            z-index: -2; pointer-events: none; user-select: none;
-            white-space: nowrap; transition: color 0.4s ease;
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 18vw; font-weight: 900; color: var(--watermark-color);
+            z-index: -2; pointer-events: none; user-select: none; white-space: nowrap; transition: color 0.4s ease;
         }
 
         #global-parallax {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: -1; pointer-events: none;
+            z-index: -1; pointer-events: none; overflow: hidden;
         }
         
-        .floating-note {
-            position: absolute; color: var(--text-color); opacity: 0.05;
-            transition: transform 0.1s linear; 
+        /* Wrapper đảm nhiệm việc lơ lửng tự nhiên của CSS */
+        @keyframes organicFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-30px); }
+        }
+
+        .note-wrapper {
+            position: absolute;
+            animation: organicFloat 10s ease-in-out infinite;
+        }
+
+        /* Icon bên trong sẽ do JavaScript điều khiển để né chuột */
+        .note-icon {
+            color: var(--text-color); 
+            opacity: 0.1;
+            /* Transition để khi JS gỡ lực đẩy, icon trôi về mượt mà */
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         /* ==========================================================================
-           3. NAVBAR THÔNG MINH (TRƯỢT LÊN/XUỐNG)
+           3. NAVBAR THÔNG MINH
            ========================================================================== */
         .navbar {
-            background-color: var(--nav-bg);
-            border-bottom: 1px solid var(--border-color);
-            backdrop-filter: blur(12px);
-            transition: top 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55), background-color 0.4s;
+            background-color: var(--nav-bg); border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(12px); transition: top 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55), background-color 0.4s;
             position: fixed; width: 100%; top: 0; z-index: 1030;
         }
         .navbar-brand, .nav-link { color: var(--text-color) !important; font-weight: 600; }
+        
+        .navbar-brand i { transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); display: inline-block; }
+        .navbar-brand:hover i { transform: scale(1.2) rotate(-15deg); color: #3b82f6 !important; }
+
+        .nav-link { position: relative; padding-bottom: 5px; }
+        .nav-link::after {
+            content: ''; position: absolute; width: 0; height: 2px;
+            bottom: 0; left: 50%; background-color: #3b82f6;
+            transition: all 0.3s ease; transform: translateX(-50%);
+        }
+        .nav-link:hover::after { width: 80%; }
 
         /* ==========================================================================
            4. HERO SECTION (VIDEO NỀN)
            ========================================================================== */
-        .hero-section {
-            position: relative; height: 90vh; display: flex; align-items: center; justify-content: center; overflow: hidden;
-        }
-        .video-background {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
-        }
+        .hero-section { position: relative; height: 90vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .video-background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
         .video-background iframe {
             width: 100vw; height: 56.25vw; min-height: 100vh; min-width: 177.77vh;
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
         }
-        .hero-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 1;
-        }
+        .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 1; }
         .hero-content { position: relative; z-index: 2; color: white; }
 
         /* ==========================================================================
-           5. HIỆU ỨNG THƯƠNG HIỆU: KẸO DẺO & TRƯỢT NGANG MƯỢT MÀ KHÔNG VẤP
+           5. THƯƠNG HIỆU: CHẠY NGANG & NẢY KẸO DẺO
            ========================================================================== */
         .marquee-wrapper {
-            display: flex;
-            overflow: hidden;
-            border-top: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
-            background: var(--card-bg);
-            padding: 25px 0;
-            width: 100%;
+            display: flex; overflow: hidden; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);
+            background: var(--card-bg); padding: 25px 0; width: 100%;
         }
-        
-        .marquee-content {
-            display: flex;
-            flex-shrink: 0;
-            animation: marqueeScroll 25s linear infinite;
-        }
-
-        @keyframes marqueeScroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-100%); }
-        }
-
-        /* Keyframes kẹo dẻo (nhún và nảy lên) */
-        @keyframes jellyBounce {
-            0%   { transform: scale3d(1, 1, 1); }
-            30%  { transform: scale3d(1.25, 0.75, 1); } 
-            40%  { transform: scale3d(0.75, 1.25, 1); } 
-            50%  { transform: scale3d(1.15, 0.85, 1); }
-            65%  { transform: scale3d(0.95, 1.05, 1); }
-            75%  { transform: scale3d(1.05, 0.95, 1); }
-            100% { transform: scale3d(1, 1, 1) translateY(-10px); }
-        }
+        .marquee-content { display: flex; flex-shrink: 0; animation: marqueeScroll 25s linear infinite; }
+        @keyframes marqueeScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
         .brand-item {
+            display: flex; align-items: center; justify-content: center; margin: 0 45px;
+            font-size: 2rem; font-weight: 800; color: var(--text-color); cursor: pointer; opacity: 0.6;
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s, color 0.3s;
+            white-space: nowrap;
+        }
+        .brand-item:hover { opacity: 1; color: #3b82f6; transform: translateY(-12px) scale(1.15); }
+
+        /* ==========================================================================
+           6. CARD SẢN PHẨM (CHUẨN E-COMMERCE TỐI GIẢN)
+           ========================================================================== */
+        .product-card-clean {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            position: relative;
+            padding: 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+
+        .product-card-clean:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-color: #3b82f6;
+        }
+
+        /* Khung chứa ảnh để overflow hidden nếu cần */
+        .img-container {
+            position: relative;
+            height: 220px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 45px;
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--text-color);
-            cursor: pointer;
-            opacity: 0.6;
-            transition: opacity 0.3s;
-            white-space: nowrap;
+            margin-bottom: 20px;
+            z-index: 1;
         }
 
-        .brand-item:hover {
-            opacity: 1;
-            color: #3b82f6;
-            animation: jellyBounce 0.8s both;
+        /* Hình ảnh chỉ phóng to nhẹ bên trong khung khi hover */
+        .img-container img {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+            transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.15));
         }
 
-        /* ==========================================================================
-           6. HIỆU ỨNG SẢN PHẨM CUT-OUT ĐÀN HỒI (ELASTIC POP-OUT)
-           ========================================================================== */
-        .elastic-card {
-            background-color: transparent; border: none; position: relative; padding-top: 80px; cursor: pointer;
+        .product-card-clean:hover .img-container img {
+            transform: scale(1.1); /* Phóng to 10% */
         }
 
-        .elastic-bg {
-            background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px;
-            height: 100%; padding: 100px 20px 30px 20px; 
-            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); position: relative; z-index: 1;
-        }
-
-        /* Ảnh PNG thật */
-        .elastic-img {
-            width: 75%; position: absolute; top: -10px; left: 12.5%; z-index: 2;
-            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            filter: drop-shadow(0 15px 15px rgba(0,0,0,0.4));
-        }
-
-        .elastic-card:hover .elastic-bg {
-            transform: rotate(3deg) scale(1.02); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15); border-color: #3b82f6;
-        }
-
-        .elastic-card:hover .elastic-img {
-            transform: translateY(-50px) scale(1.15) rotate(-3deg); 
+        /* Tem (Badge) đỏ nổi bật giống ảnh tham khảo */
+        .pickup-badge {
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            background-color: #dc2626; /* Đỏ rực */
+            color: #ffffff;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%; /* Hình tròn đơn giản thanh lịch */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(220, 38, 38, 0.4);
+            z-index: 10;
+            transform: rotate(-15deg);
         }
 
         /* ==========================================================================
-           7. CÁC COMPONENT CHUẨN (CARD, HÌNH ẢNH, FOOTER)
+           7. CÁC THÀNH PHẦN KHÁC (PHỤ KIỆN, FAQ, TIN TỨC, FOOTER)
            ========================================================================== */
         .custom-card {
             background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px;
-            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            transition: box-shadow 0.4s ease; cursor: pointer;
         }
-        .custom-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); border-color: #3b82f6; }
+        .custom-card:hover { box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); border-color: #3b82f6; }
+        
+        /* Hiệu ứng hover cho Icon tối giản (Chỉ to lên và đổi màu, không xoay) */
+        .simple-hover-icon { transition: transform 0.3s ease, color 0.3s ease; }
+        .custom-card:hover .simple-hover-icon { transform: scale(1.15); color: #3b82f6 !important; }
+
         .showcase-img { border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); transition: transform 0.5s ease; width: 100%; }
         .showcase-img:hover { transform: scale(1.02); }
-        .blog-img { height: 200px; object-fit: cover; border-radius: 12px 12px 0 0; width: 100%; }
         
-        footer {
-            background-color: var(--card-bg); border-top: 1px solid var(--border-color); padding: 60px 0 20px 0;
-            position: relative; z-index: 10;
-        }
+        /* Kích thước ảnh bài viết Blog */
+        .blog-img { height: 220px; object-fit: cover; border-radius: 12px 12px 0 0; width: 100%; transition: transform 0.5s ease; }
+        .blog-img-wrapper { overflow: hidden; border-radius: 12px 12px 0 0; }
+        .custom-card:hover .blog-img { transform: scale(1.05); }
+
+        .accordion-item { background-color: var(--card-bg); border-color: var(--border-color); }
+        .accordion-button { background-color: var(--card-bg); color: var(--text-color); font-weight: bold; }
+        .accordion-button:not(.collapsed) { background-color: var(--faq-bg); color: #3b82f6; box-shadow: none; }
+        .accordion-body { color: var(--text-color); opacity: 0.9; }
+
+        footer { background-color: var(--card-bg); border-top: 1px solid var(--border-color); padding: 60px 0 20px 0; position: relative; z-index: 10; }
         .footer-text { color: var(--text-color); opacity: 0.8; text-decoration: none; transition: 0.3s; }
         .footer-text:hover { opacity: 1; color: #3b82f6; }
     </style>
@@ -244,7 +267,8 @@
 
     <section class="marquee-wrapper my-5">
         <div class="marquee-content">
-            <div class="brand-item"><i class="fas fa-record-vinyl me-2"></i> YAMAHA</div> <div class="brand-item"><i class="fas fa-guitar me-2"></i> FENDER</div>
+            <div class="brand-item"><i class="fas fa-record-vinyl me-2"></i> YAMAHA</div>
+            <div class="brand-item"><i class="fas fa-guitar me-2"></i> FENDER</div>
             <div class="brand-item"><i class="fas fa-keyboard me-2"></i> ROLAND</div>
             <div class="brand-item"><i class="fas fa-drum me-2"></i> PEARL</div>
             <div class="brand-item"><i class="fas fa-headphones me-2"></i> MARSHALL</div>
@@ -268,9 +292,7 @@
             <div class="col-lg-5 offset-lg-1" data-aos="fade-left" data-aos-duration="1000">
                 <h6 class="text-primary fw-bold text-uppercase tracking-wide mb-2">Đẳng cấp hoàng gia</h6>
                 <h2 class="display-5 fw-bold mb-4">Grand Piano Premium</h2>
-                <p class="fs-5 mb-4" style="opacity: 0.8;">
-                    Sự kết hợp hoàn hảo giữa kỹ tác thủ công truyền thống và công nghệ âm thanh tiên tiến.
-                </p>
+                <p class="fs-5 mb-4" style="opacity: 0.8;">Sự kết hợp hoàn hảo giữa kỹ tác thủ công truyền thống và công nghệ âm thanh tiên tiến.</p>
                 <ul class="list-unstyled mb-4">
                     <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Âm thanh cộng hưởng chuẩn Studio</li>
                     <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Thiết kế sang trọng, điểm nhấn phòng khách</li>
@@ -284,43 +306,50 @@
         <div class="text-center mb-5" data-aos="fade-up">
             <h6 class="text-primary fw-bold text-uppercase">Bán chạy nhất</h6>
             <h2 class="display-6 fw-bold">Sản Phẩm Đang Hot Tại TTB</h2>
-            <p>Di chuột vào sản phẩm để xem hiệu ứng 3D Cut-out đàn hồi cực mượt</p>
         </div>
         
         <div class="row g-5">
             <div class="col-12 col-md-4" data-aos="fade-up" data-aos-delay="100">
-                <div class="elastic-card">
-                    <img src="https://freepngimg.com/thumb/guitar/2-2-guitar-png-pic.png" alt="Guitar" class="elastic-img" style="top: -30px;">
-                    <div class="elastic-bg text-center d-flex flex-column">
-                        <span class="badge bg-danger position-absolute top-0 end-0 m-3 z-3">Cho Thuê</span>
-                        <h5 class="fw-bold mt-auto pt-4">Acoustic Yamaha F310</h5>
-                        <p class="small" style="opacity: 0.7;">Gỗ vân sam, âm mộc chuẩn</p>
+                <div class="product-card-clean">
+                    <div class="pickup-badge">Pickup!</div>
+                    <div class="img-container">
+                        <img src="https://freepngimg.com/thumb/guitar/2-2-guitar-png-pic.png" alt="Guitar">
+                    </div>
+                    <div class="text-center mt-auto">
+                        <h5 class="fw-bold">Acoustic Yamaha F310</h5>
+                        <p class="small text-muted mb-2">Gỗ vân sam, âm mộc chuẩn</p>
                         <p class="text-primary fw-bold fs-4 mb-3">3.500.000 ₫</p>
-                        <button class="btn btn-outline-primary rounded-pill w-100 mt-2">Thêm giỏ hàng</button>
+                        <button class="btn btn-outline-primary rounded-pill w-100"><i class="fas fa-shopping-cart me-2"></i>Thêm giỏ hàng</button>
                     </div>
                 </div>
             </div>
 
             <div class="col-12 col-md-4" data-aos="fade-up" data-aos-delay="200">
-                <div class="elastic-card">
-                    <img src="https://freepngimg.com/thumb/piano/3-2-piano-png-file.png" alt="Piano" class="elastic-img" style="transform: scale(1.1); top: 30px;">
-                    <div class="elastic-bg text-center d-flex flex-column">
-                        <h5 class="fw-bold mt-auto pt-4">Roland Midi Keyboard</h5>
-                        <p class="small" style="opacity: 0.7;">Phím gõ chân thực, siêu nhạy</p>
+                <div class="product-card-clean">
+                    <div class="pickup-badge bg-success">Mới!</div>
+                    <div class="img-container">
+                        <img src="https://freepngimg.com/thumb/piano/3-2-piano-png-file.png" alt="Piano">
+                    </div>
+                    <div class="text-center mt-auto">
+                        <h5 class="fw-bold">Roland Midi Keyboard</h5>
+                        <p class="small text-muted mb-2">Phím gõ chân thực, siêu nhạy</p>
                         <p class="text-primary fw-bold fs-4 mb-3">16.900.000 ₫</p>
-                        <button class="btn btn-outline-primary rounded-pill w-100 mt-2">Thêm giỏ hàng</button>
+                        <button class="btn btn-outline-primary rounded-pill w-100"><i class="fas fa-shopping-cart me-2"></i>Thêm giỏ hàng</button>
                     </div>
                 </div>
             </div>
 
             <div class="col-12 col-md-4" data-aos="fade-up" data-aos-delay="300">
-                <div class="elastic-card">
-                    <img src="https://freepngimg.com/thumb/drum/1-2-drum-png.png" alt="Drum" class="elastic-img" style="top: 20px;">
-                    <div class="elastic-bg text-center d-flex flex-column">
-                        <h5 class="fw-bold mt-auto pt-4">Trống Pearl Roadshow</h5>
-                        <p class="small" style="opacity: 0.7;">Bộ 5 trống tiêu chuẩn</p>
+                <div class="product-card-clean">
+                    <div class="pickup-badge bg-warning text-dark">Hot!</div>
+                    <div class="img-container">
+                        <img src="https://freepngimg.com/thumb/drum/1-2-drum-png.png" alt="Drum">
+                    </div>
+                    <div class="text-center mt-auto">
+                        <h5 class="fw-bold">Trống Pearl Roadshow</h5>
+                        <p class="small text-muted mb-2">Bộ 5 trống tiêu chuẩn</p>
                         <p class="text-primary fw-bold fs-4 mb-3">12.500.000 ₫</p>
-                        <button class="btn btn-outline-primary rounded-pill w-100 mt-2">Thêm giỏ hàng</button>
+                        <button class="btn btn-outline-primary rounded-pill w-100"><i class="fas fa-shopping-cart me-2"></i>Thêm giỏ hàng</button>
                     </div>
                 </div>
             </div>
@@ -334,21 +363,21 @@
         <div class="row g-4 text-center">
             <div class="col-md-4" data-aos="zoom-in" data-aos-delay="100">
                 <div class="custom-card p-4 h-100">
-                    <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+                    <i class="fas fa-shield-alt fa-3x text-primary mb-3 simple-hover-icon"></i>
                     <h5 class="fw-bold">Bảo hành 10 năm</h5>
                     <p class="mb-0" style="opacity: 0.8;">Cam kết hàng chính hãng, bảo hành trọn đời tại mọi chi nhánh.</p>
                 </div>
             </div>
             <div class="col-md-4" data-aos="zoom-in" data-aos-delay="200">
                 <div class="custom-card p-4 h-100">
-                    <i class="fas fa-shipping-fast fa-3x text-primary mb-3"></i>
+                    <i class="fas fa-shipping-fast fa-3x text-primary mb-3 simple-hover-icon"></i>
                     <h5 class="fw-bold">Giao hàng Hỏa tốc</h5>
                     <p class="mb-0" style="opacity: 0.8;">Miễn phí vận chuyển toàn quốc cho đơn hàng từ 2.000.000đ.</p>
                 </div>
             </div>
             <div class="col-md-4" data-aos="zoom-in" data-aos-delay="300">
                 <div class="custom-card p-4 h-100">
-                    <i class="fas fa-retweet fa-3x text-primary mb-3"></i>
+                    <i class="fas fa-retweet fa-3x text-primary mb-3 simple-hover-icon"></i>
                     <h5 class="fw-bold">Dịch vụ Cho thuê</h5>
                     <p class="mb-0" style="opacity: 0.8;">Thỏa mãn đam mê với chi phí tiết kiệm qua dịch vụ thuê nhạc cụ.</p>
                 </div>
@@ -363,26 +392,26 @@
         </div>
         <div class="row g-4">
             <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="100">
-                <div class="custom-card p-3 text-center">
-                    <i class="fas fa-headphones-alt fa-3x text-secondary mb-3"></i>
+                <div class="custom-card p-4 text-center">
+                    <i class="fas fa-headphones-alt fa-3x text-secondary mb-3 simple-hover-icon"></i>
                     <h6 class="fw-bold">Tai nghe kiểm âm</h6>
                 </div>
             </div>
             <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="200">
-                <div class="custom-card p-3 text-center">
-                    <i class="fas fa-microphone fa-3x text-secondary mb-3"></i>
+                <div class="custom-card p-4 text-center">
+                    <i class="fas fa-microphone fa-3x text-secondary mb-3 simple-hover-icon"></i>
                     <h6 class="fw-bold">Micro Thu Âm</h6>
                 </div>
             </div>
             <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="300">
-                <div class="custom-card p-3 text-center">
-                    <i class="fas fa-bolt fa-3x text-secondary mb-3"></i>
+                <div class="custom-card p-4 text-center">
+                    <i class="fas fa-bolt fa-3x text-secondary mb-3 simple-hover-icon"></i>
                     <h6 class="fw-bold">Amply Guitar</h6>
                 </div>
             </div>
             <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="400">
-                <div class="custom-card p-3 text-center">
-                    <i class="fas fa-sliders-h fa-3x text-secondary mb-3"></i>
+                <div class="custom-card p-4 text-center">
+                    <i class="fas fa-sliders-h fa-3x text-secondary mb-3 simple-hover-icon"></i>
                     <h6 class="fw-bold">Pedal & Phôi</h6>
                 </div>
             </div>
@@ -400,28 +429,86 @@
         <div class="row g-4">
             <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
                 <div class="custom-card h-100">
-                    <img src="https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?q=80&w=600&auto=format&fit=crop" class="blog-img" alt="Blog 1">
+                    <div class="blog-img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?q=80&w=600&auto=format&fit=crop" class="blog-img" alt="Blog 1">
+                    </div>
                     <div class="p-4">
                         <span class="badge bg-primary mb-2">Hướng dẫn</span>
                         <h5 class="fw-bold">Cách chọn Guitar cho người mới</h5>
+                        <p class="small mt-2" style="opacity: 0.8;">Các tiêu chí quan trọng để chọn đàn phù hợp với vóc dáng và phong cách.</p>
                     </div>
                 </div>
             </div>
             <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
                 <div class="custom-card h-100">
-                    <img src="https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?q=80&w=600&auto=format&fit=crop" class="blog-img" alt="Blog 2">
+                    <div class="blog-img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?q=80&w=600&auto=format&fit=crop" class="blog-img" alt="Blog 2">
+                    </div>
                     <div class="p-4">
-                        <span class="badge bg-primary mb-2">Review</span>
+                        <span class="badge bg-success mb-2">Review</span>
                         <h5 class="fw-bold">Đánh giá chi tiết Roland RP-30</h5>
+                        <p class="small mt-2" style="opacity: 0.8;">Liệu đây có phải là cây đàn Piano điện quốc dân trong tầm giá?</p>
                     </div>
                 </div>
             </div>
             <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
                 <div class="custom-card h-100">
-                    <img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=600&auto=format&fit=crop" class="blog-img" alt="Blog 3">
+                    <div class="blog-img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=600&auto=format&fit=crop" class="blog-img" alt="Blog 3">
+                    </div>
                     <div class="p-4">
-                        <span class="badge bg-primary mb-2">Sự kiện</span>
+                        <span class="badge bg-warning text-dark mb-2">Sự kiện</span>
                         <h5 class="fw-bold">Sự kiện Workshop: Kỹ thuật Slap</h5>
+                        <p class="small mt-2" style="opacity: 0.8;">Đăng ký tham gia ngay buổi workshop cùng tay bass hàng đầu.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container mt-5 pt-5">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h6 class="text-primary fw-bold text-uppercase">Hỗ trợ khách hàng</h6>
+            <h2 class="display-6 fw-bold">Câu Hỏi Thường Gặp (FAQ)</h2>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8" data-aos="fade-up">
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item mb-3 rounded border">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed rounded" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                <i class="fas fa-question-circle text-primary me-2"></i> Quy trình thuê nhạc cụ tại TTB diễn ra thế nào?
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Chọn nhạc cụ dán nhãn <strong>"Cho Thuê"</strong>, chọn ngày trên lịch. Hệ thống tự tính tiền thuê và tiền cọc. Nhạc cụ được giao tận nhà.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item mb-3 rounded border">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed rounded" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                <i class="fas fa-tools text-primary me-2"></i> Chính sách bảo hành của TTB kéo dài bao lâu?
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                TTB bảo hành chính hãng từ <strong>1 đến 10 năm</strong>. Trong 30 ngày đầu, hỗ trợ lỗi 1 đổi 1 tận nhà miễn phí.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item rounded border">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed rounded" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                <i class="fas fa-credit-card text-primary me-2"></i> Shop có hỗ trợ mua trả góp không?
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Có! TTB hỗ trợ trả góp 0% lãi suất qua thẻ tín dụng của hơn 25 ngân hàng.
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -471,24 +558,18 @@
         </div>
     </section>
 
-    <footer class="mt-5">
+    <footer class="mt-5 pt-5">
         <div class="container">
             <div class="row gy-4">
                 <div class="col-lg-4">
                     <h4 class="fw-bold mb-3"><i class="fas fa-music text-primary me-2"></i>TTB MUSIC</h4>
                     <p class="footer-text">Hệ thống mua bán và cho thuê nhạc cụ hàng đầu, giúp bạn tự tin tỏa sáng và viết nên giai điệu của riêng mình.</p>
-                    <div class="mt-3">
-                        <a href="#" class="footer-text me-3 fs-5"><i class="fab fa-facebook"></i></a>
-                        <a href="#" class="footer-text me-3 fs-5"><i class="fab fa-youtube"></i></a>
-                        <a href="#" class="footer-text fs-5"><i class="fab fa-instagram"></i></a>
-                    </div>
                 </div>
                 <div class="col-lg-2 offset-lg-1 col-md-4">
                     <h5 class="fw-bold mb-3">Danh mục</h5>
                     <ul class="list-unstyled">
                         <li class="mb-2"><a href="#" class="footer-text">Guitar & Bass</a></li>
                         <li class="mb-2"><a href="#" class="footer-text">Piano & Organ</a></li>
-                        <li class="mb-2"><a href="#" class="footer-text">Trống & Bộ gõ</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-2 col-md-4">
@@ -496,7 +577,6 @@
                     <ul class="list-unstyled">
                         <li class="mb-2"><a href="#" class="footer-text text-warning fw-bold">Cho Thuê Nhạc Cụ</a></li>
                         <li class="mb-2"><a href="#" class="footer-text">Bảo hành & Sửa chữa</a></li>
-                        <li class="mb-2"><a href="#" class="footer-text">Hướng dẫn trả góp</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-3 col-md-4">
@@ -504,7 +584,6 @@
                     <ul class="list-unstyled footer-text">
                         <li class="mb-2"><i class="fas fa-map-marker-alt me-2 text-primary"></i> Quận 1, TP.HCM</li>
                         <li class="mb-2"><i class="fas fa-phone-alt me-2 text-primary"></i> 1900 1000</li>
-                        <li class="mb-2"><i class="fas fa-envelope me-2 text-primary"></i> contact@ttbmusic.vn</li>
                     </ul>
                 </div>
             </div>
@@ -518,38 +597,27 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // 1. Khởi tạo thư viện cuộn AOS
         AOS.init({ once: true, offset: 100 });
 
-        // =====================================================================
-        // SCRIPT 1: SMART NAVBAR (Ẩn hiện khi cuộn dạng cao su)
-        // =====================================================================
+        // ================= JS: SMART NAVBAR =================
         let prevScrollpos = window.pageYOffset;
         const navbar = document.getElementById("smartNavbar");
-
         window.onscroll = function() {
             let currentScrollPos = window.pageYOffset;
             if (currentScrollPos <= 50) {
-                navbar.style.top = "0";
-                navbar.style.boxShadow = "none";
+                navbar.style.top = "0"; navbar.style.boxShadow = "none";
             } else {
                 navbar.style.boxShadow = "0 4px 15px rgba(0,0,0,0.1)";
-                if (prevScrollpos > currentScrollPos) {
-                    navbar.style.top = "0"; // Cuộn lên -> Hiện ra
-                } else {
-                    navbar.style.top = "-100px"; // Cuộn xuống -> Giấu đi
-                }
+                if (prevScrollpos > currentScrollPos) { navbar.style.top = "0"; } 
+                else { navbar.style.top = "-100px"; }
             }
             prevScrollpos = currentScrollPos;
         }
 
-        // =====================================================================
-        // SCRIPT 2: DARK/LIGHT THEME CƠ BẢN
-        // =====================================================================
+        // ================= JS: THEME TOGGLE =================
         const themeToggleBtn = document.getElementById('theme-toggle');
         const htmlElement = document.documentElement;
         const icon = themeToggleBtn.querySelector('i');
-
         const savedTheme = localStorage.getItem('theme') || 'dark';
         htmlElement.setAttribute('data-theme', savedTheme);
         icon.className = savedTheme === 'dark' ? 'fas fa-sun text-warning' : 'fas fa-moon text-dark';
@@ -561,39 +629,82 @@
             icon.className = newTheme === 'dark' ? 'fas fa-sun text-warning' : 'fas fa-moon text-dark';
         });
 
-        // =====================================================================
-        // SCRIPT 3: TẠO HẠT MƯA NỐT NHẠC VÀ BÁM THEO CHUỘT TOÀN TRANG
-        // =====================================================================
+        // ================= JS: PARALLAX HẠT NÉ CHUỘT =================
         const parallaxContainer = document.getElementById('global-parallax');
-        const icons = ['fa-music', 'fa-guitar', 'fa-headphones', 'fa-drum', 'fa-play'];
+        const fontIcons = ['fa-music', 'fa-guitar', 'fa-headphones', 'fa-drum', 'fa-play'];
         const notes = []; 
+        let mouseX = -1000, mouseY = -1000; // Khởi tạo chuột ở ngoài màn hình
         
-        // Sinh ra 20 hạt ngẫu nhiên
-        for(let i = 0; i < 20; i++) {
-            let note = document.createElement('i');
-            let randomIcon = icons[Math.floor(Math.random() * icons.length)];
-            note.className = `fas ${randomIcon} floating-note`;
+        // Sinh ra 50 hạt nền
+        for(let i = 0; i < 50; i++) {
+            // Tạo div bọc ngoài để CSS lo việc lơ lửng chậm (organicFloat)
+            let wrapper = document.createElement('div');
+            wrapper.className = 'note-wrapper';
+            wrapper.style.left = Math.random() * 100 + 'vw';
+            wrapper.style.top = Math.random() * 100 + 'vh';
+            wrapper.style.animationDelay = (Math.random() * 10) + 's';
+
+            // Tạo icon bên trong để JS lo việc né chuột
+            let iconElem = document.createElement('i');
+            let randomIcon = fontIcons[Math.floor(Math.random() * fontIcons.length)];
+            iconElem.className = `fas ${randomIcon} note-icon`;
+            iconElem.style.fontSize = (Math.random() * 1.5 + 0.5) + 'rem';
             
-            note.style.left = Math.random() * 100 + 'vw';
-            note.style.top = Math.random() * 100 + 'vh';
-            note.style.fontSize = (Math.random() * 2 + 1) + 'rem';
-            note.dataset.speed = (Math.random() * 4 - 2).toFixed(2); 
+            wrapper.appendChild(iconElem);
+            parallaxContainer.appendChild(wrapper);
             
-            parallaxContainer.appendChild(note);
-            notes.push(note);
+            // Lưu object để JS tính toán
+            notes.push({
+                wrapper: wrapper,
+                icon: iconElem,
+                currentX: 0,
+                currentY: 0
+            });
         }
 
+        // Cập nhật tọa độ chuột liên tục
         window.addEventListener('mousemove', (e) => {
-            const x = (e.clientX / window.innerWidth) - 0.5;
-            const y = (e.clientY / window.innerHeight) - 0.5;
-
-            requestAnimationFrame(() => {
-                notes.forEach(note => {
-                    const speed = parseFloat(note.dataset.speed);
-                    note.style.transform = `translate(${x * speed * 50}px, ${y * speed * 50}px)`;
-                });
-            });
+            mouseX = e.clientX;
+            mouseY = e.clientY;
         });
+
+        // Vòng lặp Animation kiểm tra khoảng cách từ chuột đến từng hạt
+        function animateRepel() {
+            notes.forEach(note => {
+                // Lấy tọa độ trung tâm của hạt trên màn hình
+                let rect = note.wrapper.getBoundingClientRect();
+                let iconCenterX = rect.left + rect.width / 2;
+                let iconCenterY = rect.top + rect.height / 2;
+                
+                // Tính khoảng cách giữa chuột và hạt
+                let dx = iconCenterX - mouseX;
+                let dy = iconCenterY - mouseY;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                
+                const repelRadius = 150; // Bán kính tác động của chuột (150px)
+
+                if (distance < repelRadius) {
+                    // Nếu chuột lại gần -> Tính lực đẩy hạt ra xa
+                    let force = (repelRadius - distance) / repelRadius;
+                    let angle = Math.atan2(dy, dx);
+                    // Hạt bị đẩy tối đa 60px
+                    let pushX = Math.cos(angle) * force * 60;
+                    let pushY = Math.sin(angle) * force * 60;
+                    
+                    // Gán tạm thời để tắt transition khi đang bị đẩy nhanh
+                    note.icon.style.transition = 'none';
+                    note.icon.style.transform = `translate(${pushX}px, ${pushY}px)`;
+                } else {
+                    // Nếu xa chuột -> Bật lại transition để hạt từ từ trôi về vị trí (0,0)
+                    note.icon.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)';
+                    note.icon.style.transform = `translate(0px, 0px)`;
+                }
+            });
+            requestAnimationFrame(animateRepel);
+        }
+        
+        // Khởi động vòng lặp
+        animateRepel();
     </script>
 </body>
 </html>

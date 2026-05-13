@@ -401,10 +401,135 @@
             opacity: 1;
             color: #3b82f6;
         }
+
+        /* ==========================================================================
+           8. Preloader
+           ========================================================================== */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a192f;
+            /* Màu xanh dương tối đồng bộ */
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+
+        .loader-content {
+            text-align: center;
+        }
+
+        /* Hiệu ứng sóng âm */
+        .music-waves {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 40px;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+
+        .music-waves span {
+            width: 6px;
+            height: 10px;
+            background: #64ffda;
+            /* Màu xanh ngọc thương hiệu */
+            animation: wave-animation 1.2s infinite ease-in-out;
+        }
+
+        .music-waves span:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .music-waves span:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .music-waves span:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+
+        .music-waves span:nth-child(5) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes wave-animation {
+
+            0%,
+            100% {
+                height: 10px;
+            }
+
+            50% {
+                height: 40px;
+            }
+        }
+
+        .loader-text {
+            color: white;
+            font-weight: 800;
+            letter-spacing: 5px;
+            margin-bottom: 5px;
+            animation: pulse 2s infinite;
+        }
+
+        .loader-subtext {
+            color: #8892b0;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* Class ẩn preloader */
+        .preloader-hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
     </style>
 </head>
 
 <body>
+
+    <div id="preloader">
+        <div class="loader-content">
+            <div class="music-waves">
+                <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <h2 class="loader-text">TTB MUSIC</h2>
+            <p class="loader-subtext">Đang tinh chỉnh giai điệu...</p>
+        </div>
+    </div>
+
+    <style>
+
+    </style>
+
+    <script>
+        // JS xử lý tắt màn hình Loading sau khi trang web tải xong
+        window.addEventListener('load', function() {
+            const preloader = document.getElementById('preloader');
+            // Tạo độ trễ nhẹ 1s để khách kịp cảm nhận hiệu ứng
+            setTimeout(() => {
+                preloader.classList.add('preloader-hidden');
+            }, 1000);
+        });
+    </script>
 
     <div class="watermark">TTB MUSIC</div>
 
@@ -425,13 +550,19 @@
                     <li class="nav-item"><a class="nav-link text-warning fw-bold" href="#">Cho Thuê Nhạc Cụ</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Blog</a></li>
                 </ul>
+
+
                 <div class="d-flex align-items-center mt-3 mt-lg-0">
                     <button id="theme-toggle" class="btn btn-outline-secondary rounded-circle me-3">
                         <i class="fas fa-moon"></i>
                     </button>
                     <a href="#" class="btn btn-outline-primary me-2 rounded-pill px-3"><i class="fas fa-shopping-cart"></i> (0)</a>
-                    <a href="#" class="btn btn-primary rounded-pill px-4"><i class="fas fa-user"></i> Đăng nhập</a>
+
+                    <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#loginModal">
+                        <i class="fas fa-user"></i> Đăng nhập
+                    </button>
                 </div>
+
             </div>
         </div>
     </nav>
@@ -889,7 +1020,88 @@
 
         animateRepel();
     </script>
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background-color: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color);">
 
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold fs-4" id="loginModalLabel">Đăng Nhập</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: var(--text-color) == #f8fafc ? invert(1) : none;"></button>
+                </div>
+
+                <div class="modal-body p-4">
+                    <p class="text-muted mb-4">Chào mừng bạn quay trở lại với TTB Music!</p>
+
+                    <form action="index.php?controller=auth&action=login" method="POST">
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-semibold">Email</label>
+                            <input type="email" class="form-control form-control-lg bg-transparent text-light border-secondary" id="email" name="email" required placeholder="Nhập email...">
+                        </div>
+                        <div class="mb-4">
+                            <label for="password" class="form-label fw-semibold">Mật khẩu</label>
+                            <input type="password" class="form-control form-control-lg bg-transparent text-light border-secondary" id="password" name="password" required placeholder="Nhập mật khẩu...">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold rounded-pill">Đăng Nhập</button>
+                    </form>
+
+                    <div class="position-relative my-4 text-center">
+                        <hr class="border-secondary opacity-25">
+                        <span class="position-absolute top-50 start-50 translate-middle px-3 text-muted" style="background-color: var(--card-bg);">Hoặc tiếp tục với</span>
+                    </div>
+
+                    <div class="d-flex gap-3">
+                        <button class="btn btn-outline-danger w-50 rounded-pill"><i class="fab fa-google me-2"></i> Google</button>
+                        <button class="btn btn-outline-primary w-50 rounded-pill"><i class="fab fa-facebook-f me-2"></i> Facebook</button>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <p class="mb-2">Chưa có tài khoản? <a href="index.php?controller=auth&action=register" class="text-primary text-decoration-none fw-bold">Đăng ký ngay</a></p>
+                        <a href="index.php?controller=auth&action=forgot" class="text-muted text-decoration-none small">Quên mật khẩu?</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    ```
+
+    ### 3. Nâng cấp Router trong `public/index.php`
+    Để các đường link như `index.php?controller=auth&action=register` thực sự hoạt động, chúng ta cần biến file `index.php` thành một bộ định tuyến (Router) thực thụ. Bạn mở file `public/index.php` và thay bằng đoạn code sau:
+
+    ```php
+    <?php
+    // Đường dẫn file: public/index.php
+
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+
+    session_start();
+    define('ROOT_PATH', dirname(__DIR__));
+
+    // Lấy tên Controller và Action từ URL (Mặc định là Home và index)
+    $controllerName = isset($_GET['controller']) ? ucfirst($_GET['controller']) . 'Controller' : 'HomeController';
+    $actionName = isset($_GET['action']) ? $_GET['action'] : 'index';
+
+    // Đường dẫn tới file Controller
+    $controllerFile = ROOT_PATH . '/app/Controllers/' . $controllerName . '.php';
+
+    // Kiểm tra xem file Controller có tồn tại không
+    if (file_exists($controllerFile)) {
+        require_once $controllerFile;
+
+        // Khởi tạo Controller
+        $controller = new $controllerName();
+
+        // Kiểm tra xem hàm (action) có tồn tại trong Controller không
+        if (method_exists($controller, $actionName)) {
+            $controller->$actionName();
+        } else {
+            die("Lỗi 404: Không tìm thấy phương thức {$actionName} trong {$controllerName}!");
+        }
+    } else {
+        die("Lỗi 404: Không tìm thấy trang (Controller {$controllerName} không tồn tại)!");
+    }
+    ?>
 </body>
 
 </html>

@@ -2,35 +2,33 @@
 /**
  * =========================================================================
  * TÊN FILE: app/Views/partials/chat_and_scroll.php
- * * MÔ TẢ: 
- * File này đóng vai trò là một Component (Thành phần giao diện độc lập). 
+ * * MÔ TẢ CHI TIẾT VÀ CÁCH SỬ DỤNG:
+ * File này đóng vai trò là một Component (Thành phần giao diện độc lập).
  * Nó chứa mã HTML, CSS và JavaScript cho 2 tính năng:
  * 1. Nút "Lên đầu trang" (Scroll-to-top)
  * 2. Khung Chatbot Hỗ trợ trực tiếp (Live Chat)
- *
- * CÁCH SỬ DỤNG TRONG MÔ HÌNH MVC:
+ * * CÁCH NHÚNG VÀO CÁC TRANG KHÁC (THEO CHUẨN MVC):
  * - Thay vì lặp lại code, ở bất kỳ file giao diện nào (home.php, register.php...),
  * bạn chỉ cần gọi file này ra bằng lệnh include của PHP đặt ngay trên thẻ đóng </body>.
- * - Ví dụ: <?php include __DIR__ . '/partials/chat_and_scroll.php'; ?>
- * * CÁCH HOẠT ĐỘNG:
- * - UI (CSS): Áp dụng chuẩn Frosted Glass (Kính mờ). Nền trong suốt tự động lấy 
- * màu từ các biến của Theme (--card-bg, --text-color) nên sẽ đồng bộ hoàn hảo 
- * giữa chế độ Sáng/Tối.
- * - Logic (JS): Bắt sự kiện 'scroll' (cuộn trang) để ẩn/hiện nút mũi tên. Bắt 
- * sự kiện 'click' để trượt mượt mà lên top hoặc mở/đóng popup Chatbot.
+ * - Cú pháp: <?php include __DIR__ . '/partials/chat_and_scroll.php'; ?>
+ * * CÁCH HOẠT ĐỘNG CỦA LƯỚI GIAO DIỆN (UI/UX):
+ * - Khung Chatbot được thiết lập tọa độ (right: 100px) để luôn mở ra bên trái 
+ * của trục nút bấm, tránh tình trạng đè giao diện.
+ * - Thứ tự HTML được sắp xếp: Nút Scroll ở trên, nút Chat ở dưới. Giúp nút Chat 
+ * luôn neo cố định ở góc màn hình dù nút Scroll có ẩn đi hay hiện ra.
  * =========================================================================
  */
 ?>
 
 <style>
-    /* Nút bấm trôi nổi (Góc dưới bên phải) */
+    /* Trục chứa 2 nút bấm trôi nổi (Góc dưới bên phải) */
     .floating-widget-container {
         position: fixed;
         bottom: 30px;
         right: 30px;
         display: flex;
-        flex-direction: column;
-        gap: 15px;
+        flex-direction: column; /* Xếp dọc các nút */
+        gap: 15px; /* Khoảng cách giữa 2 nút */
         z-index: 1050; /* Đảm bảo luôn nổi trên cùng */
     }
 
@@ -49,7 +47,7 @@
         justify-content: center;
         cursor: pointer;
         box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); /* Hiệu ứng kẹo dẻo nhẹ */
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     [data-theme="dark"] .float-btn { box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
@@ -61,7 +59,7 @@
         border-color: transparent;
     }
 
-    /* Ẩn nút Scroll To Top mặc định */
+    /* Trạng thái ẩn/hiện của nút Scroll To Top */
     #scrollToTopBtn {
         opacity: 0;
         visibility: hidden;
@@ -73,11 +71,11 @@
         transform: translateY(0);
     }
 
-    /* Cửa sổ Chatbot */
+    /* ================= CỬA SỔ CHATBOT ================= */
     .chat-window {
         position: fixed;
-        bottom: 90px; /* Nằm ngay trên nút bấm */
-        right: 30px;
+        bottom: 30px; /* Đặt cùng độ cao với trục nút bấm */
+        right: 100px; /* Đẩy sang trái 100px để không đè lên nút bấm */
         width: 350px;
         height: 450px;
         border-radius: 1.2rem;
@@ -91,7 +89,7 @@
         overflow: hidden;
         z-index: 1049;
         
-        /* Hiệu ứng trượt lên mượt mà */
+        /* Hiệu ứng trượt lên mượt mà từ góc phải dưới */
         opacity: 0;
         visibility: hidden;
         transform: translateY(50px) scale(0.9);
@@ -118,7 +116,7 @@
         font-weight: bold;
     }
 
-    /* Khung nội dung tin nhắn */
+    /* Khung chứa nội dung cuộc hội thoại */
     .chat-body {
         flex: 1;
         padding: 20px;
@@ -149,7 +147,7 @@
         border-bottom-right-radius: 0.2rem;
     }
 
-    /* Khung nhập liệu */
+    /* Khu vực nhập liệu tin nhắn */
     .chat-footer {
         padding: 15px;
         border-top: 1px solid var(--border-color);
@@ -167,6 +165,7 @@
         transition: 0.3s;
     }
     .chat-input:focus { border-color: #0072ff; }
+    
     .chat-send-btn {
         background: #0072ff;
         color: white;
@@ -200,18 +199,19 @@
 </div>
 
 <div class="floating-widget-container">
-    <button id="openChatBtn" class="float-btn" title="Hỗ trợ trực tuyến">
-        <i class="fas fa-comment-dots"></i>
-    </button>
-    
     <button id="scrollToTopBtn" class="float-btn" title="Lên đầu trang">
         <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <button id="openChatBtn" class="float-btn" title="Hỗ trợ trực tuyến">
+        <i class="fas fa-comment-dots"></i>
     </button>
 </div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // --- LOGIC SCROLL TO TOP ---
+        
+        // --- LOGIC: LÊN ĐẦU TRANG ---
         const scrollBtn = document.getElementById("scrollToTopBtn");
         
         // Hiện nút khi cuộn xuống 300px
@@ -223,15 +223,13 @@
             }
         });
 
-        // Trượt mượt mà lên đầu trang khi click
+        // Click để cuộn mượt mà lên top = 0
         scrollBtn.addEventListener("click", function() {
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
-            });
+            window.scrollTo({ top: 0, behavior: "smooth" });
         });
 
-        // --- LOGIC CHATBOT ---
+
+        // --- LOGIC: CHATBOT TRỰC TUYẾN ---
         const chatWindow = document.getElementById("liveChatWindow");
         const openChatBtn = document.getElementById("openChatBtn");
         const closeChatBtn = document.getElementById("closeChatBtn");
@@ -239,28 +237,27 @@
         const sendChatBtn = document.getElementById("sendChatBtn");
         const chatBody = document.getElementById("chatBody");
 
-        // Mở/Đóng cửa sổ Chat
+        // Bật/tắt class 'show' để CSS chạy hiệu ứng trượt lên/xuống
         openChatBtn.addEventListener("click", () => {
             chatWindow.classList.toggle("show");
-            chatInput.focus();
+            if (chatWindow.classList.contains("show")) chatInput.focus();
         });
         closeChatBtn.addEventListener("click", () => chatWindow.classList.remove("show"));
 
-        // Tính năng gửi tin nhắn ảo (tạo UI tin nhắn)
+        // Hàm xử lý tạo bong bóng tin nhắn
         function sendMessage() {
             const text = chatInput.value.trim();
             if (text !== "") {
-                // Tạo bong bóng tin nhắn của User
+                // 1. Tạo tin nhắn của người dùng
                 const userMsg = document.createElement("div");
                 userMsg.className = "chat-bubble chat-user";
                 userMsg.innerText = text;
                 chatBody.appendChild(userMsg);
                 
-                // Xóa ô nhập và cuộn xuống cuối
                 chatInput.value = "";
-                chatBody.scrollTop = chatBody.scrollHeight;
+                chatBody.scrollTop = chatBody.scrollHeight; // Tự động cuộn xuống cuối
 
-                // Giả lập bot trả lời sau 1 giây
+                // 2. Giả lập Bot phản hồi sau 1 giây
                 setTimeout(() => {
                     const botMsg = document.createElement("div");
                     botMsg.className = "chat-bubble chat-bot";
@@ -271,7 +268,7 @@
             }
         }
 
-        // Bắt sự kiện click nút gửi hoặc nhấn Enter
+        // Kích hoạt gửi tin nhắn khi bấm nút hoặc ấn Enter
         sendChatBtn.addEventListener("click", sendMessage);
         chatInput.addEventListener("keypress", function(e) {
             if (e.key === "Enter") {

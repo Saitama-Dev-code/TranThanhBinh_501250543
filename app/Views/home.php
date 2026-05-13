@@ -505,40 +505,140 @@
         /* ==========================================================================
            9. Modal đăng nhập
            ========================================================================== */
-        /* Hiệu ứng kính mờ và viền nổi bật */
-        .glass-modal {
-            background-color: var(--card-bg);
-            border: 1px solid rgba(59, 130, 246, 0.4);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        /* 1. Viền chuyển động mượt mà (Animated Gradient Border) */
+        .animated-border-modal {
+            position: relative;
+            background: transparent;
+            border: none;
+            border-radius: 1.2rem;
+            z-index: 1;
         }
 
-        [data-theme="dark"] .glass-modal {
-            background: rgba(30, 41, 59, 0.95);
-            backdrop-filter: blur(15px);
+        .animated-border-modal::before {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            /* Độ mỏng của viền */
+            border-radius: 1.25rem;
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6, #ec4899, #3b82f6);
+            background-size: 300% 300%;
+            animation: gradientBorderMove 6s linear infinite;
+            z-index: -2;
         }
 
-        /* Khắc phục lỗi nút Close bị đen trong chế độ Dark Mode */
+        @keyframes gradientBorderMove {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* 2. Nền kính mờ & Hiệu ứng ánh sáng bên trong */
+        .modal-inner-glass {
+            background: var(--card-bg);
+            border-radius: 1.2rem;
+            position: relative;
+            overflow: hidden;
+            z-index: -1;
+            height: 100%;
+            width: 100%;
+        }
+
+        [data-theme="dark"] .modal-inner-glass {
+            background: rgba(15, 23, 42, 0.85);
+            /* Nền tối mờ */
+            backdrop-filter: blur(20px);
+        }
+
+        /* Hiệu ứng ánh sáng xoay chậm bên trong nền */
+        .modal-inner-glass::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.15), transparent 60%);
+            animation: slowSpinGlow 15s linear infinite;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        @keyframes slowSpinGlow {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Khắc phục lỗi nút Close trong Dark Mode */
         [data-theme="dark"] .btn-close {
             filter: invert(1) grayscale(100%) brightness(200%);
         }
 
-        /* Nâng cấp form input với hiệu ứng Floating */
-        .form-floating .form-control {
-            background-color: transparent;
+        /* 3. Input Fields phong cách Minimalist */
+        .modern-input {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid var(--border-color);
             color: var(--text-color) !important;
-            border-color: var(--border-color);
+            border-radius: 0.75rem;
             transition: all 0.3s ease;
         }
 
-        .form-floating .form-control:focus {
-            background-color: transparent;
+        .modern-input:focus {
+            background: rgba(255, 255, 255, 0.1) !important;
             border-color: #3b82f6;
-            box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
         }
 
         .form-floating label {
             color: var(--text-color);
-            opacity: 0.7;
+            opacity: 0.6;
+        }
+
+        /* Nút đăng nhập phát sáng */
+        .btn-glow {
+            background: linear-gradient(45deg, #3b82f6, #2563eb);
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-glow:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.5);
+        }
+
+        /* Nút MXH hiện đại */
+        .social-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            transition: all 0.3s;
+        }
+
+        .social-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .social-btn.google:hover {
+            color: #ea4335;
+            border-color: #ea4335;
+        }
+
+        .social-btn.facebook:hover {
+            color: #1877f2;
+            border-color: #1877f2;
         }
     </style>
 </head>
@@ -1061,67 +1161,71 @@
     </script>
     <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content glass-modal rounded-4">
+            <div class="modal-content animated-border-modal p-0">
 
-                <div class="modal-header border-0 pb-0 pt-4 px-4">
-                    <h4 class="modal-title fw-bold" id="loginModalLabel" style="color: var(--text-color);">
-                        <i class="fas fa-user-circle text-primary me-2"></i>Đăng Nhập
-                    </h4>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-inner-glass p-4">
+
+                    <div class="modal-header border-0 pb-2 px-0">
+                        <div>
+                            <h3 class="modal-title fw-bolder mb-1" id="loginModalLabel" style="color: var(--text-color);">Đăng Nhập</h3>
+                            <p class="small mb-0" style="color: var(--text-color); opacity: 0.7;">Viết tiếp giai điệu của bạn tại TTB Music.</p>
+                        </div>
+                        <button type="button" class="btn-close mb-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body px-0 pb-0 pt-3">
+                        <form action="index.php?controller=auth&action=login" method="POST">
+
+                            <div class="form-floating mb-3">
+                                <input type="email" class="form-control modern-input" id="floatingEmail" name="email" placeholder="name@example.com" required>
+                                <label for="floatingEmail"><i class="fas fa-envelope me-2"></i>Email của bạn</label>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input type="password" class="form-control modern-input" id="floatingPassword" name="password" placeholder="Password" required>
+                                <label for="floatingPassword"><i class="fas fa-lock me-2"></i>Mật khẩu</label>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="rememberMe">
+                                    <label class="form-check-label small" for="rememberMe" style="color: var(--text-color); opacity: 0.8;">Nhớ tài khoản</label>
+                                </div>
+                                <a href="index.php?controller=auth&action=forgot" class="text-primary text-decoration-none small fw-bold">Quên mật khẩu?</a>
+                            </div>
+
+                            <button type="submit" class="btn btn-glow btn-lg w-100 fw-bold rounded-pill text-white py-3">
+                                Bắt Đầu <i class="fas fa-arrow-right ms-2"></i>
+                            </button>
+                        </form>
+
+                        <div class="position-relative my-4 text-center">
+                            <hr style="border-color: var(--border-color); opacity: 0.5;">
+                            <span class="position-absolute top-50 start-50 translate-middle px-3 small fw-semibold" style="background-color: transparent; color: var(--text-color); opacity: 0.6;">
+                                Hoặc tiếp tục với
+                            </span>
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <button class="btn social-btn google w-50 rounded-pill py-2 fw-semibold">
+                                <i class="fab fa-google me-2"></i> Google
+                            </button>
+                            <button class="btn social-btn facebook w-50 rounded-pill py-2 fw-semibold">
+                                <i class="fab fa-facebook-f me-2"></i> Facebook
+                            </button>
+                        </div>
+
+                        <div class="mt-4 pt-3 text-center">
+                            <p class="mb-0 small" style="color: var(--text-color);">
+                                Chưa có tài khoản? <a href="index.php?controller=auth&action=register" class="text-primary text-decoration-none fw-bolder fs-6">Tạo tài khoản</a>
+                            </p>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="modal-body p-4">
-                    <p class="mb-4" style="color: var(--text-color); opacity: 0.8;">
-                        Chào mừng bạn quay trở lại với không gian âm nhạc của TTB!
-                    </p>
-
-                    <form action="index.php?controller=auth&action=login" method="POST">
-                        <div class="form-floating mb-3">
-                            <input type="email" class="form-control" id="floatingEmail" name="email" placeholder="name@example.com" required>
-                            <label for="floatingEmail"><i class="fas fa-envelope me-2"></i>Email của bạn</label>
-                        </div>
-
-                        <div class="form-floating mb-4">
-                            <input type="password" class="form-control" id="floatingPassword" name="password" placeholder="Password" required>
-                            <label for="floatingPassword"><i class="fas fa-lock me-2"></i>Mật khẩu</label>
-                        </div>
-
-                        <div class="d-flex justify-content-end mb-4">
-                            <a href="index.php?controller=auth&action=forgot" class="text-primary text-decoration-none small fw-semibold">Quên mật khẩu?</a>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold rounded-pill shadow-sm">
-                            ĐĂNG NHẬP
-                        </button>
-                    </form>
-
-                    <div class="position-relative my-4 text-center">
-                        <hr style="border-color: var(--border-color);">
-                        <span class="position-absolute top-50 start-50 translate-middle px-3 small" style="background-color: var(--card-bg); color: var(--text-color); opacity: 0.7;">
-                            Hoặc tiếp tục với
-                        </span>
-                    </div>
-
-                    <div class="d-flex gap-3">
-                        <button class="btn btn-outline-danger w-50 rounded-pill fw-semibold">
-                            <i class="fab fa-google me-2"></i> Google
-                        </button>
-                        <button class="btn btn-outline-primary w-50 rounded-pill fw-semibold">
-                            <i class="fab fa-facebook-f me-2"></i> Facebook
-                        </button>
-                    </div>
-
-                    <div class="mt-4 pt-2 text-center border-top" style="border-color: var(--border-color) !important;">
-                        <p class="mb-0 mt-3" style="color: var(--text-color);">
-                            Chưa có tài khoản? <a href="index.php?controller=auth&action=register" class="text-primary text-decoration-none fw-bold">Đăng ký ngay</a>
-                        </p>
-                    </div>
-                </div>
-
             </div>
         </div>
     </div>
-    
+
     ### 3. Nâng cấp Router trong `public/index.php`
     Để các đường link như `index.php?controller=auth&action=register` thực sự hoạt động, chúng ta cần biến file `index.php` thành một bộ định tuyến (Router) thực thụ. Bạn mở file `public/index.php` và thay bằng đoạn code sau:
 

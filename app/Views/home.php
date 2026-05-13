@@ -506,6 +506,41 @@
            9. Modal đăng nhập
            ========================================================================== */
         /* ================= MODAL ĐĂNG NHẬP (FROSTED WATERMARK) ================= */
+
+        /* ================= HIỆU ỨNG VIÊN CHUYỂN ĐỘNG (ANIMATED BORDER) ================= */
+        .animated-border-wrapper {
+            position: relative;
+            border-radius: 1.6rem;
+            z-index: 1;
+            padding: 2px;
+            /* Độ dày của viền gradient */
+        }
+
+        .animated-border-wrapper::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 1.6rem;
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6, #ec4899, #3b82f6);
+            background-size: 300% 300%;
+            animation: gradientBorderMove 6s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes gradientBorderMove {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
         .glass-panel {
             background: var(--card-bg);
             backdrop-filter: blur(25px);
@@ -1122,63 +1157,68 @@
     <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-transparent border-0">
-                <div class="glass-panel p-4">
 
-                    <div class="form-watermark"><i class="fas fa-music"></i></div>
+                <div class="animated-border-wrapper">
+                    <div class="glass-panel p-4 border-0">
 
-                    <div class="modal-body-content">
-                        <div class="modal-header border-0 pb-2 px-0">
-                            <div>
-                                <h3 class="modal-title fw-bolder mb-1" id="loginModalLabel" style="color: var(--text-color);">Đăng Nhập</h3>
-                                <p class="small mb-0" style="color: var(--text-color); opacity: 0.7;">Viết tiếp giai điệu của bạn tại TTB Music.</p>
+                        <div class="form-watermark"><i class="fas fa-music"></i></div>
+
+                        <div class="modal-body-content">
+                            <div class="modal-header border-0 pb-3 px-0 position-relative d-flex justify-content-center text-center">
+                                <div>
+                                    <h3 class="modal-title fw-bolder mb-1" id="loginModalLabel" style="color: var(--text-color);">
+                                        <i class="fas fa-user-circle text-primary me-2"></i>Đăng Nhập
+                                    </h3>
+                                    <p class="small mb-0" style="color: var(--text-color); opacity: 0.7;">Viết tiếp giai điệu của bạn tại TTB Music.</p>
+                                </div>
+                                <button type="button" class="btn-close position-absolute top-0 end-0 mt-1" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <button type="button" class="btn-close mb-auto" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
 
-                        <div class="modal-body px-0 pb-0 pt-3">
-                            <form action="index.php?controller=auth&action=login" method="POST">
-                                <div class="form-floating mb-3">
-                                    <input type="email" class="form-control modern-input" id="floatingEmail" name="email" placeholder="name@example.com" required>
-                                    <label for="floatingEmail"><i class="fas fa-envelope me-2"></i>Email của bạn</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="password" class="form-control modern-input" id="floatingPassword" name="password" placeholder="Password" required>
-                                    <label for="floatingPassword"><i class="fas fa-lock me-2"></i>Mật khẩu</label>
-                                </div>
-
-                                <div class="d-flex justify-content-between align-items-center mb-4">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="rememberMe">
-                                        <label class="form-check-label small" for="rememberMe" style="color: var(--text-color); opacity: 0.8;">Nhớ tài khoản</label>
+                            <div class="modal-body px-0 pb-0 pt-2">
+                                <form action="index.php?controller=auth&action=login" method="POST">
+                                    <div class="form-floating mb-3">
+                                        <input type="email" class="form-control modern-input" id="floatingEmail" name="email" placeholder="name@example.com" required>
+                                        <label for="floatingEmail"><i class="fas fa-envelope me-2"></i>Email của bạn</label>
                                     </div>
-                                    <a href="index.php?controller=auth&action=forgot" class="text-primary text-decoration-none small fw-bold">Quên mật khẩu?</a>
+                                    <div class="form-floating mb-3">
+                                        <input type="password" class="form-control modern-input" id="floatingPassword" name="password" placeholder="Password" required>
+                                        <label for="floatingPassword"><i class="fas fa-lock me-2"></i>Mật khẩu</label>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="rememberMe">
+                                            <label class="form-check-label small" for="rememberMe" style="color: var(--text-color); opacity: 0.8;">Nhớ tài khoản</label>
+                                        </div>
+                                        <a href="index.php?controller=auth&action=forgot" class="text-primary text-decoration-none small fw-bold">Quên mật khẩu?</a>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-glow btn-lg w-100 fw-bold rounded-pill text-white py-3">
+                                        ĐĂNG NHẬP <i class="fas fa-sign-in-alt ms-2"></i>
+                                    </button>
+                                </form>
+
+                                <div class="position-relative my-4 text-center">
+                                    <hr style="border-color: var(--border-color); opacity: 0.5;">
+                                    <span class="position-absolute top-50 start-50 translate-middle px-3 small fw-semibold" style="background-color: var(--card-bg); color: var(--text-color); opacity: 0.6;">
+                                        Hoặc tiếp tục với
+                                    </span>
                                 </div>
 
-                                <button type="submit" class="btn btn-glow btn-lg w-100 fw-bold rounded-pill text-white py-3">
-                                    Bắt Đầu <i class="fas fa-arrow-right ms-2"></i>
-                                </button>
-                            </form>
+                                <div class="d-flex gap-3">
+                                    <button class="btn social-btn google w-50 rounded-pill py-2 fw-semibold">
+                                        <i class="fab fa-google me-2"></i> Google
+                                    </button>
+                                    <button class="btn social-btn facebook w-50 rounded-pill py-2 fw-semibold">
+                                        <i class="fab fa-facebook-f me-2"></i> Facebook
+                                    </button>
+                                </div>
 
-                            <div class="position-relative my-4 text-center">
-                                <hr style="border-color: var(--border-color); opacity: 0.5;">
-                                <span class="position-absolute top-50 start-50 translate-middle px-3 small fw-semibold" style="background-color: var(--card-bg); color: var(--text-color); opacity: 0.6;">
-                                    Hoặc tiếp tục với
-                                </span>
-                            </div>
-
-                            <div class="d-flex gap-3">
-                                <button class="btn social-btn google w-50 rounded-pill py-2 fw-semibold">
-                                    <i class="fab fa-google me-2"></i> Google
-                                </button>
-                                <button class="btn social-btn facebook w-50 rounded-pill py-2 fw-semibold">
-                                    <i class="fab fa-facebook-f me-2"></i> Facebook
-                                </button>
-                            </div>
-
-                            <div class="mt-4 pt-3 text-center">
-                                <p class="mb-0 small" style="color: var(--text-color);">
-                                    Chưa có tài khoản? <a href="index.php?controller=auth&action=register" class="text-primary text-decoration-none fw-bolder fs-6">Tạo tài khoản</a>
-                                </p>
+                                <div class="mt-4 pt-3 text-center">
+                                    <p class="mb-0 small" style="color: var(--text-color);">
+                                        Chưa có tài khoản? <a href="index.php?controller=auth&action=register" class="text-primary text-decoration-none fw-bolder fs-6">Tạo ngay</a>
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>

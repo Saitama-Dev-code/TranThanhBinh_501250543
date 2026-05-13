@@ -1226,19 +1226,11 @@
         </div>
     </div>
 
-    ### 3. Nâng cấp Router trong `public/index.php`
+    <!-- ### 3. Nâng cấp Router trong `public/index.php`
     Để các đường link như `index.php?controller=auth&action=register` thực sự hoạt động, chúng ta cần biến file `index.php` thành một bộ định tuyến (Router) thực thụ. Bạn mở file `public/index.php` và thay bằng đoạn code sau:
 
-    ```php
+    ```php -->
     <?php
-    // Đường dẫn file: public/index.php
-
-    error_reporting(E_ALL);
-    ini_set('display_errors', 1);
-
-    session_start();
-    define('ROOT_PATH', dirname(__DIR__));
-
     // Lấy tên Controller và Action từ URL (Mặc định là Home và index)
     $controllerName = isset($_GET['controller']) ? ucfirst($_GET['controller']) . 'Controller' : 'HomeController';
     $actionName = isset($_GET['action']) ? $_GET['action'] : 'index';

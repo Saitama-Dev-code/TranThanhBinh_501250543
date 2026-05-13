@@ -11,88 +11,97 @@
         :root[data-theme="dark"] { --bg-color: #0f172a; --text-color: #f8fafc; --card-bg: rgba(15, 23, 42, 0.8); --border-color: rgba(255, 255, 255, 0.1); }
         
         body {
-            background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            min-height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; transition: 0.4s ease;
+            background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            position: relative; overflow: hidden; transition: 0.4s ease;
         }
+
+        /* KHẮC PHỤC LỖI BÓP KÍCH THƯỚC */
+        .auth-container {
+            width: 100%;
+            max-width: 500px; /* Form này thu nhỏ gọn hơn đăng ký một chút */
+            padding: 20px;
+            z-index: 1;
+        }
+
+        .animated-border-wrapper {
+            position: relative; border-radius: 1.6rem; padding: 2px; width: 100%;
+        }
+        .animated-border-wrapper::before {
+            content: ""; position: absolute; inset: 0; border-radius: 1.6rem;
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6, #ec4899, #3b82f6);
+            background-size: 300% 300%; animation: gradientBorderMove 6s linear infinite; z-index: -1;
+        }
+        @keyframes gradientBorderMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        .glass-panel {
+            background: var(--card-bg); backdrop-filter: blur(25px); border-radius: 1.5rem;
+            position: relative; overflow: hidden; z-index: 1; width: 100%;
+        }
+        .form-watermark {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg);
+            font-size: 15rem; font-weight: 900; color: var(--text-color); opacity: 0.03; z-index: 0; pointer-events: none;
+        }
+        .form-content { position: relative; z-index: 2; }
+
+        .modern-input { background: rgba(128, 128, 128, 0.05) !important; border: 1px solid var(--border-color); color: var(--text-color) !important; border-radius: 0.75rem; transition: 0.3s ease; }
+        .modern-input:focus { border-color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
+        .form-floating label { color: var(--text-color); opacity: 0.6; }
+        .btn-glow { background: #3b82f6; border: none; transition: 0.3s; }
+        .btn-glow:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4); }
+        
+        .top-btn { color: var(--text-color); text-decoration: none; font-weight: bold; opacity: 0.7; transition: 0.3s; z-index: 10; }
+        .top-btn:hover { opacity: 1; color: #3b82f6; }
+        .back-btn:hover { transform: translateX(-5px); }
 
         #bg-elements { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; }
         .glow-orb { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%); animation: float 15s infinite ease-in-out alternate; }
         @keyframes float { 0% { transform: translateY(0px) scale(1); } 100% { transform: translateY(-50px) scale(1.2); } }
-
-        .register-container { width: 100%; max-width: 500px; padding: 20px; z-index: 1; }
-        
-        .glass-panel {
-            background: var(--card-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--border-color); border-radius: 1.5rem;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15); position: relative; overflow: hidden; z-index: 1;
-        }
-        [data-theme="dark"] .glass-panel { box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
-
-        .form-watermark {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg);
-            font-size: 15rem; font-weight: 900; color: var(--text-color); opacity: 0.03; z-index: 0; pointer-events: none; user-select: none;
-        }
-        .modal-body-content { position: relative; z-index: 2; }
-
-        .modern-input { background: rgba(128, 128, 128, 0.05) !important; border: 1px solid var(--border-color); color: var(--text-color) !important; border-radius: 0.75rem; transition: 0.3s ease; }
-        .modern-input:focus { background: rgba(128, 128, 128, 0.1) !important; border-color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
-        .form-floating label { color: var(--text-color); opacity: 0.6; }
-        .btn-glow { background: #3b82f6; border: none; transition: 0.3s; }
-        .btn-glow:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4); }
-        .top-btn { color: var(--text-color); text-decoration: none; font-weight: bold; opacity: 0.7; transition: 0.3s; z-index: 10; }
-        .top-btn:hover { opacity: 1; color: #3b82f6; }
-        .back-btn:hover { transform: translateX(-5px); }
     </style>
 </head>
 <body>
+    <button id="theme-toggle" class="btn btn-outline-secondary rounded-circle position-absolute top-0 end-0 m-4 z-3"><i class="fas fa-moon"></i></button>
+    <a href="index.php" class="btn btn-link position-absolute top-0 start-0 m-4 text-decoration-none text-white z-3 top-btn back-btn"><i class="fas fa-arrow-left me-2"></i>Quay lại</a>
+
     <div id="bg-elements">
         <div class="glow-orb" style="width: 400px; height: 400px; top: -10%; left: -10%;"></div>
         <div class="glow-orb" style="width: 600px; height: 600px; bottom: -20%; right: -10%; animation-delay: -5s;"></div>
     </div>
 
-    <a href="index.php" class="position-absolute top-0 start-0 m-4 top-btn back-btn"><i class="fas fa-arrow-left me-2"></i>Quay lại</a>
-    <button id="theme-toggle" class="btn btn-outline-secondary rounded-circle position-absolute top-0 end-0 m-4 z-3"><i class="fas fa-moon"></i></button>
-
-    <div class="register-container">
-        <div class="glass-panel p-5">
-            <div class="form-watermark"><i class="fas fa-key"></i></div>
-            
-            <div class="modal-body-content">
-                <div class="text-center mb-4">
-                    <div class="d-inline-flex align-items-center justify-content-center bg-warning rounded-circle mb-3" style="width: 60px; height: 60px;">
-                        <i class="fas fa-key fs-3 text-dark"></i>
+    <div class="auth-container">
+        <div class="animated-border-wrapper">
+            <div class="glass-panel p-5">
+                <div class="form-watermark"><i class="fas fa-key"></i></div>
+                <div class="form-content">
+                    <div class="text-center mb-4">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-warning rounded-circle mb-3" style="width: 60px; height: 60px;">
+                            <i class="fas fa-key fs-3 text-dark"></i>
+                        </div>
+                        <h2 class="fw-bolder">Quên Mật Khẩu</h2>
                     </div>
-                    <h2 class="fw-bolder">Quên Mật Khẩu</h2>
-                    <p class="small" style="opacity: 0.7;">Nhập email của bạn, hệ thống sẽ gửi liên kết để đặt lại mật khẩu mới.</p>
+                    <form action="#" method="POST">
+                        <div class="form-floating mb-4">
+                            <input type="email" class="form-control modern-input" id="email" name="email" placeholder="Email" required>
+                            <label for="email"><i class="fas fa-envelope me-2"></i>Email đã đăng ký</label>
+                        </div>
+                        <button type="submit" class="btn btn-glow btn-lg w-100 fw-bold rounded-pill text-white py-3">GỬI YÊU CẦU <i class="fas fa-paper-plane ms-2"></i></button>
+                    </form>
+                    <p class="text-center mt-4 mb-0 small"><a href="index.php" class="text-primary fw-bold text-decoration-none">Quay lại đăng nhập</a></p>
                 </div>
-
-                <form action="#" method="POST">
-                    <div class="form-floating mb-4">
-                        <input type="email" class="form-control modern-input" id="email" name="email" placeholder="Email" required>
-                        <label for="email"><i class="fas fa-envelope me-2"></i>Email đã đăng ký</label>
-                    </div>
-
-                    <button type="submit" class="btn btn-glow btn-lg w-100 fw-bold rounded-pill text-white py-3">
-                        GỬI YÊU CẦU <i class="fas fa-paper-plane ms-2"></i>
-                    </button>
-                </form>
             </div>
         </div>
     </div>
 
     <script>
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const htmlElement = document.documentElement;
-        const icon = themeToggleBtn.querySelector('i');
+        const themeBtn = document.getElementById('theme-toggle');
         const savedTheme = localStorage.getItem('theme') || 'dark';
-        htmlElement.setAttribute('data-theme', savedTheme);
-        icon.className = savedTheme === 'dark' ? 'fas fa-sun text-warning' : 'fas fa-moon text-dark';
-
-        themeToggleBtn.addEventListener('click', () => {
-            const newTheme = htmlElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-            htmlElement.setAttribute('data-theme', newTheme);
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        themeBtn.querySelector('i').className = savedTheme === 'dark' ? 'fas fa-sun text-warning' : 'fas fa-moon text-dark';
+        themeBtn.addEventListener('click', () => {
+            const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
-            icon.className = newTheme === 'dark' ? 'fas fa-sun text-warning' : 'fas fa-moon text-dark';
+            themeBtn.querySelector('i').className = newTheme === 'dark' ? 'fas fa-sun text-warning' : 'fas fa-moon text-dark';
         });
     </script>
 </body>

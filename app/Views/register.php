@@ -8,8 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         /* ================= BIẾN MÀU SẮC ĐỒNG BỘ THEME ================= */
-        :root[data-theme="light"] { --bg-color: #f8fafc; --text-color: #0f172a; --card-bg: rgba(255, 255, 255, 0.8); --border-color: #e2e8f0; }
-        :root[data-theme="dark"] { --bg-color: #0f172a; --text-color: #f8fafc; --card-bg: rgba(15, 23, 42, 0.8); --border-color: rgba(255, 255, 255, 0.1); }
+        :root[data-theme="light"] { --bg-color: #f8fafc; --text-color: #0f172a; --card-bg: rgba(255, 255, 255, 0.85); --border-color: #e2e8f0; }
+        :root[data-theme="dark"] { --bg-color: #0f172a; --text-color: #f8fafc; --card-bg: rgba(15, 23, 42, 0.85); --border-color: rgba(255, 255, 255, 0.1); }
         
         body {
             background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', sans-serif;
@@ -17,21 +17,14 @@
             position: relative; overflow: hidden; transition: 0.4s ease;
         }
 
-        /* KHẮC PHỤC LỖI BÓP KÍCH THƯỚC Ở ĐÂY */
-        .auth-container {
-            width: 100%;
-            max-width: 550px;
-            padding: 20px;
-            z-index: 1;
-        }
+        .auth-container { width: 100%; max-width: 550px; padding: 20px; z-index: 1; }
 
-        /* ================= HIỆU ỨNG VIỀN CHUYỂN ĐỘNG ================= */
-        .animated-border-wrapper {
-            position: relative; border-radius: 1.6rem; padding: 2px; width: 100%;
-        }
+        /* ================= HIỆU ỨNG VIỀN CHUYỂN ĐỘNG (ĐỔI TÔNG XANH OCEAN ĐỂ HẾT ÁM HỒNG) ================= */
+        .animated-border-wrapper { position: relative; border-radius: 1.6rem; padding: 2px; width: 100%; }
         .animated-border-wrapper::before {
             content: ""; position: absolute; inset: 0; border-radius: 1.6rem;
-            background: linear-gradient(45deg, #3b82f6, #8b5cf6, #ec4899, #3b82f6);
+            /* Đã thay đổi dải màu: Bỏ màu hồng, thay bằng dải Xanh ngọc - Xanh dương - Indigo thanh lịch */
+            background: linear-gradient(45deg, #00c6ff, #0072ff, #4facfe, #00c6ff);
             background-size: 300% 300%; animation: gradientBorderMove 6s linear infinite; z-index: -1;
         }
         @keyframes gradientBorderMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
@@ -57,7 +50,6 @@
         .top-btn:hover { opacity: 1; color: #3b82f6; }
         .back-btn:hover { transform: translateX(-5px); }
 
-        /* Nền Parallax */
         #bg-elements { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; }
         .glow-orb { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%); animation: float 15s infinite ease-in-out alternate; }
         @keyframes float { 0% { transform: translateY(0px) scale(1); } 100% { transform: translateY(-50px) scale(1.2); } }
@@ -65,7 +57,8 @@
 </head>
 <body>
     <button id="theme-toggle" class="btn btn-outline-secondary rounded-circle position-absolute top-0 end-0 m-4 z-3"><i class="fas fa-moon"></i></button>
-    <a href="index.php" class="btn btn-link position-absolute top-0 start-0 m-4 text-decoration-none text-white z-3 top-btn back-btn"><i class="fas fa-arrow-left me-2"></i>Trang chủ</a>
+    
+    <a href="index.php" class="position-absolute top-0 start-0 m-4 z-3 top-btn back-btn"><i class="fas fa-arrow-left me-2"></i>Trang chủ</a>
 
     <div id="bg-elements">
         <div class="glow-orb" style="width: 400px; height: 400px; top: -10%; left: -10%;"></div>
@@ -95,6 +88,8 @@
             </div>
         </div>
     </div>
+
+    <?php include __DIR__ . '/partials/chat_and_scroll.php'; ?>
 
     <script>
         const themeBtn = document.getElementById('theme-toggle');

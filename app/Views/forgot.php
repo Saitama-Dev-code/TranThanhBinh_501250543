@@ -7,8 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
-        :root[data-theme="light"] { --bg-color: #f8fafc; --text-color: #0f172a; --card-bg: rgba(255, 255, 255, 0.8); --border-color: #e2e8f0; }
-        :root[data-theme="dark"] { --bg-color: #0f172a; --text-color: #f8fafc; --card-bg: rgba(15, 23, 42, 0.8); --border-color: rgba(255, 255, 255, 0.1); }
+        :root[data-theme="light"] { --bg-color: #f8fafc; --text-color: #0f172a; --card-bg: rgba(255, 255, 255, 0.85); --border-color: #e2e8f0; }
+        :root[data-theme="dark"] { --bg-color: #0f172a; --text-color: #f8fafc; --card-bg: rgba(15, 23, 42, 0.85); --border-color: rgba(255, 255, 255, 0.1); }
         
         body {
             background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', sans-serif;
@@ -16,32 +16,19 @@
             position: relative; overflow: hidden; transition: 0.4s ease;
         }
 
-        /* KHẮC PHỤC LỖI BÓP KÍCH THƯỚC */
-        .auth-container {
-            width: 100%;
-            max-width: 500px; /* Form này thu nhỏ gọn hơn đăng ký một chút */
-            padding: 20px;
-            z-index: 1;
-        }
+        .auth-container { width: 100%; max-width: 500px; padding: 20px; z-index: 1; }
 
-        .animated-border-wrapper {
-            position: relative; border-radius: 1.6rem; padding: 2px; width: 100%;
-        }
+        .animated-border-wrapper { position: relative; border-radius: 1.6rem; padding: 2px; width: 100%; }
         .animated-border-wrapper::before {
             content: ""; position: absolute; inset: 0; border-radius: 1.6rem;
-            background: linear-gradient(45deg, #3b82f6, #8b5cf6, #ec4899, #3b82f6);
+            /* Đã thay đổi dải màu sang tông Xanh Ocean */
+            background: linear-gradient(45deg, #00c6ff, #0072ff, #4facfe, #00c6ff);
             background-size: 300% 300%; animation: gradientBorderMove 6s linear infinite; z-index: -1;
         }
         @keyframes gradientBorderMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        .glass-panel {
-            background: var(--card-bg); backdrop-filter: blur(25px); border-radius: 1.5rem;
-            position: relative; overflow: hidden; z-index: 1; width: 100%;
-        }
-        .form-watermark {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg);
-            font-size: 15rem; font-weight: 900; color: var(--text-color); opacity: 0.03; z-index: 0; pointer-events: none;
-        }
+        .glass-panel { background: var(--card-bg); backdrop-filter: blur(25px); border-radius: 1.5rem; position: relative; overflow: hidden; z-index: 1; width: 100%; }
+        .form-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); font-size: 15rem; font-weight: 900; color: var(--text-color); opacity: 0.03; z-index: 0; pointer-events: none; }
         .form-content { position: relative; z-index: 2; }
 
         .modern-input { background: rgba(128, 128, 128, 0.05) !important; border: 1px solid var(--border-color); color: var(--text-color) !important; border-radius: 0.75rem; transition: 0.3s ease; }
@@ -61,7 +48,8 @@
 </head>
 <body>
     <button id="theme-toggle" class="btn btn-outline-secondary rounded-circle position-absolute top-0 end-0 m-4 z-3"><i class="fas fa-moon"></i></button>
-    <a href="index.php" class="btn btn-link position-absolute top-0 start-0 m-4 text-decoration-none text-white z-3 top-btn back-btn"><i class="fas fa-arrow-left me-2"></i>Quay lại</a>
+    
+    <a href="index.php" class="position-absolute top-0 start-0 m-4 z-3 top-btn back-btn"><i class="fas fa-arrow-left me-2"></i>Quay lại</a>
 
     <div id="bg-elements">
         <div class="glow-orb" style="width: 400px; height: 400px; top: -10%; left: -10%;"></div>
@@ -91,6 +79,8 @@
             </div>
         </div>
     </div>
+
+    <?php include __DIR__ . '/partials/chat_and_scroll.php'; ?>
 
     <script>
         const themeBtn = document.getElementById('theme-toggle');

@@ -1,12 +1,15 @@
 <?php
+
 /**
  * =========================================================================
  * TÊN FILE: app/Views/partials/header.php
- * MÔ TẢ: Chứa phần thẻ <head>, CSS dùng chung, Preloader, Nền Parallax và thanh Navbar.
- * CÁCH SỬ DỤNG: Dùng hàm include hoặc require_once để gọi vào đầu các file View khác.
- * BẢO MẬT/LỖI: Sử dụng toán tử ?? để tránh lỗi "Undefined variable" nếu biến $pageTitle chưa được Controller truyền ra.
+ * MÔ TẢ: Khôi phục 100% CSS gốc của bạn để không làm hỏng hiệu ứng trang Home.
+ * CHỈ BỔ SUNG: Hiệu ứng Active cho Menu và Preloader hiện mỗi khi F5.
  * =========================================================================
  */
+
+// Lấy tên controller hiện tại để xử lý hiệu ứng "Active" trên thanh Menu
+$currentController = $_GET['controller'] ?? 'home';
 ?>
 <!DOCTYPE html>
 <html lang="vi" data-theme="dark">
@@ -22,48 +25,269 @@
 
     <style>
         /* ================= BIẾN MÀU SẮC (THEME) ================= */
-        :root[data-theme="light"] { --bg-color: #f8fafc; --text-color: #0f172a; --card-bg: #ffffff; --border-color: #e2e8f0; --nav-bg: rgba(255, 255, 255, 0.85); --watermark-color: rgba(0, 0, 0, 0.03); --faq-bg: #f1f5f9; }
-        :root[data-theme="dark"] { --bg-color: #0f172a; --text-color: #f8fafc; --card-bg: #1e293b; --border-color: #334155; --nav-bg: rgba(15, 23, 42, 0.85); --watermark-color: rgba(255, 255, 255, 0.02); --faq-bg: #334155; }
+        :root[data-theme="light"] {
+            --bg-color: #f8fafc;
+            --text-color: #0f172a;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --nav-bg: rgba(255, 255, 255, 0.85);
+            --watermark-color: rgba(0, 0, 0, 0.03);
+            --faq-bg: #f1f5f9;
+        }
 
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', sans-serif; transition: background-color 0.4s ease, color 0.4s ease; overflow-x: hidden; padding-top: 76px; position: relative; }
+        :root[data-theme="dark"] {
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --card-bg: #1e293b;
+            --border-color: #334155;
+            --nav-bg: rgba(15, 23, 42, 0.85);
+            --watermark-color: rgba(255, 255, 255, 0.02);
+            --faq-bg: #334155;
+        }
+
+        /* GIỮ NGUYÊN CSS BODY GỐC: Tránh xung đột với Parallax và hiệu ứng nốt nhạc */
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', sans-serif;
+            transition: background-color 0.4s ease, color 0.4s ease;
+            overflow-x: hidden;
+            padding-top: 76px;
+            position: relative;
+        }
 
         /* ================= WATERMARK & NỀN PARALLAX ================= */
-        .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18vw; font-weight: 900; color: var(--watermark-color); z-index: -2; pointer-events: none; user-select: none; white-space: nowrap; transition: color 0.4s ease; }
-        #global-parallax { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; overflow: hidden; }
-        @keyframes organicFloat { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-30px); } }
-        .note-wrapper { position: absolute; animation: organicFloat 10s ease-in-out infinite; }
-        .note-icon { color: var(--text-color); opacity: 0.1; transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18vw;
+            font-weight: 900;
+            color: var(--watermark-color);
+            z-index: -2;
+            pointer-events: none;
+            user-select: none;
+            white-space: nowrap;
+            transition: color 0.4s ease;
+        }
+
+        #global-parallax {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        @keyframes organicFloat {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-30px);
+            }
+        }
+
+        .note-wrapper {
+            position: absolute;
+            animation: organicFloat 10s ease-in-out infinite;
+        }
+
+        .note-icon {
+            color: var(--text-color);
+            opacity: 0.1;
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
 
         /* ================= NAVBAR ================= */
-        .navbar { background-color: var(--nav-bg); border-bottom: 1px solid var(--border-color); backdrop-filter: blur(12px); transition: top 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55), background-color 0.4s; position: fixed; width: 100%; top: 0; z-index: 1030; }
-        .navbar-brand, .nav-link { color: var(--text-color) !important; font-weight: 600; }
-        .navbar-brand i { transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); display: inline-block; }
-        .navbar-brand:hover i { transform: scale(1.2) rotate(-15deg); color: #3b82f6 !important; }
-        .nav-link { position: relative; padding-bottom: 5px; }
-        .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 50%; background-color: #3b82f6; transition: all 0.3s ease; transform: translateX(-50%); }
-        .nav-link:hover::after { width: 80%; }
+        .navbar {
+            background-color: var(--nav-bg);
+            border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(12px);
+            transition: top 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55), background-color 0.4s;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1030;
+        }
+
+        .navbar-brand,
+        .nav-link {
+            color: var(--text-color) !important;
+            font-weight: 600;
+        }
+
+        .navbar-brand i {
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: inline-block;
+        }
+
+        .navbar-brand:hover i {
+            transform: scale(1.2) rotate(-15deg);
+            color: #3b82f6 !important;
+        }
+
+        .nav-link {
+            position: relative;
+            padding-bottom: 5px;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            background-color: #3b82f6;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        /* HIỆU ỨNG ACTIVE (MỚI): Luôn hiện gạch chân và đổi màu khi đang ở đúng trang */
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 80%;
+        }
+
+        .nav-link.active {
+            color: #3b82f6 !important;
+        }
 
         /* ================= PRELOADER ================= */
-        #preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a192f; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.8s ease, visibility 0.8s; }
-        .loader-content { text-align: center; }
-        .music-waves { display: flex; justify-content: center; align-items: flex-end; height: 40px; gap: 5px; margin-bottom: 20px; }
-        .music-waves span { width: 6px; height: 10px; background: #64ffda; animation: wave-animation 1.2s infinite ease-in-out; }
-        .music-waves span:nth-child(2) { animation-delay: 0.1s; } .music-waves span:nth-child(3) { animation-delay: 0.2s; } .music-waves span:nth-child(4) { animation-delay: 0.3s; } .music-waves span:nth-child(5) { animation-delay: 0.4s; }
-        @keyframes wave-animation { 0%, 100% { height: 10px; } 50% { height: 40px; } }
-        .loader-text { color: white; font-weight: 800; letter-spacing: 5px; margin-bottom: 5px; animation: pulse 2s infinite; }
-        .loader-subtext { color: #8892b0; font-style: italic; font-size: 0.9rem; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        .preloader-hidden { opacity: 0; visibility: hidden; }
-        
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a192f;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+
+        .loader-content {
+            text-align: center;
+        }
+
+        .music-waves {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 40px;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+
+        .music-waves span {
+            width: 6px;
+            height: 10px;
+            background: #64ffda;
+            animation: wave-animation 1.2s infinite ease-in-out;
+        }
+
+        .music-waves span:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .music-waves span:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .music-waves span:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+
+        .music-waves span:nth-child(5) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes wave-animation {
+
+            0%,
+            100% {
+                height: 10px;
+            }
+
+            50% {
+                height: 40px;
+            }
+        }
+
+        .loader-text {
+            color: white;
+            font-weight: 800;
+            letter-spacing: 5px;
+            margin-bottom: 5px;
+            animation: pulse 2s infinite;
+        }
+
+        .loader-subtext {
+            color: #8892b0;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .preloader-hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
         /* CSS dùng chung cho các khối Card và Hover */
-        .custom-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; transition: box-shadow 0.4s ease; cursor: pointer; }
-        .custom-card:hover { box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); border-color: #3b82f6; }
-        .simple-hover-icon { transition: transform 0.3s ease, color 0.3s ease; }
-        .custom-card:hover .simple-hover-icon { transform: scale(1.15); color: #3b82f6 !important; }
+        .custom-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            transition: box-shadow 0.4s ease;
+            cursor: pointer;
+        }
+
+        .custom-card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            border-color: #3b82f6;
+        }
+
+        .simple-hover-icon {
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+
+        .custom-card:hover .simple-hover-icon {
+            transform: scale(1.15);
+            color: #3b82f6 !important;
+        }
     </style>
 </head>
-<body>
 
+<body id="top">
+    <script>
+        // Kiểm tra theme ngay lập tức để tránh bị chớp màn hình
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
     <div id="preloader">
         <div class="loader-content">
             <div class="music-waves">
@@ -73,10 +297,16 @@
             <p class="loader-subtext">Đang tinh chỉnh giai điệu...</p>
         </div>
     </div>
+
     <script>
+        /**
+         * [cite_start]XỬ LÝ PRELOADER: window.load đảm bảo hiện hiệu ứng khi F5 trang[cite: 1043].
+         */
         window.addEventListener('load', function() {
             const preloader = document.getElementById('preloader');
-            setTimeout(() => { preloader.classList.add('preloader-hidden'); }, 1000);
+            setTimeout(() => {
+                preloader.classList.add('preloader-hidden');
+            }, 1000);
         });
     </script>
 
@@ -85,7 +315,7 @@
 
     <nav class="navbar navbar-expand-lg" id="smartNavbar">
         <div class="container">
-            <a class="navbar-brand fw-bold fs-4" href="index.php">
+            <a class="navbar-brand fw-bold fs-4" href="index.php?controller=home">
                 <i class="fas fa-music text-primary me-2"></i>TTB
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -93,11 +323,18 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
-                    <li class="nav-item"><a class="nav-link" href="index.php">Trang chủ</a></li>
-                    
-                    <li class="nav-item"><a class="nav-link" href="index.php?controller=product&action=index">Cửa hàng</a></li>
-                    
-                    <li class="nav-item"><a class="nav-link text-warning fw-bold" href="#">Cho Thuê Nhạc Cụ</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link <?= ($currentController == 'home') ? 'active' : '' ?>"
+                            href="<?= ($currentController == 'home') ? '#top' : 'index.php?controller=home' ?>"
+                            onclick="<?= ($currentController == 'home') ? 'window.scrollTo({top: 0, behavior: \'smooth\'}); return false;' : '' ?>">
+                            Trang chủ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?= ($currentController == 'product') ? 'active' : '' ?>"
+                            href="index.php?controller=product&action=index">Cửa hàng</a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="#">Cho Thuê Nhạc Cụ</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Blog</a></li>
                 </ul>
 
@@ -113,3 +350,4 @@
             </div>
         </div>
     </nav>
+    <div class="main-content-wrapper" style="min-height: 75vh;">

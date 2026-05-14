@@ -53,6 +53,12 @@
         #bg-elements { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; }
         .glow-orb { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%); animation: float 15s infinite ease-in-out alternate; }
         @keyframes float { 0% { transform: translateY(0px) scale(1); } 100% { transform: translateY(-50px) scale(1.2); } }
+
+        /* Hiệu ứng hạt nền tương tự trang chủ */
+        #global-parallax { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -3; pointer-events: none; overflow: hidden; }
+        @keyframes organicFloat { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-30px); } }
+        .note-wrapper { position: absolute; animation: organicFloat 10s ease-in-out infinite; }
+        .note-icon { color: var(--text-color); opacity: 0.1; transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
     </style>
 </head>
 <body>
@@ -64,6 +70,8 @@
         <div class="glow-orb" style="width: 400px; height: 400px; top: -10%; left: -10%;"></div>
         <div class="glow-orb" style="width: 600px; height: 600px; bottom: -20%; right: -10%; animation-delay: -5s;"></div>
     </div>
+
+    <div id="global-parallax"></div>
 
     <div class="auth-container">
         <div class="animated-border-wrapper">
@@ -102,6 +110,42 @@
             localStorage.setItem('theme', newTheme);
             themeBtn.querySelector('i').className = newTheme === 'dark' ? 'fas fa-sun text-warning' : 'fas fa-moon text-dark';
         });
+
+        // Hiệu ứng hạt né chuột
+        const ptn = document.getElementById('global-parallax');
+        if(ptn) {
+            const icons = ['fa-music', 'fa-guitar', 'fa-headphones', 'fa-drum', 'fa-play'];
+            const notes = [];
+            let mX = -1000, mY = -1000;
+            for (let i = 0; i < 40; i++) {
+                let w = document.createElement('div');
+                w.className = 'note-wrapper';
+                w.style.left = Math.random() * 100 + 'vw'; w.style.top = Math.random() * 100 + 'vh';
+                let ic = document.createElement('i');
+                ic.className = `fas ${icons[Math.floor(Math.random() * icons.length)]} note-icon`;
+                ic.style.fontSize = (Math.random() * 1.2 + 0.5) + 'rem';
+                w.appendChild(ic); ptn.appendChild(w);
+                notes.push({ w, ic });
+            }
+            window.addEventListener('mousemove', (e) => { mX = e.clientX; mY = e.clientY; });
+            function repel() {
+                notes.forEach(n => {
+                    let r = n.w.getBoundingClientRect();
+                    let dx = (r.left + r.width/2) - mX, dy = (r.top + r.height/2) - mY;
+                    let d = Math.sqrt(dx*dx + dy*dy);
+                    if (d < 150) {
+                        let f = (150 - d) / 150, a = Math.atan2(dy, dx);
+                        n.ic.style.transform = `translate(${Math.cos(a)*f*50}px, ${Math.sin(a)*f*50}px)`;
+                        n.ic.style.transition = 'none';
+                    } else {
+                        n.ic.style.transform = `translate(0,0)`;
+                        n.ic.style.transition = 'transform 0.5s ease';
+                    }
+                });
+                requestAnimationFrame(repel);
+            }
+            repel();
+        }
     </script>
 </body>
 </html>

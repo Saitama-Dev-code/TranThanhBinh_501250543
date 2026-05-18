@@ -12,8 +12,12 @@ include __DIR__ . '/partials/header.php';
 
 <style>
     .sidebar-category { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; }
-    .category-link { color: var(--text-color); text-decoration: none; padding: 10px 15px; display: block; border-bottom: 1px solid var(--border-color); transition: 0.3s; }
-    .category-link:hover, .category-link.active { background: rgba(59, 130, 246, 0.1); color: #3b82f6; font-weight: bold; border-left: 4px solid #3b82f6; }
+    .category-link { position: relative; color: var(--text-color); text-decoration: none; padding: 12px 15px; display: block; border-bottom: 1px solid var(--border-color); transition: background 0.3s ease, color 0.3s ease; overflow: hidden; }
+    .category-link::before { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: #3b82f6; transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+    .category-link:hover, .category-link.active { background: rgba(59, 130, 246, 0.05); color: #3b82f6; }
+    .category-link:hover::before, .category-link.active::before { transform: translateX(0); }
+    .category-link i { transition: transform 0.3s ease; display: inline-block; }
+    .category-link:hover i, .category-link.active i { transform: translateX(5px) scale(1.1); }
     
     .product-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; transition: 0.3s; overflow: hidden; height: 100%; }
     .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); border-color: #3b82f6; }

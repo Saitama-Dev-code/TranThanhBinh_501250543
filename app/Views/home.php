@@ -20,8 +20,15 @@ include __DIR__ . '/partials/header.php';
     .marquee-wrapper { display: flex; overflow: hidden; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); background: var(--card-bg); padding: 25px 0; width: 100%; }
     .marquee-content { display: flex; flex-shrink: 0; animation: marqueeScroll 25s linear infinite; }
     @keyframes marqueeScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-    .brand-item { display: flex; align-items: center; justify-content: center; margin: 0 45px; font-size: 2rem; font-weight: 800; color: var(--text-color); cursor: pointer; opacity: 0.6; transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s, color 0.3s; white-space: nowrap; }
-    .brand-item:hover { opacity: 1; color: #3b82f6; transform: translateY(-12px) scale(1.15); }
+    @keyframes subtlePulse {
+        0%, 85%, 100% { transform: scale(1); opacity: 0.6; color: var(--text-color); }
+        92% { transform: scale(1.1) translateY(-5px); opacity: 0.9; color: #3b82f6; text-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+    }
+    .brand-item { display: flex; align-items: center; justify-content: center; margin: 0 45px; font-size: 2rem; font-weight: 800; color: var(--text-color); cursor: pointer; opacity: 0.6; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); white-space: nowrap; animation: subtlePulse 8s infinite; }
+    .brand-item:nth-child(2n) { animation-delay: 2s; }
+    .brand-item:nth-child(3n) { animation-delay: 4s; }
+    .brand-item:nth-child(5n) { animation-delay: 6s; }
+    .brand-item:hover { animation: none; opacity: 1 !important; color: #3b82f6 !important; transform: translateY(-12px) scale(1.15) !important; text-shadow: 0 10px 20px rgba(59, 130, 246, 0.4); }
 
     .product-card-clean { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; position: relative; padding: 20px; height: 100%; display: flex; flex-direction: column; transition: box-shadow 0.3s ease, border-color 0.3s ease; }
     .product-card-clean:hover { box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); border-color: #3b82f6; }

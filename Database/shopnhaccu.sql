@@ -62,6 +62,7 @@ CREATE TABLE `products` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `category_id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
+  `brand` varchar(100) DEFAULT 'Generic' COMMENT 'Thương hiệu nhạc cụ (Yamaha, Fender...)',
   `price` decimal(10,2) NOT NULL,
   `image` varchar(255) DEFAULT NULL,
   `description` text DEFAULT NULL,
@@ -75,10 +76,19 @@ CREATE TABLE `products` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dữ liệu mẫu sản phẩm (Link ảnh từ Unsplash/PNG)
-INSERT INTO `products` (`category_id`, `name`, `price`, `image`, `description`, `stock`, `is_rentable`, `rent_price_day`, `deposit_price`) VALUES
-(1, 'Acoustic Yamaha F310', 3500000.00, 'https://images.unsplash.com/photo-1550291652-6ea9114a47b1?q=80&w=600&auto=format&fit=crop', 'Gỗ vân sam, âm mộc chuẩn. Lựa chọn tuyệt vời cho người mới.', 15, 1, 150000.00, 2000000.00),
-(2, 'Roland Midi Keyboard RP-30', 16900000.00, 'https://images.unsplash.com/photo-1595069906974-f0ae90cefc70?q=80&w=600&auto=format&fit=crop', 'Phím gõ chân thực, siêu nhạy, chuẩn studio.', 5, 0, NULL, NULL),
-(3, 'Trống Pearl Roadshow', 12500000.00, 'https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?q=80&w=600&auto=format&fit=crop', 'Bộ 5 trống tiêu chuẩn kèm đầy đủ Hardware.', 3, 1, 500000.00, 10000000.00);
+INSERT INTO `products` (`category_id`, `name`, `brand`, `price`, `image`, `description`, `stock`, `is_rentable`, `rent_price_day`, `deposit_price`) VALUES
+(1, 'Acoustic Yamaha F310', 'Yamaha', 3500000.00, 'https://images.unsplash.com/photo-1550291652-6ea9114a47b1?q=80&w=600&auto=format&fit=crop', 'Gỗ vân sam, âm mộc chuẩn. Lựa chọn tuyệt vời cho người mới.', 15, 1, 150000.00, 2000000.00),
+(2, 'Roland Midi Keyboard RP-30', 'Roland', 16900000.00, 'https://images.unsplash.com/photo-1595069906974-f0ae90cefc70?q=80&w=600&auto=format&fit=crop', 'Phím gõ chân thực, siêu nhạy, chuẩn studio.', 5, 0, NULL, NULL),
+(3, 'Trống Pearl Roadshow', 'Pearl', 12500000.00, 'https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?q=80&w=600&auto=format&fit=crop', 'Bộ 5 trống tiêu chuẩn kèm đầy đủ Hardware.', 3, 1, 500000.00, 10000000.00),
+(1, 'Fender Stratocaster', 'Fender', 45000000.00, 'https://images.unsplash.com/photo-1564186763535-ebb21ef5277f?q=80&w=600&auto=format&fit=crop', 'Đàn guitar điện huyền thoại, âm thanh classic.', 8, 1, 800000.00, 25000000.00),
+(2, 'Kawai CN29', 'Kawai', 28000000.00, 'https://images.unsplash.com/photo-1552422535-c45813c61732?q=80&w=600&auto=format&fit=crop', 'Đàn piano điện cao cấp với âm thanh grand piano.', 4, 0, NULL, NULL),
+(3, 'Yamaha Stage Custom', 'Yamaha', 15000000.00, 'https://images.unsplash.com/photo-1571327073757-71d13c24de30?q=80&w=600&auto=format&fit=crop', 'Bộ trống acoustic chất lượng cao cho biểu diễn.', 6, 1, 600000.00, 8000000.00),
+(1, 'Gibson Les Paul', 'Gibson', 75000000.00, 'https://images.unsplash.com/photo-1516924962500-2b4b3b99ea02?q=80&w=600&auto=format&fit=crop', 'Guitar điện cao cấp, âm thanh rich và warm.', 2, 1, 1500000.00, 40000000.00),
+(4, 'Shure SM58', 'Shure', 3500000.00, 'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?q=80&w=600&auto=format&fit=crop', 'Microphone huyền thoại cho ca sĩ và phát biểu.', 25, 0, NULL, NULL),
+(4, 'Marshall Stack', 'Marshall', 65000000.00, 'https://images.unsplash.com/photo-1558098329-a11cff621064?q=80&w=600&auto=format&fit=crop', 'Amplifier guitar stack cực mạnh cho stage.', 3, 0, NULL, NULL),
+(1, 'Taylor 214ce', 'Taylor', 38000000.00, 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?q=80&w=600&auto=format&fit=crop', 'Acoustic guitar cao cấp với âm thanh balanced.', 5, 1, 700000.00, 20000000.00),
+(2, 'Casio CDP-S110', 'Casio', 8500000.00, 'https://images.unsplash.com/photo-1552422535-c45813c61732?q=80&w=600&auto=format&fit=crop', 'Piano điện compact, phím cảm ứng nhạy.', 12, 0, NULL, NULL),
+(4, 'Audio Technica ATH-M50x', 'Audio-Technica', 5500000.00, 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=600&auto=format&fit=crop', 'Tai nghe studio monitoring chuyên nghiệp.', 18, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 -- 4. BẢNG ORDERS (Đơn mua hàng)

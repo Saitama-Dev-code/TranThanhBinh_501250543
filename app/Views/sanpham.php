@@ -2,236 +2,1479 @@
 /**
  * =========================================================================
  * TÊN FILE: app/Views/sanpham.php
- * MÔ TẢ: Trang hiển thị danh sách sản phẩm. Sử dụng header.php và footer.php.
- * XỬ LÝ LỖI: Tất cả các biến từ Controller truyền sang đều được bọc bởi ?? ''
- * để ngăn chặn hoàn toàn lỗi Undefined Variable.
+ * MÔ TẢ: Trang hiển thị danh sách sản phẩm với bộ lọc nâng cao,
+ * Infinite Scroll trong khung riêng, và card sản phẩm tương tác.
+ * SỬ DỤNG: header.php và footer.php
  * =========================================================================
  */
 include __DIR__ . '/partials/header.php';
 ?>
 
 <style>
-    .sidebar-category { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; }
-    .category-link { position: relative; color: var(--text-color); text-decoration: none; padding: 12px 15px; display: block; border-bottom: 1px solid var(--border-color); transition: background 0.3s ease, color 0.3s ease; overflow: hidden; }
-    .category-link::before { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: #3b82f6; transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
-    .category-link:hover, .category-link.active { background: rgba(59, 130, 246, 0.05); color: #3b82f6; }
-    .category-link:hover::before, .category-link.active::before { transform: translateX(0); }
-    .category-link i { transition: transform 0.3s ease; display: inline-block; }
-    .category-link:hover i, .category-link.active i { transform: translateX(5px) scale(1.1); }
-    
-    /* Sửa màu Placeholder để dễ đọc trên nền tối */
-    .form-control::placeholder { color: rgba(255, 255, 255, 0.5) !important; font-style: italic; }
-    
-    /* Hiệu ứng 3D Pop-out thanh lịch (Đã bỏ nghiêng ngả lộn xộn) */
-    .product-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s ease, border-color 0.4s ease; overflow: hidden; height: 100%; position: relative; z-index: 1; }
-    .product-wrapper:hover .product-card { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.2); border-color: #3b82f6; z-index: 10; }
-    
-    /* Ảnh sản phẩm bật ra tinh tế khi hover */
-    .product-img { height: 200px; width: 100%; object-fit: contain; padding: 15px; transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
-    .product-wrapper:hover .product-img { transform: scale(1.1); filter: drop-shadow(0 8px 8px rgba(0,0,0,0.15)); }
+/* ================================================================================
+   PHẦN 1: CSS CHO BỘ LỌC NÂNG CAO (ADVANCED FILTER SIDEBAR)
+   ================================================================================ */
+
+/* Container chính của sidebar lọc */
+.filter-sidebar {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 20px;
+    position: sticky;
+    top: 90px;
+    max-height: calc(100vh - 110px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+}
+
+.filter-sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.filter-sidebar::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+/* Tiêu đề mỗi nhóm lọc */
+.filter-group {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.filter-group:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.filter-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-color);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-title i {
+    color: #3b82f6;
+    font-size: 0.9rem;
+}
+
+/* Checkbox tùy chỉnh */
+.filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    margin-bottom: 6px;
+}
+
+.filter-checkbox:hover {
+    background: rgba(59, 130, 246, 0.08);
+}
+
+.filter-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #3b82f6;
+    cursor: pointer;
+}
+
+.filter-checkbox span {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    transition: color 0.25s;
+}
+
+.filter-checkbox:hover span {
+    color: #3b82f6;
+}
+
+/* Khoảng giá - Range Slider */
+.price-range-container {
+    padding: 5px 0;
+}
+
+.price-inputs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.price-input-wrapper {
+    flex: 1;
+    position: relative;
+}
+
+.price-input-wrapper label {
+    display: block;
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 4px;
+}
+
+.price-input {
+    width: 100%;
+    padding: 10px 12px 10px 35px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-size: 0.85rem;
+    transition: border-color 0.25s;
+}
+
+.price-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
+.price-input-wrapper .currency-symbol {
+    position: absolute;
+    left: 12px;
+    bottom: 10px;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.85rem;
+}
+
+/* Range Slider kép */
+.price-slider {
+    position: relative;
+    height: 6px;
+    background: var(--border-color);
+    border-radius: 3px;
+    margin: 15px 0;
+}
+
+.price-slider-fill {
+    position: absolute;
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    border-radius: 3px;
+    left: 0%;
+    right: 0%;
+}
+
+.price-slider input[type="range"] {
+    position: absolute;
+    width: 100%;
+    height: 6px;
+    background: transparent;
+    pointer-events: none;
+    -webkit-appearance: none;
+    top: 0;
+    left: 0;
+}
+
+.price-slider input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border: 3px solid #3b82f6;
+    border-radius: 50%;
+    cursor: pointer;
+    pointer-events: auto;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+    transition: transform 0.2s;
+}
+
+.price-slider input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+.price-display {
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #3b82f6;
+    margin-top: 8px;
+}
+
+/* Nút Áp dụng / Xóa bộ lọc */
+.filter-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.btn-apply-filter {
+    flex: 1;
+    padding: 12px;
+    background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-apply-filter:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.btn-clear-filter {
+    padding: 12px 16px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--text-color);
+    font-weight: 500;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.25s;
+}
+
+.btn-clear-filter:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.05);
+}
+
+/* Badge hiển thị bộ lọc đang active */
+.active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.filter-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: #60a5fa;
+    animation: fadeIn 0.3s ease;
+}
+
+.filter-tag .remove-tag {
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.filter-tag .remove-tag:hover {
+    opacity: 1;
+}
+
+/* ================================================================================
+   PHẦN 2: CSS CHO KHUNG SẢN PHẨM - INFINITE SCROLL TRONG KHUNG RIÊNG
+   ================================================================================ */
+
+/* Container bao bọc toàn bộ khu vực sản phẩm */
+.products-frame {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    /* Chiều cao tối đa = 100vh - navbar - some padding */
+    max-height: calc(100vh - 140px);
+}
+
+/* Lớp phủ mờ dần ở viền dưới (Fade effect) */
+.products-frame::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    background: linear-gradient(to top, var(--card-bg) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.4s;
+}
+
+.products-frame.is-scrolling::after {
+    opacity: 1;
+}
+
+/* Vùng cuộn chính - Scroll theo chiều dọc trong khung riêng */
+.products-scroll-container {
+    height: calc(100vh - 140px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 24px;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+}
+
+.products-scroll-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.products-scroll-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.products-scroll-container::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+/* Grid hiển thị sản phẩm - 3 cột */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding-bottom: 40px;
+}
+
+/* Responsive: 2 cột trên tablet, 1 cột trên mobile */
+@media (max-width: 1200px) {
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ================================================================================
+   PHẦN 3: CSS CHO CARD SẢN PHẨM - HOVER HIỆN MÀU/LOẠI ĐỔI HÌNH
+   ================================================================================ */
+
+/* Wrapper bọc card - dùng để hover effect */
+.product-wrapper {
+    position: relative;
+    perspective: 1000px;
+}
+
+/* Card sản phẩm chính */
+.product-card {
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+}
+
+/* Khi hover vào wrapper -> card nổi lên */
+.product-wrapper:hover .product-card {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    border-color: rgba(59, 130, 246, 0.5);
+}
+
+/* Container chứa hình ảnh sản phẩm */
+.product-image-container {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
+}
+
+.product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Zoom nhẹ khi hover */
+.product-wrapper:hover .product-image {
+    transform: scale(1.08);
+}
+
+/* Badge trạng thái (Cho thuê / Còn hàng) */
+.product-badges {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 5;
+}
+
+.badge-rent {
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
+    color: #000;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.badge-stock {
+    background: rgba(16, 185, 129, 0.9);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.badge-stock.low {
+    background: rgba(239, 68, 68, 0.9);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* ================================================================================
+   PHẦN 3A: PANEL MÀU SẮC & LOẠI - HIỆN KHI HOVER
+   ================================================================================ */
+
+/* Panel chứa các lựa chọn màu/loại - Mặc định ẩn đi, chỉ hiện khi hover */
+.variant-panel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.95));
+    backdrop-filter: blur(10px);
+    padding: 16px;
+    transform: translateY(100%);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 20;
+    border-top: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* Khi hover -> Panel trượt lên từ dưới */
+.product-wrapper:hover .variant-panel {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* Tiêu đề nhóm tùy chọn */
+.variant-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Container chứa các nút chọn màu/loại */
+.variant-options {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* Mỗi nút chọn màu/loại */
+.variant-btn {
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.variant-btn:hover {
+    background: rgba(59, 130, 246, 0.3);
+    border-color: rgba(59, 130, 246, 0.5);
+    color: white;
+    transform: scale(1.05);
+}
+
+.variant-btn.selected {
+    background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+/* Dot màu nhỏ trước text */
+.variant-btn .color-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ================================================================================
+   PHẦN 4: CSS CHO THÔNG TIN SẢN PHẨM
+   ================================================================================ */
+
+/* Container thông tin sản phẩm */
+.product-info {
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Thương hiệu */
+.product-brand {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #60a5fa;
+    margin-bottom: 6px;
+}
+
+/* Tên sản phẩm */
+.product-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 10px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Mô tả ngắn */
+.product-desc {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 12px;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Container giá */
+.product-pricing {
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Giá chính */
+.product-price {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #3b82f6;
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+}
+
+.product-price .currency {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Giá thuê (nếu có) */
+.product-rent-price {
+    font-size: 0.8rem;
+    color: #f59e0b;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Nút Thêm vào giỏ */
+.btn-add-cart {
+    width: 100%;
+    padding: 12px;
+    margin-top: 14px;
+    background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-add-cart:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+}
+
+.btn-add-cart i {
+    font-size: 1.1rem;
+}
+
+/* ================================================================================
+   PHẦN 5: LOADING & LOAD MORE
+   ================================================================================ */
+
+/* Spinner khi đang load thêm sản phẩm */
+.loading-indicator {
+    display: none;
+    text-align: center;
+    padding: 30px;
+    grid-column: 1 / -1;
+}
+
+.loading-indicator.active {
+    display: block;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border-color);
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-text {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Nút "Xem thêm sản phẩm" */
+.btn-load-more {
+    display: none;
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 20px;
+}
+
+.btn-load-more.active {
+    display: block;
+}
+
+.btn-load-more-inner {
+    padding: 14px 40px;
+    background: transparent;
+    border: 2px solid #3b82f6;
+    border-radius: 30px;
+    color: #3b82f6;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-load-more-inner:hover {
+    background: #3b82f6;
+    color: white;
+    transform: scale(1.05);
+}
+
+/* Animation fadeIn cho sản phẩm mới load */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.product-item-new {
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+/* ================================================================================
+   PHẦN 6: ANIMATION NỀN CHO TRANG SẢN PHẨM (KHÁC TRANG CHỦ)
+   ================================================================================ */
+
+/* Canvas particles cho trang sản phẩm */
+#product-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    pointer-events: none;
+}
 </style>
+
+<!-- Canvas cho animation nền riêng của trang sản phẩm -->
+<canvas id="product-canvas"></canvas>
 
 <div class="container my-5 pt-4">
     <div class="row">
+        <!-- ================================================================= -->
+        <!-- CỘT TRÁI: SIDEBAR BỘ LỌC NÂNG CAO -->
+        <!-- ================================================================= -->
         <div class="col-lg-3 mb-4">
-            <form action="index.php" method="GET" class="mb-4">
+            <!-- Form bọc toàn bộ bộ lọc - Submit bằng AJAX -->
+            <form id="filter-form" method="GET" action="index.php">
                 <input type="hidden" name="controller" value="product">
                 <input type="hidden" name="action" value="index">
-                <div class="input-group">
-                    <input type="text" name="search" class="form-control bg-transparent text-light border-secondary" placeholder="Tên nhạc cụ..." value="<?= htmlspecialchars($currentKeyword ?? '') ?>">
-                    <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
-                </div>
-            </form>
 
-            <div class="sidebar-category overflow-hidden">
-                <h5 class="p-3 mb-0 fw-bold border-bottom" style="border-color: var(--border-color) !important;">
-                    <i class="fas fa-list me-2"></i>Danh mục
-                </h5>
-                <a href="index.php?controller=product&action=index" class="category-link <?= empty($currentCategory) ? 'active' : '' ?>">
-                    <i class="fas fa-music me-2"></i> Tất cả nhạc cụ
-                </a>
-                
-                <?php
-                // Kiểm tra xem danh sách thể loại có tồn tại không trước khi lặp
-                if(isset($categories) && is_array($categories)) {
-                    foreach ($categories as $cat) {
-                        // Xác định xem danh mục này có trùng với danh mục trên URL không (active)
-                        $catId = $currentCategory ?? null;
-                        $isActive = ($catId == $cat['id']) ? 'active' : '';
-                        echo '<a href="index.php?controller=product&action=index&category='.$cat['id'].'" class="category-link '.$isActive.'">';
-                        echo '<i class="'.$cat['icon'].' me-2"></i> ' . $cat['name'];
-                        echo '</a>';
-                    }
-                }
-                ?>
-            </div>
-        </div>
+                <!-- Sidebar lọc với scroll riêng -->
+                <div class="filter-sidebar">
+                    <!-- Tiêu đề sidebar -->
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h5 class="fw-bold mb-0">
+                            <i class="fas fa-sliders-h me-2 text-primary"></i>Bộ Lọc
+                        </h5>
+                        <span id="active-filter-count" class="badge bg-primary rounded-pill" style="display: none;">0</span>
+                    </div>
 
-        <div class="col-lg-9" id="product-list-container">
-            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3" style="border-color: var(--border-color) !important;">
-                <h4 class="fw-bold mb-0">Cửa hàng nhạc cụ</h4>
-                <span class="text-muted">Trang <?= $currentPage ?? 1 ?> / <?= $totalPages ?? 1 ?></span>
-            </div>
+                    <!-- Nút xóa tất cả lọc -->
+                    <a href="index.php?controller=product&action=index" class="btn-clear-filter w-100 mb-4 text-center" id="clear-all-filters" style="display: none;">
+                        <i class="fas fa-times me-2"></i>Xóa tất cả
+                    </a>
 
-            <div class="row g-4">
-                <?php
-                // Kiểm tra xem có sản phẩm nào được trả về từ DB không
-                if (isset($products) && is_array($products) && count($products) > 0) {
-                    // Lặp qua từng sản phẩm để hiển thị Card
-                    foreach ($products as $p) {
-                ?>
-                        <div class="col-md-4 col-sm-6 product-wrapper">
-                            <!-- Hiệu ứng Tilt và Pop-out do CSS điều khiển qua product-wrapper -->
-                            <div class="product-card d-flex flex-column">
-                                <a href="index.php?controller=product&action=detail&id=<?= $p['id'] ?>">
-                                    <img src="<?= $p['image'] ?>" class="product-img" alt="<?= $p['name'] ?>">
-                                </a>
-                                
-                                <div class="p-3 d-flex flex-column flex-grow-1 text-center">
-                                    <?php if($p['is_rentable']) echo '<span class="badge bg-warning text-dark mx-auto mb-2">Có cho thuê</span>'; ?>
-                                    <h6 class="fw-bold text-truncate"><?= $p['name'] ?></h6>
-                                    <p class="text-primary fw-bolder fs-5 mt-auto"><?= number_format($p['price'], 0, ',', '.') ?> ₫</p>
-                                    
-                                    <button class="btn btn-outline-primary w-100 rounded-pill mt-2">
-                                        <i class='bx bx-cart-add fs-5 align-middle me-2'></i>Thêm giỏ hàng
-                                    </button>
+                    <!-- ========================================================= -->
+                    <!-- NHÓM 1: TÌM KIẾM THEO TÊN -->
+                    <!-- ========================================================= -->
+                    <div class="filter-group">
+                        <div class="filter-title">
+                            <i class="fas fa-search"></i> Tìm kiếm
+                        </div>
+                        <div class="input-group">
+                            <input type="text" name="search" class="form-control bg-transparent border-secondary" 
+                                   placeholder="Tên nhạc cụ..." 
+                                   value="<?= htmlspecialchars($currentKeyword ?? '') ?>">
+                        </div>
+                    </div>
+
+                    <!-- ========================================================= -->
+                    <!-- NHÓM 2: DANH MỤC -->
+                    <!-- ========================================================= -->
+                    <div class="filter-group">
+                        <div class="filter-title">
+                            <i class="fas fa-guitar"></i> Danh mục
+                        </div>
+                        <a href="index.php?controller=product&action=index" 
+                           class="filter-checkbox <?= empty($currentCategory) ? 'active' : '' ?>">
+                            <input type="radio" name="category" value="" <?= empty($currentCategory) ? 'checked' : '' ?>>
+                            <span>Tất cả nhạc cụ</span>
+                        </a>
+                        <?php
+                        // Lặp qua danh sách danh mục để render radio button
+                        if (isset($categories) && is_array($categories)) {
+                            foreach ($categories as $cat) {
+                                $isChecked = ($currentCategory ?? null) == $cat['id'] ? 'checked' : '';
+                                echo '<label class="filter-checkbox">';
+                                echo '<input type="radio" name="category" value="' . $cat['id'] . '" ' . $isChecked . '>';
+                                echo '<span><i class="' . $cat['icon'] . ' me-2 opacity-50"></i>' . $cat['name'] . '</span>';
+                                echo '</label>';
+                            }
+                        }
+                        ?>
+                    </div>
+
+                    <!-- ========================================================= -->
+                    <!-- NHÓM 3: KHOẢNG GIÁ -->
+                    <!-- ========================================================= -->
+                    <div class="filter-group">
+                        <div class="filter-title">
+                            <i class="fas fa-tag"></i> Khoảng giá
+                        </div>
+                        <div class="price-range-container">
+                            <div class="price-inputs">
+                                <div class="price-input-wrapper">
+                                    <span class="currency-symbol">₫</span>
+                                    <label>Từ</label>
+                                    <input type="number" name="price_min" class="price-input" 
+                                           placeholder="0" 
+                                           value="<?= $currentPriceMin ?? '' ?>">
+                                </div>
+                                <div class="price-input-wrapper">
+                                    <span class="currency-symbol">₫</span>
+                                    <label>Đến</label>
+                                    <input type="number" name="price_max" class="price-input" 
+                                           placeholder="100,000,000" 
+                                           value="<?= $currentPriceMax ?? '' ?>">
                                 </div>
                             </div>
+                            <div class="price-slider">
+                                <div class="price-slider-fill" id="price-slider-fill"></div>
+                                <input type="range" id="price-range-max" min="0" max="100000000" step="1000000" value="<?= $currentPriceMax ?? 100000000 ?>">
+                            </div>
+                            <div class="price-display" id="price-display">
+                                <?php
+                                // Hiển thị khoảng giá đã chọn
+                                $min = isset($currentPriceMin) ? number_format((float)$currentPriceMin, 0, ',', '.') : '0';
+                                $max = isset($currentPriceMax) ? number_format((float)$currentPriceMax, 0, ',', '.') : '100M+';
+                                echo $min . ' ₫ - ' . $max . ' ₫';
+                                ?>
+                            </div>
                         </div>
-                <?php
-                    }
-                } else {
-                    echo '<div class="col-12 text-center py-5"><h5 class="text-muted"><i class="fas fa-box-open fa-3x mb-3 d-block"></i>Không tìm thấy nhạc cụ nào phù hợp.</h5></div>';
-                }
-                ?>
+                    </div>
+
+                    <!-- ========================================================= -->
+                    <!-- NHÓM 4: THƯƠNG HIỆU -->
+                    <!-- ========================================================= -->
+                    <div class="filter-group">
+                        <div class="filter-title">
+                            <i class="fas fa-star"></i> Thương hiệu
+                        </div>
+                        <?php
+                        // Lặp qua danh sách thương hiệu để render checkbox
+                        if (isset($brands) && is_array($brands)) {
+                            foreach ($brands as $b) {
+                                $isChecked = ($currentBrand ?? '') === $b ? 'checked' : '';
+                                echo '<label class="filter-checkbox">';
+                                echo '<input type="checkbox" name="brand" value="' . $b . '" ' . $isChecked . '>';
+                                echo '<span>' . $b . '</span>';
+                                echo '</label>';
+                            }
+                        }
+                        ?>
+                    </div>
+
+                    <!-- ========================================================= -->
+                    <!-- NHÓM 5: TÌNH TRẠNG KHO -->
+                    <!-- ========================================================= -->
+                    <div class="filter-group">
+                        <div class="filter-title">
+                            <i class="fas fa-boxes"></i> Tình trạng
+                        </div>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" name="in_stock" value="1" <?= ($currentInStock ?? null) == 1 ? 'checked' : '' ?>>
+                            <span>Chỉ còn hàng (<?php echo isset($totalProducts) ? $totalProducts : 0; ?>)</span>
+                        </label>
+                    </div>
+
+                    <!-- ========================================================= -->
+                    <!-- NHÓM 6: CHO THUÊ -->
+                    <!-- ========================================================= -->
+                    <div class="filter-group">
+                        <div class="filter-title">
+                            <i class="fas fa-clock"></i> Loại
+                        </div>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" name="is_rentable" value="1" <?= ($currentIsRentable ?? null) == 1 ? 'checked' : '' ?>>
+                            <span>Có cho thuê</span>
+                        </label>
+                    </div>
+
+                    <!-- Nút hành động -->
+                    <div class="filter-actions">
+                        <button type="submit" class="btn-apply-filter">
+                            <i class="fas fa-check"></i> Áp dụng
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- CỘT PHẢI: KHUNG SẢN PHẨM VỚI INFINITE SCROLL -->
+        <!-- ========================================================= -->
+        <div class="col-lg-9">
+            <!-- Tiêu đề + Thông tin -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="fw-bold mb-1">Cửa hàng nhạc cụ</h4>
+                    <small class="text-muted">
+                        <?= isset($totalProducts) ? $totalProducts : 0 ?> sản phẩm
+                        <?php if(!empty($currentKeyword)): ?>
+                            - Tìm kiếm: "<?= htmlspecialchars($currentKeyword) ?>"
+                        <?php endif; ?>
+                    </small>
+                </div>
             </div>
 
-            <?php 
-            // XỬ LÝ PHÂN TRANG (PAGINATION)
-            $totPages = $totalPages ?? 1;
-            $curPage = $currentPage ?? 1;
-            // Chỉ hiển thị thanh phân trang nếu có nhiều hơn 1 trang
-            if ($totPages > 1): 
-            ?>
-            <nav class="mt-5">
-                <ul class="pagination justify-content-center">
-                    <?php 
-                    for ($i = 1; $i <= $totPages; $i++) { 
-                        $activeClass = ($i == $curPage) ? 'active' : '';
-                        $link = "index.php?controller=product&action=index&page={$i}";
-                        if (!empty($currentKeyword)) $link .= "&search={$currentKeyword}";
-                        if (!empty($currentCategory)) $link .= "&category={$currentCategory}";
-                    ?>
-                        <li class="page-item <?= $activeClass ?>">
-                            <a class="page-link" href="<?= $link ?>"><?= $i ?></a>
-                        </li>
-                    <?php } ?>
-                </ul>
-            </nav>
-            <?php endif; ?>
+            <!-- ========================================================= -->
+            <!-- KHUNG CHỨA SẢN PHẨM - SCROLL TRONG KHUNG RIÊNG -->
+            <!-- ========================================================= -->
+            <div class="products-frame" id="products-frame">
+                <div class="products-scroll-container" id="products-scroll">
+                    <div class="products-grid" id="products-grid">
+                        <?php
+                        // =================================================================
+                        // BƯỚC 1: KIỂM TRA CÓ SẢN PHẨM NÀO KHÔNG
+                        // =================================================================
+                        if (isset($products) && is_array($products) && count($products) > 0) {
+                            // =================================================================
+                            // BƯỚC 2: LẶP QUA TỪNG SẢN PHẨM ĐỂ HIỂN THỊ CARD
+                            // =================================================================
+                            foreach ($products as $index => $p) {
+                                // Xác định badge tồn kho
+                                $stockClass = $p['stock'] <= 3 ? 'low' : '';
+                                $stockText = $p['stock'] > 0 ? 'Còn ' . $p['stock'] : 'Hết hàng';
 
+                                // Các biến thể màu sắc giả lập (trong thực tế sẽ từ DB)
+                                // Mỗi sản phẩm có 3-4 màu khác nhau
+                                $colorOptions = ['Đen' => '#1a1a2e', 'Nâu' => '#8B4513', 'Trắng' => '#f0f0f0', 'Vàng' => '#FFD700', 'Đỏ' => '#DC143C'];
+                                $selectedColors = array_slice($colorOptions, 0, rand(3, 4), true);
+
+                                // Các biến thể loại giả lập (trong thực tế sẽ từ DB)
+                                $typeOptions = ['Standard', 'Pro', 'Premium', 'Limited'];
+                                $selectedTypes = array_slice($typeOptions, 0, rand(2, 3));
+
+                                // Ảnh phụ để đổi khi chọn màu/loại (thực tế sẽ từ DB)
+                                $altImages = [
+                                    'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?q=80&w=400',
+                                    'https://images.unsplash.com/photo-1550291652-6ea9114a47b1?q=80&w=400',
+                                    'https://images.unsplash.com/photo-1564186763535-ebb21ef5277f?q=80&w=400'
+                                ];
+                        ?>
+                                <!-- MỖI SẢN PHẨM LÀ 1 ITEM TRONG GRID -->
+                                <div class="product-item" data-index="<?= $index ?>">
+                                    <div class="product-wrapper">
+                                        <!-- Card chính -->
+                                        <div class="product-card">
+                                            <!-- Hình ảnh sản phẩm -->
+                                            <div class="product-image-container">
+                                                <img src="<?= $p['image'] ?>" 
+                                                     class="product-image" 
+                                                     alt="<?= $p['name'] ?>"
+                                                     data-default-image="<?= $p['image'] ?>">
+                                                
+                                                <!-- Badges -->
+                                                <div class="product-badges">
+                                                    <?php if($p['is_rentable']): ?>
+                                                        <span class="badge-rent">
+                                                            <i class="fas fa-clock"></i> Cho thuê
+                                                        </span>
+                                                    <?php endif; ?>
+                                                    <span class="badge-stock <?= $stockClass ?>">
+                                                        <?= $stockText ?>
+                                                    </span>
+                                                </div>
+
+                                                <!-- Panel màu sắc & loại - Hiện khi hover -->
+                                                <div class="variant-panel">
+                                                    <!-- Tùy chọn màu sắc -->
+                                                    <div class="mb-3">
+                                                        <div class="variant-label">
+                                                            <i class="fas fa-palette"></i> Màu sắc
+                                                        </div>
+                                                        <div class="variant-options">
+                                                            <?php foreach($selectedColors as $colorName => $colorHex): ?>
+                                                                <button class="variant-btn color-btn" 
+                                                                        data-color="<?= $colorName ?>"
+                                                                        data-image="<?= $altImages[array_rand($altImages)] ?>">
+                                                                    <span class="color-dot" style="background: <?= $colorHex ?>"></span>
+                                                                    <?= $colorName ?>
+                                                                </button>
+                                                            <?php endforeach; ?>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Tùy chọn loại -->
+                                                    <div>
+                                                        <div class="variant-label">
+                                                            <i class="fas fa-layer-group"></i> Phiên bản
+                                                        </div>
+                                                        <div class="variant-options">
+                                                            <?php foreach($selectedTypes as $typeName): ?>
+                                                                <button class="variant-btn type-btn" data-type="<?= $typeName ?>">
+                                                                    <?= $typeName ?>
+                                                                </button>
+                                                            <?php endforeach; ?>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Thông tin sản phẩm -->
+                                            <div class="product-info">
+                                                <span class="product-brand"><?= $p['brand'] ?></span>
+                                                <h6 class="product-name"><?= $p['name'] ?></h6>
+                                                <p class="product-desc"><?= substr($p['description'] ?? '', 0, 80) ?>...</p>
+
+                                                <div class="product-pricing">
+                                                    <div class="product-price">
+                                                        <?= number_format($p['price'], 0, ',', '.') ?> <span class="currency">₫</span>
+                                                    </div>
+                                                    <?php if($p['is_rentable'] && $p['rent_price_day']): ?>
+                                                        <div class="product-rent-price">
+                                                            <i class="fas fa-calendar-alt"></i>
+                                                            Thuê <?= number_format($p['rent_price_day'], 0, ',', '.') ?>₫/ngày
+                                                        </div>
+                                                    <?php endif; ?>
+                                                </div>
+
+                                                <button class="btn-add-cart">
+                                                    <i class='bx bx-cart-add'></i> Thêm vào giỏ
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                        <?php
+                            } // Kết thúc vòng lặp foreach
+                        } else {
+                            // =================================================================
+                            // BƯỚC 3: KHÔNG CÓ SẢN PHẨM NÀO PHÙ HỢP
+                            // =================================================================
+                            echo '<div class="col-12 text-center py-5">';
+                            echo '<i class="fas fa-box-open fa-4x mb-4" style="opacity: 0.3;"></i>';
+                            echo '<h5 class="text-muted">Không tìm thấy nhạc cụ nào phù hợp!</h5>';
+                            echo '<p class="text-muted small">Thử thay đổi bộ lọc hoặc tìm kiếm từ khóa khác.</p>';
+                            echo '</div>';
+                        }
+                        ?>
+                    </div>
+
+                    <!-- Loading indicator khi load thêm sản phẩm -->
+                    <div class="loading-indicator" id="loading-indicator">
+                        <div class="spinner"></div>
+                        <span class="loading-text">Đang tải thêm sản phẩm...</span>
+                    </div>
+
+                    <!-- Nút Xem thêm (nếu còn sản phẩm) -->
+                    <?php
+                    // Chỉ hiện nút xem thêm nếu chưa load hết
+                    $hasMore = ($currentPage ?? 1) < ($totalPages ?? 1);
+                    if ($hasMore && isset($products) && count($products) > 0):
+                    ?>
+                    <div class="btn-load-more active" id="load-more-section">
+                        <button class="btn-load-more-inner" id="btn-load-more">
+                            <i class="fas fa-plus"></i> Xem thêm sản phẩm
+                        </button>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
 /**
- * AJAX FILTERING & PAGINATION
- * Tải sản phẩm mượt mà không làm mới trang để không làm gián đoạn hiệu ứng Particle.
+ * ================================================================================
+ * PHẦN 1: JAVASCRIPT CHO BỘ LỌC & INFINITE SCROLL
+ * ================================================================================
  */
-document.addEventListener('DOMContentLoaded', function() {
-    const container = document.getElementById('product-list-container');
-    const searchForm = document.querySelector('form[action="index.php"]');
-    
-    // Hàm gọi API lấy dữ liệu HTML và thay thế
-    async function loadProducts(url) {
-        // Hiển thị trạng thái đang tải mờ nhẹ
-        container.style.opacity = '0.5';
-        container.style.pointerEvents = 'none';
-        
-        try {
-            const response = await fetch(url);
-            const htmlString = await response.text();
-            
-            // Phân tích HTML trả về
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(htmlString, 'text/html');
-            const newContent = doc.getElementById('product-list-container').innerHTML;
-            
-            // Thay thế nội dung
-            container.innerHTML = newContent;
-            
-            // Cập nhật lại thanh địa chỉ URL (History API)
-            window.history.pushState({path: url}, '', url);
-            
-            // Kích hoạt lại các sự kiện click cho các link mới (Phân trang)
-            attachAjaxEvents();
-            
-            // Xóa class active của sidebar và gán lại cho đúng
-            updateSidebarActive(url);
-        } catch (error) {
-            console.error('Lỗi khi tải sản phẩm:', error);
-        } finally {
-            container.style.opacity = '1';
-            container.style.pointerEvents = 'auto';
-        }
-    }
 
-    function attachAjaxEvents() {
-        // Bắt sự kiện click vào link phân trang
-        const pageLinks = container.querySelectorAll('.pagination .page-link');
-        pageLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
+// Biến toàn cục lưu trạng thái
+let currentPage = <?= $currentPage ?? 1 ?>;
+let totalPages = <?= $totalPages ?? 1 ?>;
+let isLoading = false;
+let currentFilters = {
+    search: '<?= addslashes($currentKeyword ?? '') ?>',
+    category: '<?= $currentCategory ?? '' ?>',
+    price_min: '<?= $currentPriceMin ?? '' ?>',
+    price_max: '<?= $currentPriceMax ?? '' ?>',
+    brand: '<?= addslashes($currentBrand ?? '') ?>',
+    in_stock: '<?= $currentInStock ?? '' ?>',
+    is_rentable: '<?= $currentIsRentable ?? '' ?>'
+};
+
+// =================================================================
+// HÀM: Build URL từ các filter hiện tại
+// =================================================================
+function buildFilterUrl(page = 1) {
+    const params = new URLSearchParams();
+    
+    if (currentFilters.search) params.append('search', currentFilters.search);
+    if (currentFilters.category) params.append('category', currentFilters.category);
+    if (currentFilters.price_min) params.append('price_min', currentFilters.price_min);
+    if (currentFilters.price_max) params.append('price_max', currentFilters.price_max);
+    if (currentFilters.brand) params.append('brand', currentFilters.brand);
+    if (currentFilters.in_stock) params.append('in_stock', currentFilters.in_stock);
+    if (currentFilters.is_rentable) params.append('is_rentable', currentFilters.is_rentable);
+    
+    params.append('controller', 'product');
+    params.append('action', 'index');
+    params.append('page', page);
+    
+    return 'index.php?' + params.toString();
+}
+
+// =================================================================
+// HÀM: Load sản phẩm bằng AJAX (gọi API để lấy HTML fragment)
+// =================================================================
+async function loadProducts(url, append = false) {
+    if (isLoading) return;
+    isLoading = true;
+    
+    const loadingIndicator = document.getElementById('loading-indicator');
+    const loadMoreSection = document.getElementById('load-more-section');
+    const productsGrid = document.getElementById('products-grid');
+    
+    if (!append) {
+        // Trường hợp filter mới -> Hiển thị loading overlay
+        productsGrid.style.opacity = '0.5';
+    }
+    
+    loadingIndicator.classList.add('active');
+    if (loadMoreSection) loadMoreSection.style.display = 'none';
+    
+    try {
+        const response = await fetch(url);
+        const htmlString = await response.text();
+        
+        // Parse HTML trả về để lấy phần products-grid
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlString, 'text/html');
+        const newProductsHtml = doc.getElementById('products-grid').innerHTML;
+        const newTotalPages = doc.getElementById('products-grid').dataset.totalPages;
+        
+        if (append) {
+            // Thêm sản phẩm mới vào cuối grid ( Infinite Scroll )
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = newProductsHtml;
+            const newItems = tempDiv.querySelectorAll('.product-item');
+            
+            newItems.forEach((item, idx) => {
+                item.classList.add('product-item-new');
+                item.style.animationDelay = (idx * 0.1) + 's';
+                productsGrid.appendChild(item);
+            });
+            
+            // Cập nhật số trang hiện tại
+            currentPage++;
+        } else {
+            // Thay thế toàn bộ grid (Filter mới)
+            productsGrid.innerHTML = newProductsHtml;
+            productsGrid.scrollTop = 0;
+        }
+        
+        // Cập nhật totalPages
+        if (newTotalPages) {
+            totalPages = parseInt(newTotalPages);
+        }
+        
+        // Ẩn/Hiện nút Xem thêm
+        if (currentPage >= totalPages && loadMoreSection) {
+            loadMoreSection.style.display = 'none';
+        } else if (loadMoreSection) {
+            loadMoreSection.style.display = 'block';
+        }
+        
+        // Gắn lại sự kiện hover cho card sản phẩm
+        attachCardEvents();
+        
+        // Cập nhật URL mà không reload trang
+        window.history.pushState({path: url}, '', url);
+        
+    } catch (error) {
+        console.error('Lỗi khi tải sản phẩm:', error);
+    } finally {
+        isLoading = false;
+        productsGrid.style.opacity = '1';
+        loadingIndicator.classList.remove('active');
+    }
+}
+
+// =================================================================
+// HÀM: Xử lý sự kiện hover cho card (đổi hình khi chọn màu/loại)
+// =================================================================
+function attachCardEvents() {
+    // Lấy tất cả các card sản phẩm
+    const productItems = document.querySelectorAll('.product-item');
+    
+    productItems.forEach(item => {
+        const colorBtns = item.querySelectorAll('.color-btn');
+        const typeBtns = item.querySelectorAll('.type-btn');
+        const productImage = item.querySelector('.product-image');
+        const defaultImage = productImage?.dataset.defaultImage;
+        
+        // =================================================================
+        // SỰ KIỆN: Click vào nút màu sắc -> Đổi hình ảnh sản phẩm
+        // =================================================================
+        colorBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
                 e.preventDefault();
-                loadProducts(this.getAttribute('href'));
+                e.stopPropagation();
+                
+                // Xóa class selected khỏi tất cả nút màu
+                colorBtns.forEach(b => b.classList.remove('selected'));
+                // Thêm class selected vào nút được click
+                this.classList.add('selected');
+                
+                // Đổi hình ảnh sản phẩm
+                const newImage = this.dataset.image;
+                if (newImage && productImage) {
+                    productImage.style.opacity = '0';
+                    setTimeout(() => {
+                        productImage.src = newImage;
+                        productImage.style.opacity = '1';
+                    }, 200);
+                }
             });
         });
-    }
-
-    function updateSidebarActive(url) {
-        const urlObj = new URL(url, window.location.origin);
-        const categoryId = urlObj.searchParams.get('category');
         
-        const categoryLinks = document.querySelectorAll('.category-link');
-        categoryLinks.forEach(link => link.classList.remove('active'));
-        
-        if (categoryId) {
-            const activeLink = document.querySelector(`.category-link[href*="category=${categoryId}"]`);
-            if (activeLink) activeLink.classList.add('active');
-        } else {
-            // Nếu không có category, TẤT CẢ NHẠC CỤ sẽ active
-            const allLink = document.querySelector(`.category-link[href="index.php?controller=product&action=index"]`);
-            if (allLink) allLink.classList.add('active');
-        }
-    }
-
-    // Bắt sự kiện click menu Danh mục bên trái
-    const categoryLinks = document.querySelectorAll('.category-link');
-    categoryLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            loadProducts(this.getAttribute('href'));
+        // =================================================================
+        // SỰ KIỆN: Click vào nút loại -> Highlight loại đã chọn
+        // =================================================================
+        typeBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Toggle class selected
+                if (this.classList.contains('selected')) {
+                    this.classList.remove('selected');
+                } else {
+                    // Xóa selected từ tất cả loại khác
+                    typeBtns.forEach(b => b.classList.remove('selected'));
+                    // Thêm selected vào nút này
+                    this.classList.add('selected');
+                }
+            });
         });
     });
+}
 
-    // Bắt sự kiện submit form Tìm kiếm
-    if (searchForm) {
-        searchForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            const params = new URLSearchParams(formData).toString();
-            const url = 'index.php?' + params;
-            loadProducts(url);
+// =================================================================
+// HÀM: Xử lý form filter - Submit bằng AJAX
+// =================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    const filterForm = document.getElementById('filter-form');
+    const productsFrame = document.getElementById('products-frame');
+    const productsScroll = document.getElementById('products-scroll');
+    
+    // =================================================================
+    // SỰ KIỆN: Scroll trong khung sản phẩm -> Hiệu ứng fade
+    // =================================================================
+    if (productsScroll) {
+        productsScroll.addEventListener('scroll', function() {
+            const scrollTop = this.scrollTop;
+            const scrollHeight = this.scrollHeight - this.clientHeight;
+            
+            // Thêm class is-scrolling khi đang cuộn (để hiện fade effect)
+            if (scrollTop > 20) {
+                productsFrame.classList.add('is-scrolling');
+            } else {
+                productsFrame.classList.remove('is-scrolling');
+            }
+            
+            // =================================================================
+            // INFINITE SCROLL: Khi cuộn gần đến cuối -> Tự động load thêm
+            // =================================================================
+            if (scrollTop >= scrollHeight - 200) {
+                if (!isLoading && currentPage < totalPages) {
+                    loadProducts(buildFilterUrl(currentPage + 1), true);
+                }
+            }
         });
     }
     
-    // Xử lý nút Back của trình duyệt
-    window.addEventListener('popstate', function() {
-        loadProducts(window.location.href);
-    });
+    // =================================================================
+    // SỰ KIỆN: Submit form filter -> Load sản phẩm mới bằng AJAX
+    // =================================================================
+    if (filterForm) {
+        filterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Cập nhật currentFilters từ form data
+            const formData = new FormData(this);
+            
+            currentFilters.search = formData.get('search') || '';
+            currentFilters.category = formData.get('category') || '';
+            currentFilters.price_min = formData.get('price_min') || '';
+            currentFilters.price_max = formData.get('price_max') || '';
+            currentFilters.brand = formData.get('brand') || '';
+            currentFilters.in_stock = formData.get('in_stock') || '';
+            currentFilters.is_rentable = formData.get('is_rentable') || '';
+            
+            currentPage = 1;
+            
+            // Load sản phẩm mới (không append)
+            loadProducts(buildFilterUrl(1), false);
+        });
+    }
+    
+    // =================================================================
+    // SỰ KIỆN: Nút Xem thêm -> Load thêm sản phẩm
+    // =================================================================
+    const btnLoadMore = document.getElementById('btn-load-more');
+    if (btnLoadMore) {
+        btnLoadMore.addEventListener('click', function() {
+            if (!isLoading && currentPage < totalPages) {
+                loadProducts(buildFilterUrl(currentPage + 1), true);
+            }
+        });
+    }
+    
+    // =================================================================
+    // SỰ KIỆN: Xóa tất cả filter
+    // =================================================================
+    const clearAllBtn = document.getElementById('clear-all-filters');
+    if (clearAllBtn) {
+        clearAllBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Reset currentFilters
+            currentFilters = {
+                search: '', category: '', price_min: '',
+                price_max: '', brand: '', in_stock: '', is_rentable: ''
+            };
+            currentPage = 1;
+            
+            // Navigate về trang filter mặc định
+            window.location.href = 'index.php?controller=product&action=index';
+        });
+    }
+    
+    // Khởi tạo sự kiện hover cho card
+    attachCardEvents();
+});
 
-    // Khởi tạo lần đầu
-    attachAjaxEvents();
+/**
+ * ================================================================================
+ * PHẦN 2: ANIMATION NỀN CHO TRANG SẢN PHẨM (KHÁC TRANG CHỦ)
+ * - Hiệu ứng: Các nốt nhạc bay lượn từ dưới lên
+ * - Tương tác: Rê chuột đẩy các hạt ra xa (repel effect)
+ * ================================================================================
+ */
+class ProductCanvasAnimation {
+    constructor() {
+        this.canvas = document.getElementById('product-canvas');
+        if (!this.canvas) return;
+        
+        this.ctx = this.canvas.getContext('2d');
+        this.particles = [];
+        this.mouse = { x: null, y: null, radius: 150 };
+        this.animationId = null;
+        
+        this.resize();
+        this.init();
+        this.animate();
+        
+        window.addEventListener('resize', () => this.resize());
+        window.addEventListener('mousemove', (e) => {
+            this.mouse.x = e.clientX;
+            this.mouse.y = e.clientY;
+        });
+    }
+    
+    resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+    }
+    
+    // Các icon âm nhạc để random
+    musicIcons = ['♪', '♫', '♬', '♩', '🎵', '🎶', '🎼'];
+    
+    init() {
+        // Tạo 40 particles (ít hơn trang chủ để không đ distracting)
+        for (let i = 0; i < 40; i++) {
+            this.particles.push({
+                x: Math.random() * this.canvas.width,
+                y: this.canvas.height + Math.random() * 200,
+                size: Math.random() * 20 + 15,
+                speedY: Math.random() * 0.5 + 0.2,
+                speedX: (Math.random() - 0.5) * 0.3,
+                rotation: Math.random() * 360,
+                rotationSpeed: (Math.random() - 0.5) * 0.5,
+                icon: this.musicIcons[Math.floor(Math.random() * this.musicIcons.length)],
+                opacity: Math.random() * 0.15 + 0.05,
+                color: this.getRandomColor()
+            });
+        }
+    }
+    
+    getRandomColor() {
+        // Màu xanh dương nhạt - phù hợp với theme sản phẩm
+        const colors = [
+            '59, 130, 246',   // Blue
+            '139, 92, 246',  // Purple
+            '99, 102, 241',  // Indigo
+            '6, 182, 212',   // Cyan
+        ];
+        return colors[Math.floor(Math.random() * colors.length)];
+    }
+    
+    animate() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        this.particles.forEach((p, index) => {
+            // Di chuyển lên trên
+            p.y -= p.speedY;
+            p.x += p.speedX;
+            p.rotation += p.rotationSpeed;
+            
+            // Reset khi đi ra khỏi màn hình
+            if (p.y < -50) {
+                p.y = this.canvas.height + 50;
+                p.x = Math.random() * this.canvas.width;
+            }
+            if (p.x < -50) p.x = this.canvas.width + 50;
+            if (p.x > this.canvas.width + 50) p.x = -50;
+            
+            // =================================================================
+            // TƯƠNG TÁC: Đẩy particles ra xa khi rê chuột
+            // =================================================================
+            if (this.mouse.x !== null && this.mouse.y !== null) {
+                const dx = p.x - this.mouse.x;
+                const dy = p.y - this.mouse.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < this.mouse.radius) {
+                    const force = (this.mouse.radius - distance) / this.mouse.radius;
+                    const angle = Math.atan2(dy, dx);
+                    p.x += Math.cos(angle) * force * 3;
+                    p.y += Math.sin(angle) * force * 3;
+                    p.opacity = Math.min(0.3, p.opacity + force * 0.1);
+                }
+            }
+            
+            // Vẽ icon nốt nhạc
+            this.ctx.save();
+            this.ctx.translate(p.x, p.y);
+            this.ctx.rotate(p.rotation * Math.PI / 180);
+            this.ctx.font = `${p.size}px Arial`;
+            this.ctx.fillStyle = `rgba(${p.color}, ${p.opacity})`;
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            this.ctx.fillText(p.icon, 0, 0);
+            this.ctx.restore();
+        });
+        
+        this.animationId = requestAnimationFrame(() => this.animate());
+    }
+}
+
+// Khởi tạo animation khi DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+    new ProductCanvasAnimation();
 });
 </script>
 

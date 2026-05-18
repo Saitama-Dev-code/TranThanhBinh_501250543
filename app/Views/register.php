@@ -84,7 +84,8 @@
                         </div>
                         <h2 class="fw-bolder">Tạo Tài Khoản</h2>
                     </div>
-                    <form action="#" method="POST">
+                    <form action="index.php?controller=auth&action=registerSubmit" method="POST">
+                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                         <div class="form-floating mb-3"><input type="text" class="form-control modern-input" id="fullname" name="fullname" placeholder="Họ và tên" required><label for="fullname"><i class="fas fa-id-card me-2"></i>Họ và tên</label></div>
                         <div class="form-floating mb-3"><input type="email" class="form-control modern-input" id="email" name="email" placeholder="Email" required><label for="email"><i class="fas fa-envelope me-2"></i>Email của bạn</label></div>
                         <div class="form-floating mb-3"><input type="password" class="form-control modern-input" id="password" name="password" placeholder="Mật khẩu" required><label for="password"><i class="fas fa-lock me-2"></i>Mật khẩu</label></div>

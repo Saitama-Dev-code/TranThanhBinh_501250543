@@ -162,7 +162,8 @@
                                 <button type="button" class="btn-close position-absolute top-0 end-0 mt-1" data-bs-dismiss="modal"></button>
                             </div>
                             <div class="modal-body px-0">
-                                <form action="index.php?controller=auth&action=login" method="POST">
+                                <form action="index.php?controller=auth&action=loginSubmit" method="POST">
+                                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                                     <div class="custom-floating mb-4">
                                         <input type="email" class="form-control modern-input" id="logEmail" name="email" placeholder=" " required>
                                         <label for="logEmail">Email của bạn</label>

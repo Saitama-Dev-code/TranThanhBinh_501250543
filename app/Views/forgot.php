@@ -75,7 +75,8 @@
                         </div>
                         <h2 class="fw-bolder">Quên Mật Khẩu</h2>
                     </div>
-                    <form action="#" method="POST">
+                    <form action="index.php?controller=auth&action=forgotSubmit" method="POST">
+                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                         <div class="form-floating mb-4">
                             <input type="email" class="form-control modern-input" id="email" name="email" placeholder="Email" required>
                             <label for="email"><i class="fas fa-envelope me-2"></i>Email đã đăng ký</label>

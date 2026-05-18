@@ -6,6 +6,10 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 session_start();
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 define('ROOT_PATH', dirname(__DIR__));
 
 // Lấy tên Controller và Action từ URL (Mặc định là Home và index)

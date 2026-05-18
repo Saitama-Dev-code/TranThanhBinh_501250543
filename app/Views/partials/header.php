@@ -259,40 +259,15 @@ $isFiltering = ($currentController == 'product');
             visibility: hidden;
         }
 
-        /* ================= PARTICLE BACKGROUND ================= */
-        #particle-container {
+        /* ================= PARTICLE BACKGROUND CANVAS ================= */
+        #particle-canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
             z-index: -1;
-            pointer-events: none; /* Container không cản chuột */
-            overflow: hidden;
-        }
-
-        .particle {
-            position: absolute;
-            color: var(--text-color);
-            opacity: 0.04;
-            pointer-events: auto; /* Để nhận sự kiện Hover */
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            animation: fall linear infinite;
-        }
-
-        /* Rơi từ trên xuống dưới màn hình */
-        @keyframes fall {
-            0% { transform: translateY(-100px) rotate(0deg); }
-            100% { transform: translateY(110vh) rotate(360deg); }
-        }
-
-        /* Hiệu ứng khi chạm chuột: Sáng rực rỡ, phóng to, nảy lên */
-        .particle:hover {
-            opacity: 0.8 !important;
-            color: #3b82f6;
-            transform: scale(2) rotate(-15deg) translateY(-20px) !important;
-            text-shadow: 0 0 15px rgba(59, 130, 246, 0.8);
-            z-index: 10;
+            pointer-events: auto; /* Cho phép bắt sự kiện chuột trên toàn bộ mảng nền */
         }
 
         /* CSS dùng chung cho các khối Card và Hover */
@@ -356,41 +331,129 @@ $isFiltering = ($currentController == 'product');
 
     <div class="watermark">TTB MUSIC</div>
     
-    <!-- Hệ Thống Hạt Mưa Âm Nhạc -->
-    <div id="particle-container"></div>
+    <!-- Hệ Thống Mưa Âm Nhạc Bằng Canvas (Siêu Mượt & Tương Tác Thật) -->
+    <canvas id="particle-canvas"></canvas>
 
     <script>
-        // JAVASCRIPT PARTICLE SYSTEM (MƯA ICON ÂM NHẠC)
-        document.addEventListener('DOMContentLoaded', function() {
-            const container = document.getElementById('particle-container');
-            const icons = ['bx-music', 'bx-headphone', 'bx-microphone', 'bx-slider-alt', 'bx-disc', 'bx-album'];
-            const maxParticles = 20; // Số lượng icon trên màn hình
-            
-            function createParticle() {
-                const p = document.createElement('i');
-                const randomIcon = icons[Math.floor(Math.random() * icons.length)];
-                p.className = `bx ${randomIcon} particle`;
-                
-                // Khởi tạo kích thước ngẫu nhiên
-                const size = Math.random() * 4 + 2; // 2rem - 6rem
-                p.style.fontSize = `${size}rem`;
-                
-                // Vị trí trục X ngẫu nhiên
-                p.style.left = `${Math.random() * 100}vw`;
-                
-                // Thời gian rơi và delay ngẫu nhiên để tạo sự chênh lệch
-                const duration = Math.random() * 10 + 8; // 8s - 18s
-                p.style.animationDuration = `${duration}s`;
-                p.style.animationDelay = `-${Math.random() * 15}s`; // Âm delay giúp hạt đã xuất hiện sẵn trên màn hình
-                
-                container.appendChild(p);
-            }
-            
-            // Tạo sẵn một lượng hạt
-            for(let i=0; i<maxParticles; i++) {
-                createParticle();
-            }
+        // JAVASCRIPT CANVAS PARTICLE SYSTEM
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let particles = [];
+        const icons = ['♪', '♫', '♬', '♩'];
+        
+        // Cấu hình chuột
+        let mouse = { x: null, y: null, radius: 100 };
+        
+        window.addEventListener('mousemove', function(e) {
+            mouse.x = e.x;
+            mouse.y = e.y;
         });
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height - height; // Bắt đầu ngẫu nhiên từ trên xuống
+                this.size = Math.random() * 20 + 15;
+                this.speedY = Math.random() * 1 + 0.5;
+                this.icon = icons[Math.floor(Math.random() * icons.length)];
+                this.opacity = 0.05;
+                this.color = '#cbd5e1'; // Màu mặc định mờ
+                this.angle = Math.random() * 360;
+                this.spin = (Math.random() - 0.5) * 2;
+                
+                // Trạng thái hover
+                this.isHovered = false;
+                this.hoverScale = 1;
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.angle += this.spin;
+
+                // Nếu rơi khỏi màn hình thì đưa lên trên cùng và vị trí x hoàn toàn ngẫu nhiên mới
+                if (this.y > height + 50) {
+                    this.y = -50;
+                    this.x = Math.random() * width;
+                    this.speedY = Math.random() * 1 + 0.5; // Random lại tốc độ
+                }
+
+                // Tương tác vật lý với chuột
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < mouse.radius) {
+                    this.isHovered = true;
+                    // Nảy ra xa chuột một chút
+                    this.x -= dx / 15;
+                    this.y -= dy / 15;
+                } else {
+                    this.isHovered = false;
+                }
+                
+                // Animation mượt mà khi hover
+                if (this.isHovered) {
+                    this.hoverScale = Math.min(this.hoverScale + 0.1, 1.8);
+                    this.opacity = Math.min(this.opacity + 0.05, 0.8);
+                    this.color = '#3b82f6'; // Sáng màu xanh
+                } else {
+                    this.hoverScale = Math.max(this.hoverScale - 0.05, 1);
+                    this.opacity = Math.max(this.opacity - 0.02, 0.05);
+                    this.color = '#cbd5e1'; // Trở lại màu gốc
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle * Math.PI / 180);
+                ctx.scale(this.hoverScale, this.hoverScale);
+                
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+                
+                if (this.isHovered) {
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = '#3b82f6';
+                } else {
+                    ctx.shadowBlur = 0;
+                }
+
+                ctx.font = `bold ${this.size}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(this.icon, 0, 0);
+                
+                ctx.restore();
+            }
+        }
+
+        // Tạo mảng hạt
+        for (let i = 0; i < 35; i++) {
+            particles.push(new Particle());
+        }
+
+        // Vòng lặp vẽ liên tục
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            
+            requestAnimationFrame(animate);
+        }
+        animate();
     </script>
 
     <nav class="navbar navbar-expand-lg" id="smartNavbar">

@@ -2,7 +2,18 @@
 
 **Ngày cập nhật:** 18/05/2026
 
-## 🚀 Cập Nhật Lần 3 (Mới nhất)
+## 🚀 Cập Nhật Lần 4 (Hoàn thiện theo phản hồi mới nhất)
+1. **Nền Mưa Âm Nhạc Bằng Canvas (Tương Tác Thật):**
+   - Xóa bỏ hệ thống DOM Particle cũ. Thay thế bằng một hệ thống hạt **Canvas 2D siêu mượt**.
+   - Các nốt nhạc giờ đây có tọa độ rơi hoàn toàn ngẫu nhiên (không bao giờ lặp lại theo cột).
+   - Tương tác vật lý: Khi rê chuột vào khu vực nốt nhạc đang rơi, nốt nhạc sẽ **bị đẩy lùi ra xa (repel)**, đồng thời phóng to, đổi màu xanh dương và tỏa sáng bóng đổ (glow) vô cùng sống động. 
+2. **Tinh chỉnh Dải Thương Hiệu (Brand Wave):**
+   - Đã điều chỉnh lại `@keyframes smoothWave` và `transition` để các hãng đàn thỉnh thoảng mới "gợn sóng" lên thật chậm rãi và êm ái thay vì nhấp nhô liên tục.
+   - Khi hover vào, hiệu ứng chuyển động mượt mà hơn rất nhiều, khắc phục triệt để cảm giác "khựng" hay "nhảy" khó chịu.
+
+---
+
+## 🚀 Cập Nhật Lần 3
 1. **Lọc Sản Phẩm AJAX (Không tải lại trang):**
    - Áp dụng Fetch API vào `sanpham.php` để tải dữ liệu khi Click danh mục, chuyển trang hoặc tìm kiếm.
    - Ưu điểm: Tốc độ phản hồi cực nhanh, không làm chớp trang và không làm gián đoạn hiệu ứng Particle nền.

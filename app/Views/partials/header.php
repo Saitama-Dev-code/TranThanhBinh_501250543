@@ -192,11 +192,12 @@ $isFiltering = ($currentController == 'product');
             left: 0;
             width: 100%;
             height: 100%;
-            background: #0a192f;
+            background: #0f172a;
             z-index: 9999;
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
             transition: opacity 0.8s ease, visibility 0.8s;
         }
 
@@ -204,74 +205,18 @@ $isFiltering = ($currentController == 'product');
             text-align: center;
         }
 
-        .music-waves {
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            height: 40px;
-            gap: 5px;
-            margin-bottom: 20px;
-        }
-
-        .music-waves span {
-            width: 6px;
-            height: 10px;
-            background: #64ffda;
-            animation: wave-animation 1.2s infinite ease-in-out;
-        }
-
-        .music-waves span:nth-child(2) {
-            animation-delay: 0.1s;
-        }
-
-        .music-waves span:nth-child(3) {
-            animation-delay: 0.2s;
-        }
-
-        .music-waves span:nth-child(4) {
-            animation-delay: 0.3s;
-        }
-
-        .music-waves span:nth-child(5) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes wave-animation {
-
-            0%,
-            100% {
-                height: 10px;
-            }
-
-            50% {
-                height: 40px;
-            }
-        }
-
         .loader-text {
             color: white;
             font-weight: 800;
             letter-spacing: 5px;
             margin-bottom: 5px;
-            animation: pulse 2s infinite;
+            margin-top: 15px;
         }
 
         .loader-subtext {
             color: #8892b0;
             font-style: italic;
             font-size: 0.9rem;
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.5;
-            }
         }
 
         .preloader-hidden {
@@ -315,11 +260,17 @@ $isFiltering = ($currentController == 'product');
     <?php if (!$isFiltering): ?>
     <div id="preloader">
         <div class="loader-content">
-            <div class="music-waves">
-                <span></span><span></span><span></span><span></span><span></span>
-            </div>
-            <h2 class="loader-text">TTB MUSIC</h2>
-            <p class="loader-subtext">Đang tinh chỉnh giai điệu...</p>
+            <!-- Sử dụng Lordicon (Hoạt hình Lottie) xoay mượt mà -->
+            <lord-icon
+                src="https://cdn.lordicon.com/xjovhxra.json"
+                trigger="loop"
+                colors="primary:#3b82f6,secondary:#64ffda"
+                style="width:120px;height:120px">
+            </lord-icon>
+            
+            <!-- Áp dụng Animate.css để tạo hiệu ứng fadeIn -->
+            <h2 class="loader-text animate__animated animate__fadeInUp">TTB MUSIC</h2>
+            <p class="loader-subtext animate__animated animate__fadeInUp animate__delay-1s">Đang tinh chỉnh giai điệu...</p>
         </div>
     </div>
     <?php endif; ?>
@@ -340,12 +291,12 @@ $isFiltering = ($currentController == 'product');
 
     <div class="watermark">TTB MUSIC</div>
     <div id="global-parallax">
-        <!-- Các phần tử trôi nổi với data-speed để tạo chiều sâu 3D khi di chuột -->
-        <i class="fas fa-music parallax-item" data-speed="0.05" style="top: 15%; left: 15%; font-size: 3rem; color: var(--text-color); opacity: 0.04; position: absolute; transition: transform 0.1s ease-out;"></i>
-        <i class="fas fa-guitar parallax-item" data-speed="0.12" style="top: 35%; right: 10%; font-size: 6rem; color: var(--text-color); opacity: 0.03; position: absolute; transition: transform 0.1s ease-out;"></i>
-        <i class="fas fa-headphones parallax-item" data-speed="0.08" style="top: 65%; left: 20%; font-size: 4rem; color: var(--text-color); opacity: 0.04; position: absolute; transition: transform 0.1s ease-out;"></i>
-        <i class="fas fa-drum parallax-item" data-speed="0.04" style="top: 80%; right: 30%; font-size: 3.5rem; color: var(--text-color); opacity: 0.05; position: absolute; transition: transform 0.1s ease-out;"></i>
-        <i class="fas fa-compact-disc parallax-item" data-speed="0.02" style="top: 50%; left: 60%; font-size: 8rem; color: var(--text-color); opacity: 0.02; position: absolute; transition: transform 0.1s ease-out;"></i>
+        <!-- Áp dụng Boxicons mảnh và Animate.css (tự động đập nhịp liên tục) kết hợp với Parallax trôi theo chuột -->
+        <i class="bx bx-music parallax-item animate__animated animate__pulse animate__infinite animate__slower" data-speed="0.05" style="top: 15%; left: 15%; font-size: 4rem; color: var(--text-color); opacity: 0.05; position: absolute; transition: transform 0.1s ease-out;"></i>
+        <i class="bx bx-headphone parallax-item animate__animated animate__pulse animate__infinite animate__slower" data-speed="0.12" style="top: 35%; right: 10%; font-size: 7rem; color: var(--text-color); opacity: 0.03; position: absolute; transition: transform 0.1s ease-out;"></i>
+        <i class="bx bx-microphone parallax-item animate__animated animate__pulse animate__infinite animate__slower" data-speed="0.08" style="top: 65%; left: 20%; font-size: 5rem; color: var(--text-color); opacity: 0.04; position: absolute; transition: transform 0.1s ease-out;"></i>
+        <i class="bx bx-slider parallax-item animate__animated animate__pulse animate__infinite animate__slower" data-speed="0.04" style="top: 80%; right: 30%; font-size: 4rem; color: var(--text-color); opacity: 0.05; position: absolute; transition: transform 0.1s ease-out;"></i>
+        <i class="bx bx-disc parallax-item animate__animated animate__pulse animate__infinite animate__slower" data-speed="0.02" style="top: 50%; left: 60%; font-size: 9rem; color: var(--text-color); opacity: 0.02; position: absolute; transition: transform 0.1s ease-out;"></i>
     </div>
 
     <script>

@@ -15,29 +15,31 @@ include __DIR__ . '/partials/header.php';
     .hero-section { position: relative; height: 90vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
     .video-background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
     .video-background iframe { width: 100vw; height: 56.25vw; min-height: 100vh; min-width: 177.77vh; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-    .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 1; }
-    .hero-content { position: relative; z-index: 2; color: white; }
-
-    /* ================= MARQUEE (CHẠY CHỮ) & GỢN SÓNG LOGO ================= */
-    .marquee-wrapper { display: flex; overflow: hidden; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); background: var(--card-bg); padding: 25px 0; width: 100%; }
-    .marquee-content { display: flex; flex-shrink: 0; animation: marqueeScroll 25s linear infinite; }
-    @keyframes marqueeScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+    /* ================= DẢI THƯƠNG HIỆU & GỢN SÓNG (WAVE) ================= */
+    .brand-wrapper { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); background: var(--card-bg); padding: 30px 0; width: 100%; gap: 30px; }
     
-    /* Hiệu ứng gợn sóng (Wave) mượt mà cho Logo */
+    /* Khôi phục hiệu ứng Gợn sóng (Wave) nhịp nhàng */
     @keyframes subtlePulse {
-        0%, 85%, 100% { transform: scale(1); opacity: 0.6; color: var(--text-color); }
-        92% { transform: scale(1.1) translateY(-5px); opacity: 0.9; color: #3b82f6; text-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+        0%, 85%, 100% { transform: scale(1); opacity: 0.5; color: var(--text-color); }
+        92% { transform: scale(1.15) translateY(-8px); opacity: 1; color: #3b82f6; text-shadow: 0 0 20px rgba(59, 130, 246, 0.6); }
     }
-    .brand-item { display: flex; align-items: center; justify-content: center; margin: 0 45px; font-size: 2rem; font-weight: 800; color: var(--text-color); cursor: pointer; opacity: 0.6; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); white-space: nowrap; animation: subtlePulse 8s infinite; }
-    /* Delay tăng dần để tạo cảm giác sóng chạy từ trái sang phải */
-    .brand-item:nth-child(1) { animation-delay: 0.2s; }
-    .brand-item:nth-child(2) { animation-delay: 0.4s; }
-    .brand-item:nth-child(3) { animation-delay: 0.6s; }
-    .brand-item:nth-child(4) { animation-delay: 0.8s; }
-    .brand-item:nth-child(5) { animation-delay: 1.0s; }
-    .brand-item:nth-child(6) { animation-delay: 1.2s; }
     
-    .brand-item:hover { animation: none; opacity: 1 !important; color: #3b82f6 !important; transform: translateY(-12px) scale(1.15) !important; text-shadow: 0 10px 20px rgba(59, 130, 246, 0.4); }
+    .brand-item { display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 900; color: var(--text-color); cursor: pointer; opacity: 0.5; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); white-space: nowrap; animation: subtlePulse 8s infinite; }
+    
+    /* Tính toán Delay cho sóng truyền từ trái qua phải (11 items) */
+    .brand-item:nth-child(1) { animation-delay: 0.0s; }
+    .brand-item:nth-child(2) { animation-delay: 0.2s; }
+    .brand-item:nth-child(3) { animation-delay: 0.4s; }
+    .brand-item:nth-child(4) { animation-delay: 0.6s; }
+    .brand-item:nth-child(5) { animation-delay: 0.8s; }
+    .brand-item:nth-child(6) { animation-delay: 1.0s; }
+    .brand-item:nth-child(7) { animation-delay: 1.2s; }
+    .brand-item:nth-child(8) { animation-delay: 1.4s; }
+    .brand-item:nth-child(9) { animation-delay: 1.6s; }
+    .brand-item:nth-child(10) { animation-delay: 1.8s; }
+    .brand-item:nth-child(11) { animation-delay: 2.0s; }
+    
+    .brand-item:hover { animation: none; opacity: 1; color: #3b82f6; transform: scale(1.2) translateY(-10px) !important; text-shadow: 0 10px 20px rgba(59, 130, 246, 0.5); z-index: 10; }
 
     .product-card-clean { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; position: relative; padding: 20px; height: 100%; display: flex; flex-direction: column; transition: box-shadow 0.3s ease, border-color 0.3s ease; }
     .product-card-clean:hover { box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); border-color: #3b82f6; }
@@ -72,23 +74,18 @@ include __DIR__ . '/partials/header.php';
     </div>
 </section>
 
-<section class="marquee-wrapper my-5">
-    <div class="marquee-content">
-        <div class="brand-item"><i class="fas fa-record-vinyl me-2"></i> YAMAHA</div>
-        <div class="brand-item"><i class="fas fa-guitar me-2"></i> FENDER</div>
-        <div class="brand-item"><i class="fas fa-keyboard me-2"></i> ROLAND</div>
-        <div class="brand-item"><i class="fas fa-drum me-2"></i> PEARL</div>
-        <div class="brand-item"><i class="fas fa-headphones me-2"></i> MARSHALL</div>
-        <div class="brand-item"><i class="fas fa-music me-2"></i> KORG</div>
-    </div>
-    <div class="marquee-content">
-        <div class="brand-item"><i class="fas fa-record-vinyl me-2"></i> YAMAHA</div>
-        <div class="brand-item"><i class="fas fa-guitar me-2"></i> FENDER</div>
-        <div class="brand-item"><i class="fas fa-keyboard me-2"></i> ROLAND</div>
-        <div class="brand-item"><i class="fas fa-drum me-2"></i> PEARL</div>
-        <div class="brand-item"><i class="fas fa-headphones me-2"></i> MARSHALL</div>
-        <div class="brand-item"><i class="fas fa-music me-2"></i> KORG</div>
-    </div>
+<section class="brand-wrapper my-5 container-fluid px-5">
+    <div class="brand-item"><i class="fas fa-record-vinyl me-2"></i> YAMAHA</div>
+    <div class="brand-item"><i class="fas fa-guitar me-2"></i> FENDER</div>
+    <div class="brand-item"><i class="fas fa-keyboard me-2"></i> ROLAND</div>
+    <div class="brand-item"><i class="fas fa-drum me-2"></i> PEARL</div>
+    <div class="brand-item"><i class="fas fa-headphones me-2"></i> MARSHALL</div>
+    <div class="brand-item"><i class="fas fa-music me-2"></i> KORG</div>
+    <div class="brand-item"><i class="fas fa-guitar me-2"></i> KAWAI</div>
+    <div class="brand-item"><i class="fas fa-keyboard me-2"></i> CASIO</div>
+    <div class="brand-item"><i class="fas fa-guitar me-2"></i> GIBSON</div>
+    <div class="brand-item"><i class="fas fa-guitar me-2"></i> IBANEZ</div>
+    <div class="brand-item"><i class="fas fa-music me-2"></i> ESP</div>
 </section>
 
 <section class="container mt-5 pt-5">

@@ -22,16 +22,13 @@ include __DIR__ . '/partials/header.php';
     /* Sửa màu Placeholder để dễ đọc trên nền tối */
     .form-control::placeholder { color: rgba(255, 255, 255, 0.5) !important; font-style: italic; }
     
-    /* Hiệu ứng Góc nghiêng tinh nghịch (Playful Tilt) và 3D Pop-out như BicCamera */
-    .product-wrapper:nth-child(odd) .product-card { transform: rotate(-1.5deg); }
-    .product-wrapper:nth-child(even) .product-card { transform: rotate(1.5deg); }
+    /* Hiệu ứng 3D Pop-out thanh lịch (Đã bỏ nghiêng ngả lộn xộn) */
+    .product-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s ease, border-color 0.4s ease; overflow: hidden; height: 100%; position: relative; z-index: 1; }
+    .product-wrapper:hover .product-card { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.2); border-color: #3b82f6; z-index: 10; }
     
-    .product-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s ease, border-color 0.4s ease; overflow: visible; height: 100%; position: relative; z-index: 1; }
-    .product-wrapper:hover .product-card { transform: scale(1.05) rotate(0deg); box-shadow: 0 15px 35px rgba(0,0,0,0.15); border-color: #3b82f6; z-index: 10; }
-    
-    /* Ảnh sản phẩm bật ra ngoài (Pop-out) khi hover */
+    /* Ảnh sản phẩm bật ra tinh tế khi hover */
     .product-img { height: 200px; width: 100%; object-fit: contain; padding: 15px; transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
-    .product-wrapper:hover .product-img { transform: scale(1.15) translateY(-15px); filter: drop-shadow(0 10px 10px rgba(0,0,0,0.15)); }
+    .product-wrapper:hover .product-img { transform: scale(1.1); filter: drop-shadow(0 8px 8px rgba(0,0,0,0.15)); }
 </style>
 
 <div class="container my-5 pt-4">

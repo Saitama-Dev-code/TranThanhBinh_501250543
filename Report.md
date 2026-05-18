@@ -1,5 +1,52 @@
 # Nhật ký Cập nhật Dự án (Changelog)
 
+**Ngày cập nhật:** 19/05/2026
+
+## 🚀 Cập Nhật Lần 6 (Nâng Cấp Trang Sản Phẩm Toàn Diện)
+
+### 1. Bộ Lọc Nâng Cao (Advanced Filter Sidebar)
+- **6 nhóm lọc mới:**
+  - `Tìm kiếm` theo tên sản phẩm
+  - `Danh mục` (Guitar & Bass, Piano & Keyboard, Trống & Bộ gõ, Âm thanh Studio)
+  - `Khoảng giá` với 2 input + range slider trực quan
+  - `Thương hiệu` (Yamaha, Fender, Roland, Pearl, Gibson, Kawai, Casio, Shure, Marshall, Audio-Technica, Taylor)
+  - `Tình trạng kho` (Chỉ còn hàng / Tất cả)
+  - `Loại` (Có cho thuê / Tất cả)
+- Sidebar có scroll riêng, sticky position, hiệu ứng glassmorphism
+
+### 2. Layout Infinite Scroll Trong Khung Riêng
+- **Khung sản phẩm độc lập:** `max-height: calc(100vh - 140px)` - scroll riêng không ảnh hưởng toàn trang
+- **Fade effect viền dưới:** Gradient mờ dần khi scroll để báo hiệu còn nội dung
+- **Auto-load:** Khi scroll gần cuối (200px) tự động load thêm sản phẩm
+- **Nút "Xem thêm":** Alternative cách load thêm thủ công
+- **12 sản phẩm/lần load** thay vì 6 như trước
+- **Animation fadeInUp** cho sản phẩm mới load thêm
+
+### 3. Card Sản Phẩm Tương Tác (Interactive Product Card)
+- **Panel màu sắc & phiên bản** - Mặc định ẩn, chỉ hiện khi hover
+- **Trượt lên từ dưới** với `transform: translateY(100%)` → `translateY(0)`
+- **Chọn màu:** Click để đổi hình ảnh sản phẩm (fade transition 200ms)
+- **Chọn phiên bản:** Highlight selected với gradient blue
+- **Badge trạng thái:** "Còn hàng" (xanh), "Hết hàng" (đỏ pulse nếu stock ≤ 3)
+
+### 4. Animation Nền Riêng Cho Trang Sản Phẩm
+- **Khác với trang chủ** (mưa nhạc rơi từ trên xuống)
+- **Nốt nhạc bay lên từ dưới** với tốc độ chậm (0.2-0.7 px/frame)
+- **Ít particles hơn** (40 thay vì 60) để không gây náo loạn
+- **Repel effect khi rê chuột:** Đẩy particles ra xa, tăng opacity
+- **Màu sắc khác:** Blue, Purple, Indigo, Cyan thay vì trắng
+
+### 5. Database Mở Rộng
+- Thêm cột `brand` vào bảng `products` để lọc theo thương hiệu
+- Bổ sung **9 sản phẩm mẫu mới** (Fender Stratocaster, Gibson Les Paul, Taylor 214ce, Marshall Stack...)
+
+### 6. Code Documentation Đầy Đủ
+- **ProductModel:** Comment chi tiết từng điều kiện lọc (WHERE clause), giải thích SQL động
+- **ProductController:** Comment theo 7 BƯỚC rõ ràng, giải thích công thức phân trang
+- **sanpham.php:** Section 1-6 CSS, Section 1-2 JavaScript với tiêu đề rõ ràng
+
+---
+
 **Ngày cập nhật:** 18/05/2026
 
 ## 🚀 Cập Nhật Lần 5 (Tinh chỉnh Tối Ưu Hiển Thị)

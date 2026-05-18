@@ -2,8 +2,23 @@
 
 **Ngày cập nhật:** 18/05/2026
 
-## 🎨 UI/UX & Hiệu ứng
-1. **Preloader (Cập nhật mới):** 
+## 🚀 Cập Nhật Lần 3 (Mới nhất)
+1. **Lọc Sản Phẩm AJAX (Không tải lại trang):**
+   - Áp dụng Fetch API vào `sanpham.php` để tải dữ liệu khi Click danh mục, chuyển trang hoặc tìm kiếm.
+   - Ưu điểm: Tốc độ phản hồi cực nhanh, không làm chớp trang và không làm gián đoạn hiệu ứng Particle nền.
+2. **Particle System (Mưa Âm Nhạc):**
+   - Loại bỏ Nền cố định cũ. Thay bằng hệ thống JavaScript sinh ra các icon rơi liên tục từ trên xuống vô hạn (`header.php`).
+   - Tương tác: Khi đưa chuột chạm vào, hạt sẽ tự động phóng to, đổi màu sáng rực và xoay.
+3. **Preloader Mới:**
+   - Quay lại sử dụng cụm sóng nhạc CSS nhưng được nâng cấp bằng dải màu Gradient (Xanh dương -> Xanh ngọc) và hiệu ứng Glow cực kỳ đẹp mắt.
+4. **Dải Thương Hiệu (Brand Wave):**
+   - Giảm xuống còn đúng 8 hãng đàn với icon không trùng lặp, vừa khít một dòng.
+   - Chỉnh lại `@keyframes smoothWave` để dải lụa chỉ lượn sóng lên xuống mượt mà. Loại bỏ hiệu ứng phát sáng tự động (Chỉ phát sáng khi rê chuột vào) để tránh rối mắt.
+
+---
+
+## 🎨 UI/UX & Hiệu ứng (Các đợt trước)
+1. **Preloader (Cập nhật cũ):** 
    - Đã nhúng thành công hệ thống **Lordicon (Lottie animation)** vào màn hình tải trang để xoay mượt mà, đẳng cấp như các website quốc tế.
    - Chữ Loading được gắn hiệu ứng fadeIn từ thư viện **Animate.css**.
 2. **Hiệu ứng Dải Logo (Wave Animation):**

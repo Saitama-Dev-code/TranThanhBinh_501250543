@@ -67,7 +67,7 @@ include __DIR__ . '/partials/header.php';
             </div>
         </div>
 
-        <div class="col-lg-9">
+        <div class="col-lg-9" id="product-list-container">
             <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3" style="border-color: var(--border-color) !important;">
                 <h4 class="fw-bold mb-0">Cửa hàng nhạc cụ</h4>
                 <span class="text-muted">Trang <?= $currentPage ?? 1 ?> / <?= $totalPages ?? 1 ?></span>
@@ -133,6 +133,107 @@ include __DIR__ . '/partials/header.php';
         </div>
     </div>
 </div>
+
+<script>
+/**
+ * AJAX FILTERING & PAGINATION
+ * Tải sản phẩm mượt mà không làm mới trang để không làm gián đoạn hiệu ứng Particle.
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('product-list-container');
+    const searchForm = document.querySelector('form[action="index.php"]');
+    
+    // Hàm gọi API lấy dữ liệu HTML và thay thế
+    async function loadProducts(url) {
+        // Hiển thị trạng thái đang tải mờ nhẹ
+        container.style.opacity = '0.5';
+        container.style.pointerEvents = 'none';
+        
+        try {
+            const response = await fetch(url);
+            const htmlString = await response.text();
+            
+            // Phân tích HTML trả về
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlString, 'text/html');
+            const newContent = doc.getElementById('product-list-container').innerHTML;
+            
+            // Thay thế nội dung
+            container.innerHTML = newContent;
+            
+            // Cập nhật lại thanh địa chỉ URL (History API)
+            window.history.pushState({path: url}, '', url);
+            
+            // Kích hoạt lại các sự kiện click cho các link mới (Phân trang)
+            attachAjaxEvents();
+            
+            // Xóa class active của sidebar và gán lại cho đúng
+            updateSidebarActive(url);
+        } catch (error) {
+            console.error('Lỗi khi tải sản phẩm:', error);
+        } finally {
+            container.style.opacity = '1';
+            container.style.pointerEvents = 'auto';
+        }
+    }
+
+    function attachAjaxEvents() {
+        // Bắt sự kiện click vào link phân trang
+        const pageLinks = container.querySelectorAll('.pagination .page-link');
+        pageLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                loadProducts(this.getAttribute('href'));
+            });
+        });
+    }
+
+    function updateSidebarActive(url) {
+        const urlObj = new URL(url, window.location.origin);
+        const categoryId = urlObj.searchParams.get('category');
+        
+        const categoryLinks = document.querySelectorAll('.category-link');
+        categoryLinks.forEach(link => link.classList.remove('active'));
+        
+        if (categoryId) {
+            const activeLink = document.querySelector(`.category-link[href*="category=${categoryId}"]`);
+            if (activeLink) activeLink.classList.add('active');
+        } else {
+            // Nếu không có category, TẤT CẢ NHẠC CỤ sẽ active
+            const allLink = document.querySelector(`.category-link[href="index.php?controller=product&action=index"]`);
+            if (allLink) allLink.classList.add('active');
+        }
+    }
+
+    // Bắt sự kiện click menu Danh mục bên trái
+    const categoryLinks = document.querySelectorAll('.category-link');
+    categoryLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            loadProducts(this.getAttribute('href'));
+        });
+    });
+
+    // Bắt sự kiện submit form Tìm kiếm
+    if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const params = new URLSearchParams(formData).toString();
+            const url = 'index.php?' + params;
+            loadProducts(url);
+        });
+    }
+    
+    // Xử lý nút Back của trình duyệt
+    window.addEventListener('popstate', function() {
+        loadProducts(window.location.href);
+    });
+
+    // Khởi tạo lần đầu
+    attachAjaxEvents();
+});
+</script>
 
 <?php
 // Gọi thẻ Footer vào cuối trang

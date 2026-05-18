@@ -185,7 +185,7 @@ $isFiltering = ($currentController == 'product');
             color: #3b82f6 !important;
         }
 
-        /* ================= PRELOADER ================= */
+        /* ================= PRELOADER SÓNG NHẠC GRADIENT ================= */
         #preloader {
             position: fixed;
             top: 0;
@@ -205,12 +205,47 @@ $isFiltering = ($currentController == 'product');
             text-align: center;
         }
 
+        .music-waves {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 50px;
+            gap: 6px;
+            margin-bottom: 25px;
+        }
+
+        .music-waves span {
+            width: 8px;
+            height: 10px;
+            /* Dải màu Gradient sáng rực rỡ */
+            background: linear-gradient(to top, #3b82f6, #64ffda);
+            border-radius: 4px;
+            /* Hiệu ứng phát sáng phản quang */
+            box-shadow: 0 0 10px rgba(100, 255, 218, 0.6);
+            animation: wave-animation 1.2s infinite ease-in-out;
+        }
+
+        .music-waves span:nth-child(2) { animation-delay: 0.1s; }
+        .music-waves span:nth-child(3) { animation-delay: 0.2s; }
+        .music-waves span:nth-child(4) { animation-delay: 0.3s; }
+        .music-waves span:nth-child(5) { animation-delay: 0.4s; }
+
+        @keyframes wave-animation {
+            0%, 100% { height: 10px; }
+            50% { height: 50px; background: linear-gradient(to top, #64ffda, #3b82f6); box-shadow: 0 0 15px rgba(59, 130, 246, 0.8); }
+        }
+
         .loader-text {
             color: white;
             font-weight: 800;
             letter-spacing: 5px;
             margin-bottom: 5px;
-            margin-top: 15px;
+            animation: textPulse 2s infinite;
+        }
+
+        @keyframes textPulse {
+            0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(255, 255, 255, 0.2); }
+            50% { opacity: 0.6; text-shadow: none; }
         }
 
         .loader-subtext {
@@ -222,6 +257,42 @@ $isFiltering = ($currentController == 'product');
         .preloader-hidden {
             opacity: 0;
             visibility: hidden;
+        }
+
+        /* ================= PARTICLE BACKGROUND ================= */
+        #particle-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none; /* Container không cản chuột */
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            color: var(--text-color);
+            opacity: 0.04;
+            pointer-events: auto; /* Để nhận sự kiện Hover */
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: fall linear infinite;
+        }
+
+        /* Rơi từ trên xuống dưới màn hình */
+        @keyframes fall {
+            0% { transform: translateY(-100px) rotate(0deg); }
+            100% { transform: translateY(110vh) rotate(360deg); }
+        }
+
+        /* Hiệu ứng khi chạm chuột: Sáng rực rỡ, phóng to, nảy lên */
+        .particle:hover {
+            opacity: 0.8 !important;
+            color: #3b82f6;
+            transform: scale(2) rotate(-15deg) translateY(-20px) !important;
+            text-shadow: 0 0 15px rgba(59, 130, 246, 0.8);
+            z-index: 10;
         }
 
         /* CSS dùng chung cho các khối Card và Hover */
@@ -260,17 +331,11 @@ $isFiltering = ($currentController == 'product');
     <?php if (!$isFiltering): ?>
     <div id="preloader">
         <div class="loader-content">
-            <!-- Sử dụng Lordicon (Hoạt hình Lottie) xoay mượt mà -->
-            <lord-icon
-                src="https://cdn.lordicon.com/xjovhxra.json"
-                trigger="loop"
-                colors="primary:#3b82f6,secondary:#64ffda"
-                style="width:120px;height:120px">
-            </lord-icon>
-            
-            <!-- Áp dụng Animate.css để tạo hiệu ứng fadeIn -->
-            <h2 class="loader-text animate__animated animate__fadeInUp">TTB MUSIC</h2>
-            <p class="loader-subtext animate__animated animate__fadeInUp animate__delay-1s">Đang tinh chỉnh giai điệu...</p>
+            <div class="music-waves">
+                <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <h2 class="loader-text">TTB MUSIC</h2>
+            <p class="loader-subtext">Đang chuẩn bị giai điệu...</p>
         </div>
     </div>
     <?php endif; ?>
@@ -290,30 +355,41 @@ $isFiltering = ($currentController == 'product');
     </script>
 
     <div class="watermark">TTB MUSIC</div>
-    <div id="global-parallax">
-        <!-- Áp dụng Boxicons mảnh và Animate.css (tự động đập nhịp liên tục) kết hợp với Parallax trôi theo chuột -->
-        <i class="bx bx-music parallax-item animate__animated animate__pulse animate__infinite animate__slower" data-speed="0.05" style="top: 15%; left: 15%; font-size: 4rem; color: var(--text-color); opacity: 0.05; position: absolute; transition: transform 0.1s ease-out;"></i>
-        <i class="bx bx-headphone parallax-item animate__animated animate__pulse animate__infinite animate__slower" data-speed="0.12" style="top: 35%; right: 10%; font-size: 7rem; color: var(--text-color); opacity: 0.03; position: absolute; transition: transform 0.1s ease-out;"></i>
-        <i class="bx bx-microphone parallax-item animate__animated animate__pulse animate__infinite animate__slower" data-speed="0.08" style="top: 65%; left: 20%; font-size: 5rem; color: var(--text-color); opacity: 0.04; position: absolute; transition: transform 0.1s ease-out;"></i>
-        <i class="bx bx-slider parallax-item animate__animated animate__pulse animate__infinite animate__slower" data-speed="0.04" style="top: 80%; right: 30%; font-size: 4rem; color: var(--text-color); opacity: 0.05; position: absolute; transition: transform 0.1s ease-out;"></i>
-        <i class="bx bx-disc parallax-item animate__animated animate__pulse animate__infinite animate__slower" data-speed="0.02" style="top: 50%; left: 60%; font-size: 9rem; color: var(--text-color); opacity: 0.02; position: absolute; transition: transform 0.1s ease-out;"></i>
-    </div>
+    
+    <!-- Hệ Thống Hạt Mưa Âm Nhạc -->
+    <div id="particle-container"></div>
 
     <script>
-        // Xử lý hiệu ứng Parallax nền theo chuột (Chuẩn tương tác 3D giống BicCamera)
-        document.addEventListener('mousemove', function(e) {
-            const parallaxItems = document.querySelectorAll('.parallax-item');
-            // Tính toán khoảng cách chuột tới tâm màn hình (tỷ lệ từ -1 đến 1)
-            const xAxis = (window.innerWidth / 2 - e.clientX) / (window.innerWidth / 2);
-            const yAxis = (window.innerHeight / 2 - e.clientY) / (window.innerHeight / 2);
-
-            parallaxItems.forEach(item => {
-                const speed = parseFloat(item.getAttribute('data-speed'));
-                // Các vật ở gần (speed cao) dịch nhiều, vật ở xa dịch ít tạo chiều sâu
-                const xTranslate = xAxis * speed * 200;
-                const yTranslate = yAxis * speed * 200;
-                item.style.transform = `translate3d(${xTranslate}px, ${yTranslate}px, 0)`;
-            });
+        // JAVASCRIPT PARTICLE SYSTEM (MƯA ICON ÂM NHẠC)
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('particle-container');
+            const icons = ['bx-music', 'bx-headphone', 'bx-microphone', 'bx-slider-alt', 'bx-disc', 'bx-album'];
+            const maxParticles = 20; // Số lượng icon trên màn hình
+            
+            function createParticle() {
+                const p = document.createElement('i');
+                const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+                p.className = `bx ${randomIcon} particle`;
+                
+                // Khởi tạo kích thước ngẫu nhiên
+                const size = Math.random() * 4 + 2; // 2rem - 6rem
+                p.style.fontSize = `${size}rem`;
+                
+                // Vị trí trục X ngẫu nhiên
+                p.style.left = `${Math.random() * 100}vw`;
+                
+                // Thời gian rơi và delay ngẫu nhiên để tạo sự chênh lệch
+                const duration = Math.random() * 10 + 8; // 8s - 18s
+                p.style.animationDuration = `${duration}s`;
+                p.style.animationDelay = `-${Math.random() * 15}s`; // Âm delay giúp hạt đã xuất hiện sẵn trên màn hình
+                
+                container.appendChild(p);
+            }
+            
+            // Tạo sẵn một lượng hạt
+            for(let i=0; i<maxParticles; i++) {
+                createParticle();
+            }
         });
     </script>
 

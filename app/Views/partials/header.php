@@ -240,12 +240,7 @@ $isFiltering = ($currentController == 'product');
             font-weight: 800;
             letter-spacing: 5px;
             margin-bottom: 5px;
-            animation: textPulse 2s infinite;
-        }
-
-        @keyframes textPulse {
-            0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(255, 255, 255, 0.2); }
-            50% { opacity: 0.6; text-shadow: none; }
+            margin-top: 15px;
         }
 
         .loader-subtext {
@@ -309,8 +304,8 @@ $isFiltering = ($currentController == 'product');
             <div class="music-waves">
                 <span></span><span></span><span></span><span></span><span></span>
             </div>
-            <h2 class="loader-text">TTB MUSIC</h2>
-            <p class="loader-subtext">Đang chuẩn bị giai điệu...</p>
+            <h2 class="loader-text animate__animated animate__fadeInUp">TTB MUSIC</h2>
+            <p class="loader-subtext animate__animated animate__fadeInUp animate__delay-1s">Đang chuẩn bị giai điệu...</p>
         </div>
     </div>
     <?php endif; ?>
@@ -344,7 +339,7 @@ $isFiltering = ($currentController == 'product');
         const icons = ['♪', '♫', '♬', '♩'];
         
         // Cấu hình chuột
-        let mouse = { x: null, y: null, radius: 100 };
+        let mouse = { x: null, y: null, radius: 120 };
         
         window.addEventListener('mousemove', function(e) {
             mouse.x = e.x;
@@ -365,8 +360,8 @@ $isFiltering = ($currentController == 'product');
                 this.size = Math.random() * 20 + 15;
                 this.speedY = Math.random() * 1 + 0.5;
                 this.icon = icons[Math.floor(Math.random() * icons.length)];
-                this.opacity = 0.05;
-                this.color = '#cbd5e1'; // Màu mặc định mờ
+                this.baseOpacity = Math.random() * 0.1 + 0.1; // Độ mờ cơ bản từ 0.1 - 0.2 (Rõ hơn)
+                this.opacity = this.baseOpacity;
                 this.angle = Math.random() * 360;
                 this.spin = (Math.random() - 0.5) * 2;
                 
@@ -403,12 +398,10 @@ $isFiltering = ($currentController == 'product');
                 // Animation mượt mà khi hover
                 if (this.isHovered) {
                     this.hoverScale = Math.min(this.hoverScale + 0.1, 1.8);
-                    this.opacity = Math.min(this.opacity + 0.05, 0.8);
-                    this.color = '#3b82f6'; // Sáng màu xanh
+                    this.opacity = Math.min(this.opacity + 0.05, 0.9);
                 } else {
                     this.hoverScale = Math.max(this.hoverScale - 0.05, 1);
-                    this.opacity = Math.max(this.opacity - 0.02, 0.05);
-                    this.color = '#cbd5e1'; // Trở lại màu gốc
+                    this.opacity = Math.max(this.opacity - 0.02, this.baseOpacity);
                 }
             }
 
@@ -418,11 +411,14 @@ $isFiltering = ($currentController == 'product');
                 ctx.rotate(this.angle * Math.PI / 180);
                 ctx.scale(this.hoverScale, this.hoverScale);
                 
-                ctx.globalAlpha = this.opacity;
-                ctx.fillStyle = this.color;
+                // Xác định màu sắc tương phản với Theme hiện tại
+                const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+                const baseColor = isLight ? `rgba(15, 23, 42, ${this.opacity})` : `rgba(255, 255, 255, ${this.opacity})`;
+                
+                ctx.fillStyle = this.isHovered ? `rgba(59, 130, 246, ${this.opacity})` : baseColor;
                 
                 if (this.isHovered) {
-                    ctx.shadowBlur = 15;
+                    ctx.shadowBlur = 20;
                     ctx.shadowColor = '#3b82f6';
                 } else {
                     ctx.shadowBlur = 0;
@@ -437,8 +433,8 @@ $isFiltering = ($currentController == 'product');
             }
         }
 
-        // Tạo mảng hạt
-        for (let i = 0; i < 35; i++) {
+        // Tạo mảng hạt (Giảm bớt để không rối)
+        for (let i = 0; i < 30; i++) {
             particles.push(new Particle());
         }
 

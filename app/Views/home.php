@@ -15,16 +15,21 @@ include __DIR__ . '/partials/header.php';
     .hero-section { position: relative; height: 90vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
     .video-background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
     .video-background iframe { width: 100vw; height: 56.25vw; min-height: 100vh; min-width: 177.77vh; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+    
+    /* Overlay làm tối video và làm nổi bật Slogan */
+    .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); z-index: 1; pointer-events: none; }
+    .hero-content { position: relative; z-index: 2; color: white; text-shadow: 2px 2px 15px rgba(0,0,0,0.9); }
+    
     /* ================= DẢI THƯƠNG HIỆU & GỢN SÓNG (WAVE) ================= */
     .brand-wrapper { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); background: var(--card-bg); padding: 30px 0; width: 100%; gap: 40px; }
     
-    /* Hiệu ứng Gợn sóng (Wave) mượt mà chỉ di chuyển, KHÔNG tự động sáng lên */
-    @keyframes smoothWave {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-12px); }
+    /* Hiệu ứng Gợn sóng (Wave) mượt mà dạng lướt 3 cụm, nghỉ dài 10s */
+    @keyframes travelingWave {
+        0%, 15%, 100% { transform: translateY(0); }
+        7.5% { transform: translateY(-20px); }
     }
     
-    .brand-item { display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 900; color: var(--text-color); cursor: pointer; opacity: 0.5; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); white-space: nowrap; animation: smoothWave 4s ease-in-out infinite; }
+    .brand-item { display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 900; color: var(--text-color); cursor: pointer; opacity: 0.5; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); white-space: nowrap; animation: travelingWave 10s infinite; }
     
     /* Delay sóng truyền từ trái qua phải cực mượt (8 items) */
     .brand-item:nth-child(1) { animation-delay: 0.0s; }

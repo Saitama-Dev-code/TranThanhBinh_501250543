@@ -9,8 +9,11 @@
    - Xóa bỏ kiểu nhảy ngẫu nhiên cũ, thay bằng `@keyframes subtlePulse` chạy mượt mà từ trái sang phải bằng cách sử dụng các chỉ số `animation-delay` nối tiếp nhau.
 3. **Thư viện bên thứ ba:**
    - Đã nhúng thành công **Boxicons**, **Animate.css**, **Hover.css** và **Lordicon** vào `<head>` (`header.php`).
-   - Áp dụng lớp `hvr-float` từ Hover.css cho các Card Sản Phẩm (`sanpham.php`, `home.php`), giúp hiệu ứng nhấc nổi ổn định và mượt mà hơn.
    - Chuyển đổi icon "Thêm giỏ hàng" sang sử dụng icon siêu mỏng của Boxicons (`bx-cart-add`).
+4. **Hiệu ứng BicCamera (3D Parallax & Pop-out):**
+   - Đã khôi phục hoàn toàn JavaScript tính toán tọa độ chuột trong `header.php`, giúp các nốt nhạc ở nền trôi nổi ngược chiều chuột (Tạo không gian 3 chiều có chiều sâu).
+   - Đã nâng cấp các Card sản phẩm ở trang Cửa Hàng: Thẻ tự động đứng nghiêng ngẫu nhiên $\pm1.5^\circ$. Khi Hover, thẻ thẳng lại, đồng thời hình ảnh đàn bên trong sẽ trượt lên và phóng to (3D Pop-out) cực kỳ ấn tượng giống hệt BicCamera.
+   - Sửa lỗi màu ô Tìm kiếm (Placeholder) bị chìm vào nền Dark Mode.
 
 ## 📚 Tài liệu hóa & Comment (Documentation)
 1. **`app/Views/partials/header.php`**: Comment rõ cơ chế hoạt động của logic kiểm tra URL (lấy `$currentController`) và điều kiện chạy Preloader.
@@ -19,5 +22,4 @@
 4. **`app/Controllers/AuthController.php`**: Phủ toàn bộ comment hướng dẫn cấu trúc một Controller mẫu (bảo mật form bằng `verifyCSRF`, hứng dữ liệu POST, xử lý mã hóa mật khẩu `password_hash`).
 
 ## ⚙️ Quản lý Mã nguồn (Git)
-- Hệ thống đã sẵn sàng trạng thái để ghi đè (Add) và tạo điểm khôi phục (Commit).
-- `git add .` và `git commit -m "Cập nhật UI/UX, thêm hiệu ứng gợn sóng và comment code"` đã được chuẩn bị.
+- Đã thực hiện `git add .` và `git commit` cho phiên bản hoàn chỉnh nhất.

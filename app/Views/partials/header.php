@@ -339,7 +339,32 @@ $isFiltering = ($currentController == 'product');
     </script>
 
     <div class="watermark">TTB MUSIC</div>
-    <div id="global-parallax"></div>
+    <div id="global-parallax">
+        <!-- Các phần tử trôi nổi với data-speed để tạo chiều sâu 3D khi di chuột -->
+        <i class="fas fa-music parallax-item" data-speed="0.05" style="top: 15%; left: 15%; font-size: 3rem; color: var(--text-color); opacity: 0.04; position: absolute; transition: transform 0.1s ease-out;"></i>
+        <i class="fas fa-guitar parallax-item" data-speed="0.12" style="top: 35%; right: 10%; font-size: 6rem; color: var(--text-color); opacity: 0.03; position: absolute; transition: transform 0.1s ease-out;"></i>
+        <i class="fas fa-headphones parallax-item" data-speed="0.08" style="top: 65%; left: 20%; font-size: 4rem; color: var(--text-color); opacity: 0.04; position: absolute; transition: transform 0.1s ease-out;"></i>
+        <i class="fas fa-drum parallax-item" data-speed="0.04" style="top: 80%; right: 30%; font-size: 3.5rem; color: var(--text-color); opacity: 0.05; position: absolute; transition: transform 0.1s ease-out;"></i>
+        <i class="fas fa-compact-disc parallax-item" data-speed="0.02" style="top: 50%; left: 60%; font-size: 8rem; color: var(--text-color); opacity: 0.02; position: absolute; transition: transform 0.1s ease-out;"></i>
+    </div>
+
+    <script>
+        // Xử lý hiệu ứng Parallax nền theo chuột (Chuẩn tương tác 3D giống BicCamera)
+        document.addEventListener('mousemove', function(e) {
+            const parallaxItems = document.querySelectorAll('.parallax-item');
+            // Tính toán khoảng cách chuột tới tâm màn hình (tỷ lệ từ -1 đến 1)
+            const xAxis = (window.innerWidth / 2 - e.clientX) / (window.innerWidth / 2);
+            const yAxis = (window.innerHeight / 2 - e.clientY) / (window.innerHeight / 2);
+
+            parallaxItems.forEach(item => {
+                const speed = parseFloat(item.getAttribute('data-speed'));
+                // Các vật ở gần (speed cao) dịch nhiều, vật ở xa dịch ít tạo chiều sâu
+                const xTranslate = xAxis * speed * 200;
+                const yTranslate = yAxis * speed * 200;
+                item.style.transform = `translate3d(${xTranslate}px, ${yTranslate}px, 0)`;
+            });
+        });
+    </script>
 
     <nav class="navbar navbar-expand-lg" id="smartNavbar">
         <div class="container">

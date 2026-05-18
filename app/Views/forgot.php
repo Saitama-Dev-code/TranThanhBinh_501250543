@@ -32,7 +32,21 @@
         .form-content { position: relative; z-index: 2; }
 
         .modern-input { background: rgba(128, 128, 128, 0.05) !important; border: 1px solid var(--border-color); color: var(--text-color) !important; border-radius: 0.75rem; transition: 0.3s ease; }
-        .modern-input:focus { border-color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
+        .custom-floating { position: relative; }
+        .custom-floating .modern-input { padding: 1rem 1.25rem; height: auto; }
+        .custom-floating label {
+            position: absolute; top: 50%; left: 1rem; transform: translateY(-50%);
+            background: var(--card-bg); padding: 0 0.4rem; color: var(--text-color); opacity: 0.3;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); pointer-events: none; border-radius: 4px;
+        }
+        .custom-floating .modern-input:focus ~ label,
+        .custom-floating .modern-input:not(:placeholder-shown) ~ label {
+            top: 0; transform: translateY(-50%) scale(0.85);
+            color: #3b82f6; opacity: 1; font-weight: 600;
+        }
+        .custom-floating .modern-input:focus {
+            border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        }
         .form-floating label { color: var(--text-color); opacity: 0.6; }
         .btn-glow { background: #3b82f6; border: none; transition: 0.3s; }
         .btn-glow:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4); }
@@ -77,8 +91,8 @@
                     </div>
                     <form action="index.php?controller=auth&action=forgotSubmit" method="POST">
                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
-                        <div class="form-floating mb-4">
-                            <input type="email" class="form-control modern-input" id="email" name="email" placeholder="Email" required>
+                        <div class="custom-floating mb-4">
+                            <input type="email" class="form-control modern-input" id="email" name="email" placeholder=" " required>
                             <label for="email"><i class="fas fa-envelope me-2"></i>Email đã đăng ký</label>
                         </div>
                         <button type="submit" class="btn btn-glow btn-lg w-100 fw-bold rounded-pill text-white py-3">GỬI YÊU CẦU <i class="fas fa-paper-plane ms-2"></i></button>

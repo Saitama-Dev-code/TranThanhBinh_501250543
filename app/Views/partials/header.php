@@ -10,6 +10,9 @@
 
 // Lấy tên controller hiện tại để xử lý hiệu ứng "Active" trên thanh Menu
 $currentController = $_GET['controller'] ?? 'home';
+
+// Kiểm tra xem có đang ở trang sản phẩm và có tham số lọc không (tránh hiện preloader khi lọc)
+$isFiltering = ($currentController == 'product' && (isset($_GET['search']) || isset($_GET['category']) || isset($_GET['page'])));
 ?>
 <!DOCTYPE html>
 <html lang="vi" data-theme="dark">
@@ -288,6 +291,7 @@ $currentController = $_GET['controller'] ?? 'home';
             document.documentElement.setAttribute('data-theme', savedTheme);
         })();
     </script>
+    <?php if (!$isFiltering): ?>
     <div id="preloader">
         <div class="loader-content">
             <div class="music-waves">
@@ -297,6 +301,7 @@ $currentController = $_GET['controller'] ?? 'home';
             <p class="loader-subtext">Đang tinh chỉnh giai điệu...</p>
         </div>
     </div>
+    <?php endif; ?>
 
     <script>
         /**
@@ -304,9 +309,11 @@ $currentController = $_GET['controller'] ?? 'home';
          */
         window.addEventListener('load', function() {
             const preloader = document.getElementById('preloader');
-            setTimeout(() => {
-                preloader.classList.add('preloader-hidden');
-            }, 1000);
+            if (preloader) {
+                setTimeout(() => {
+                    preloader.classList.add('preloader-hidden');
+                }, 1000);
+            }
         });
     </script>
 

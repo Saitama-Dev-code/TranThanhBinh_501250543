@@ -2,10 +2,11 @@
 /**
  * =========================================================================
  * TÊN FILE: app/Views/home.php
- * MÔ TẢ: Giao diện trang chủ. Đã được thiết kế gọn gàng nhờ nạp Header và Footer.
+ * MÔ TẢ: Giao diện trang chủ của website TTB Music.
+ * KIẾN TRÚC: Gọi Header ở đầu và Footer ở cuối để đóng gói toàn bộ giao diện.
  * =========================================================================
  */
-// 1. GỌI HEADER
+// 1. GỌI HEADER (Chứa thẻ <html>, <head>, Navbar, Preloader)
 include __DIR__ . '/partials/header.php';
 ?>
 
@@ -17,17 +18,25 @@ include __DIR__ . '/partials/header.php';
     .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 1; }
     .hero-content { position: relative; z-index: 2; color: white; }
 
+    /* ================= MARQUEE (CHẠY CHỮ) & GỢN SÓNG LOGO ================= */
     .marquee-wrapper { display: flex; overflow: hidden; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); background: var(--card-bg); padding: 25px 0; width: 100%; }
     .marquee-content { display: flex; flex-shrink: 0; animation: marqueeScroll 25s linear infinite; }
     @keyframes marqueeScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+    
+    /* Hiệu ứng gợn sóng (Wave) mượt mà cho Logo */
     @keyframes subtlePulse {
         0%, 85%, 100% { transform: scale(1); opacity: 0.6; color: var(--text-color); }
         92% { transform: scale(1.1) translateY(-5px); opacity: 0.9; color: #3b82f6; text-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
     }
     .brand-item { display: flex; align-items: center; justify-content: center; margin: 0 45px; font-size: 2rem; font-weight: 800; color: var(--text-color); cursor: pointer; opacity: 0.6; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); white-space: nowrap; animation: subtlePulse 8s infinite; }
-    .brand-item:nth-child(2n) { animation-delay: 2s; }
-    .brand-item:nth-child(3n) { animation-delay: 4s; }
-    .brand-item:nth-child(5n) { animation-delay: 6s; }
+    /* Delay tăng dần để tạo cảm giác sóng chạy từ trái sang phải */
+    .brand-item:nth-child(1) { animation-delay: 0.2s; }
+    .brand-item:nth-child(2) { animation-delay: 0.4s; }
+    .brand-item:nth-child(3) { animation-delay: 0.6s; }
+    .brand-item:nth-child(4) { animation-delay: 0.8s; }
+    .brand-item:nth-child(5) { animation-delay: 1.0s; }
+    .brand-item:nth-child(6) { animation-delay: 1.2s; }
+    
     .brand-item:hover { animation: none; opacity: 1 !important; color: #3b82f6 !important; transform: translateY(-12px) scale(1.15) !important; text-shadow: 0 10px 20px rgba(59, 130, 246, 0.4); }
 
     .product-card-clean { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; position: relative; padding: 20px; height: 100%; display: flex; flex-direction: column; transition: box-shadow 0.3s ease, border-color 0.3s ease; }
@@ -108,7 +117,7 @@ include __DIR__ . '/partials/header.php';
 
     <div class="row g-5">
         <div class="col-12 col-md-4" data-aos="fade-up" data-aos-delay="100">
-            <div class="product-card-clean">
+            <div class="product-card-clean hvr-float">
                 <div class="pickup-badge">Pickup!</div>
                 <div class="img-container">
                     <img src="https://images.unsplash.com/photo-1550291652-6ea9114a47b1?q=80&w=600&auto=format&fit=crop" alt="Guitar">
@@ -117,13 +126,13 @@ include __DIR__ . '/partials/header.php';
                     <h5 class="fw-bold">Acoustic Yamaha F310</h5>
                     <p class="small text-muted mb-2">Gỗ vân sam, âm mộc chuẩn</p>
                     <p class="text-primary fw-bold fs-4 mb-3">3.500.000 ₫</p>
-                    <button class="btn btn-outline-primary rounded-pill w-100"><i class="fas fa-shopping-cart me-2"></i>Thêm giỏ hàng</button>
+                    <button class="btn btn-outline-primary rounded-pill w-100"><i class='bx bx-cart-add fs-5 align-middle me-2'></i>Thêm giỏ hàng</button>
                 </div>
             </div>
         </div>
 
         <div class="col-12 col-md-4" data-aos="fade-up" data-aos-delay="200">
-            <div class="product-card-clean">
+            <div class="product-card-clean hvr-float">
                 <div class="pickup-badge bg-success">Mới!</div>
                 <div class="img-container">
                     <img src="https://images.unsplash.com/photo-1595069906974-f0ae90cefc70?q=80&w=600&auto=format&fit=crop" alt="Piano">
@@ -132,13 +141,13 @@ include __DIR__ . '/partials/header.php';
                     <h5 class="fw-bold">Roland Midi Keyboard</h5>
                     <p class="small text-muted mb-2">Phím gõ chân thực, siêu nhạy</p>
                     <p class="text-primary fw-bold fs-4 mb-3">16.900.000 ₫</p>
-                    <button class="btn btn-outline-primary rounded-pill w-100"><i class="fas fa-shopping-cart me-2"></i>Thêm giỏ hàng</button>
+                    <button class="btn btn-outline-primary rounded-pill w-100"><i class='bx bx-cart-add fs-5 align-middle me-2'></i>Thêm giỏ hàng</button>
                 </div>
             </div>
         </div>
 
         <div class="col-12 col-md-4" data-aos="fade-up" data-aos-delay="300">
-            <div class="product-card-clean">
+            <div class="product-card-clean hvr-float">
                 <div class="pickup-badge bg-warning text-dark">Hot!</div>
                 <div class="img-container">
                     <img src="https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?q=80&w=600&auto=format&fit=crop" alt="Drum">
@@ -147,7 +156,7 @@ include __DIR__ . '/partials/header.php';
                     <h5 class="fw-bold">Trống Pearl Roadshow</h5>
                     <p class="small text-muted mb-2">Bộ 5 trống tiêu chuẩn</p>
                     <p class="text-primary fw-bold fs-4 mb-3">12.500.000 ₫</p>
-                    <button class="btn btn-outline-primary rounded-pill w-100"><i class="fas fa-shopping-cart me-2"></i>Thêm giỏ hàng</button>
+                    <button class="btn btn-outline-primary rounded-pill w-100"><i class='bx bx-cart-add fs-5 align-middle me-2'></i>Thêm giỏ hàng</button>
                 </div>
             </div>
         </div>

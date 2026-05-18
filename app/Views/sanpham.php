@@ -45,9 +45,10 @@ include __DIR__ . '/partials/header.php';
                 </a>
                 
                 <?php
+                // Kiểm tra xem danh sách thể loại có tồn tại không trước khi lặp
                 if(isset($categories) && is_array($categories)) {
                     foreach ($categories as $cat) {
-                        // Xác định xem danh mục này có đang click (active) không
+                        // Xác định xem danh mục này có trùng với danh mục trên URL không (active)
                         $catId = $currentCategory ?? null;
                         $isActive = ($catId == $cat['id']) ? 'active' : '';
                         echo '<a href="index.php?controller=product&action=index&category='.$cat['id'].'" class="category-link '.$isActive.'">';
@@ -67,11 +68,14 @@ include __DIR__ . '/partials/header.php';
 
             <div class="row g-4">
                 <?php
+                // Kiểm tra xem có sản phẩm nào được trả về từ DB không
                 if (isset($products) && is_array($products) && count($products) > 0) {
+                    // Lặp qua từng sản phẩm để hiển thị Card
                     foreach ($products as $p) {
                 ?>
                         <div class="col-md-4 col-sm-6">
-                            <div class="product-card d-flex flex-column">
+                            <!-- Thêm class hvr-float từ thư viện Hover.css để nảy lên khi di chuột -->
+                            <div class="product-card d-flex flex-column hvr-float">
                                 <a href="index.php?controller=product&action=detail&id=<?= $p['id'] ?>">
                                     <img src="<?= $p['image'] ?>" class="product-img" alt="<?= $p['name'] ?>">
                                 </a>
@@ -82,7 +86,7 @@ include __DIR__ . '/partials/header.php';
                                     <p class="text-primary fw-bolder fs-5 mt-auto"><?= number_format($p['price'], 0, ',', '.') ?> ₫</p>
                                     
                                     <button class="btn btn-outline-primary w-100 rounded-pill mt-2">
-                                        <i class="fas fa-cart-plus me-2"></i>Thêm giỏ hàng
+                                        <i class='bx bx-cart-add fs-5 align-middle me-2'></i>Thêm giỏ hàng
                                     </button>
                                 </div>
                             </div>
@@ -96,8 +100,10 @@ include __DIR__ . '/partials/header.php';
             </div>
 
             <?php 
+            // XỬ LÝ PHÂN TRANG (PAGINATION)
             $totPages = $totalPages ?? 1;
             $curPage = $currentPage ?? 1;
+            // Chỉ hiển thị thanh phân trang nếu có nhiều hơn 1 trang
             if ($totPages > 1): 
             ?>
             <nav class="mt-5">

@@ -8,11 +8,19 @@
  * =========================================================================
  */
 
-// Lấy tên controller hiện tại để xử lý hiệu ứng "Active" trên thanh Menu
+// =========================================================================
+// KIỂM TRA ĐIỀU HƯỚNG BẰNG TÊN CONTROLLER TRÊN URL
+// - Biến $_GET['controller'] lấy từ URL (vd: index.php?controller=product)
+// - Toán tử ?? 'home' nghĩa là: Nếu không có controller nào trên URL thì mặc định là 'home'
+// =========================================================================
 $currentController = $_GET['controller'] ?? 'home';
 
-// Kiểm tra xem có đang ở trang sản phẩm và có tham số lọc không (tránh hiện preloader khi lọc)
-$isFiltering = ($currentController == 'product' && (isset($_GET['search']) || isset($_GET['category']) || isset($_GET['page'])));
+// =========================================================================
+// LOGIC HIỂN THỊ PRELOADER (MÀN HÌNH CHỜ)
+// - Tắt preloader cho toàn bộ phân trang/cửa hàng (khi đang ở controller 'product')
+//   để tránh việc người dùng click vào "Tất cả nhạc cụ" hoặc "Lọc" bị chớp màn hình.
+// =========================================================================
+$isFiltering = ($currentController == 'product');
 ?>
 <!DOCTYPE html>
 <html lang="vi" data-theme="dark">
@@ -23,8 +31,20 @@ $isFiltering = ($currentController == 'product' && (isset($_GET['search']) || is
     <title><?= $pageTitle ?? 'TTB - Giai Điệu Của Riêng Bạn' ?></title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Gốc -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <!-- CÁC THƯ VIỆN HIỆU ỨNG MỚI ĐƯỢC THÊM VÀO -->
+    <!-- 1. AOS (Animate On Scroll): Hiệu ứng trượt khi cuộn chuột -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- 2. Boxicons: Bộ icon hiện đại, mảnh, hỗ trợ xoay/nhấp nháy -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- 3. Animate.css: Hiệu ứng chuyển động (bounce, pulse) cho các thẻ HTML -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <!-- 4. Hover.css: Hiệu ứng di chuột cho nút bấm, thẻ bài (Card) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/hover.css/2.3.1/css/hover-min.css" />
+    <!-- 5. Lordicon: Hỗ trợ load các Icon dạng hoạt hình Lottie mượt mà -->
+    <script src="https://cdn.lordicon.com/lordicon.js"></script>
 
     <style>
         /* ================= BIẾN MÀU SẮC (THEME) ================= */
@@ -110,10 +130,11 @@ $isFiltering = ($currentController == 'product' && (isset($_GET['search']) || is
         }
 
         /* ================= NAVBAR ================= */
+        /* CSS cho thanh điều hướng trên cùng */
         .navbar {
             background-color: var(--nav-bg);
             border-bottom: 1px solid var(--border-color);
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px); /* Tạo hiệu ứng kính mờ (Glassmorphism) */
             transition: top 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55), background-color 0.4s;
             position: fixed;
             width: 100%;

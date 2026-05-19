@@ -2,6 +2,26 @@
 
 **Ngày cập nhật:** 19/05/2026
 
+## 🚀 Cập Nhật Lần 7 (Dữ Liệu Biến Thể Thật Từ Database)
+
+### 1. Quản Lý Biến Thể (Product Variants)
+- **Bảng mới `product_variants`:** Lưu trữ chi tiết màu sắc và phiên bản cho từng nhạc cụ.
+  - Hỗ trợ mã màu HEX cho icon.
+  - Hỗ trợ ảnh riêng (`image_url`) cho từng màu sắc.
+- **Xóa bỏ dữ liệu giả lập:** Thay thế toàn bộ logic `rand()` và mảng cứng bằng dữ liệu truy vấn từ SQL.
+
+### 2. Tối Ưu Hóa Model & Controller
+- **`ProductModel`:** Thêm hàm `getVariantsByProductId($id)` để lấy và phân loại biến thể (colors vs versions).
+- **`ProductController`:** Tự động gắn kèm dữ liệu biến thể vào từng sản phẩm khi load trang Cửa hàng.
+
+### 3. Cải Tiến UI/UX
+- **`sanpham.php`:** Chỉ hiển thị các nhóm biến thể (Màu sắc/Phiên bản) nếu sản phẩm đó thực sự có dữ liệu biến thể trong database.
+- **Preview mượt mà:** Chuyển đổi ảnh chính xác theo từng màu sắc được định nghĩa trong DB.
+
+---
+
+**Ngày cập nhật:** 19/05/2026
+
 ## 🚀 Cập Nhật Lần 6 (Nâng Cấp Trang Sản Phẩm Toàn Diện)
 
 ### 1. Bộ Lọc Nâng Cao (Advanced Filter Sidebar)

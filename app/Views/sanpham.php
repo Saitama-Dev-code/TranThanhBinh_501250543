@@ -945,21 +945,10 @@ include __DIR__ . '/partials/header.php';
                                 $stockClass = $p['stock'] <= 3 ? 'low' : '';
                                 $stockText = $p['stock'] > 0 ? 'Còn ' . $p['stock'] : 'Hết hàng';
 
-                                // Các biến thể màu sắc giả lập (trong thực tế sẽ từ DB)
-                                // Mỗi sản phẩm có 3-4 màu khác nhau
-                                $colorOptions = ['Đen' => '#1a1a2e', 'Nâu' => '#8B4513', 'Trắng' => '#f0f0f0', 'Vàng' => '#FFD700', 'Đỏ' => '#DC143C'];
-                                $selectedColors = array_slice($colorOptions, 0, rand(3, 4), true);
-
-                                // Các biến thể loại giả lập (trong thực tế sẽ từ DB)
-                                $typeOptions = ['Standard', 'Pro', 'Premium', 'Limited'];
-                                $selectedTypes = array_slice($typeOptions, 0, rand(2, 3));
-
-                                // Ảnh phụ để đổi khi chọn màu/loại (thực tế sẽ từ DB)
-                                $altImages = [
-                                    'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?q=80&w=400',
-                                    'https://images.unsplash.com/photo-1550291652-6ea9114a47b1?q=80&w=400',
-                                    'https://images.unsplash.com/photo-1564186763535-ebb21ef5277f?q=80&w=400'
-                                ];
+                                // Lấy dữ liệu biến thể thật từ Database
+                                $variants = $p['variants'] ?? ['colors' => [], 'versions' => []];
+                                $colors = $variants['colors'];
+                                $versions = $variants['versions'];
                         ?>
                                 <!-- MỖI SẢN PHẨM LÀ 1 ITEM TRONG GRID -->
                                 <div class="product-item" data-index="<?= $index ?>">
@@ -988,35 +977,39 @@ include __DIR__ . '/partials/header.php';
                                                 <!-- Panel màu sắc & loại - Hiện khi hover -->
                                                 <div class="variant-panel">
                                                     <!-- Tùy chọn màu sắc -->
+                                                    <?php if(!empty($colors)): ?>
                                                     <div class="mb-3">
                                                         <div class="variant-label">
                                                             <i class="fas fa-palette"></i> Màu sắc
                                                         </div>
                                                         <div class="variant-options">
-                                                            <?php foreach($selectedColors as $colorName => $colorHex): ?>
+                                                            <?php foreach($colors as $c): ?>
                                                                 <button class="variant-btn color-btn" 
-                                                                        data-color="<?= $colorName ?>"
-                                                                        data-image="<?= $altImages[array_rand($altImages)] ?>">
-                                                                    <span class="color-dot" style="background: <?= $colorHex ?>"></span>
-                                                                    <?= $colorName ?>
+                                                                        data-color="<?= $c['name'] ?>"
+                                                                        data-image="<?= $c['image_url'] ?? $p['image'] ?>">
+                                                                    <span class="color-dot" style="background: <?= $c['value'] ?>"></span>
+                                                                    <?= $c['name'] ?>
                                                                 </button>
                                                             <?php endforeach; ?>
                                                         </div>
                                                     </div>
+                                                    <?php endif; ?>
 
                                                     <!-- Tùy chọn loại -->
+                                                    <?php if(!empty($versions)): ?>
                                                     <div>
                                                         <div class="variant-label">
                                                             <i class="fas fa-layer-group"></i> Phiên bản
                                                         </div>
                                                         <div class="variant-options">
-                                                            <?php foreach($selectedTypes as $typeName): ?>
-                                                                <button class="variant-btn type-btn" data-type="<?= $typeName ?>">
-                                                                    <?= $typeName ?>
+                                                            <?php foreach($versions as $v): ?>
+                                                                <button class="variant-btn type-btn" data-type="<?= $v['name'] ?>">
+                                                                    <?= $v['name'] ?>
                                                                 </button>
                                                             <?php endforeach; ?>
                                                         </div>
                                                     </div>
+                                                    <?php endif; ?>
                                                 </div>
                                             </div>
 

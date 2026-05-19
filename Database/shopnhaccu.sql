@@ -154,4 +154,33 @@ CREATE TABLE `rental_details` (
   FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- --------------------------------------------------------
+-- 8. BẢNG PRODUCT_VARIANTS (Biến thể màu sắc và phiên bản)
+-- --------------------------------------------------------
+DROP TABLE IF EXISTS `product_variants`;
+CREATE TABLE `product_variants` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `product_id` int(11) NOT NULL,
+  `variant_type` enum('color','version') NOT NULL COMMENT 'Loại biến thể: màu sắc hoặc phiên bản',
+  `name` varchar(100) NOT NULL COMMENT 'Tên hiển thị (Đen, Trắng, Pro, Standard...)',
+  `value` varchar(100) DEFAULT NULL COMMENT 'Giá trị kỹ thuật (Mã màu HEX hoặc mã loại)',
+  `image_url` varchar(255) DEFAULT NULL COMMENT 'Ảnh tương ứng với biến thể này',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dữ liệu mẫu biến thể cho sản phẩm ID 1 (Yamaha F310)
+INSERT INTO `product_variants` (`product_id`, `variant_type`, `name`, `value`, `image_url`) VALUES
+(1, 'color', 'Gỗ tự nhiên', '#D2B48C', 'https://images.unsplash.com/photo-1550291652-6ea9114a47b1?q=80&w=600'),
+(1, 'color', 'Sunburst', '#8B4513', 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?q=80&w=600'),
+(1, 'version', 'Standard', 'std', NULL),
+(1, 'version', 'Premium', 'pre', NULL);
+
+-- Dữ liệu mẫu biến thể cho sản phẩm ID 2 (Roland RP-30)
+INSERT INTO `product_variants` (`product_id`, `variant_type`, `name`, `value`, `image_url`) VALUES
+(2, 'color', 'Đen nhám', '#1a1a1a', 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?q=80&w=600'),
+(2, 'color', 'Trắng sứ', '#f8f9fa', 'https://images.unsplash.com/photo-1552422535-c45813c61732?q=80&w=600'),
+(2, 'version', 'RP-30 Basic', 'basic', NULL),
+(2, 'version', 'RP-30 Plus', 'plus', NULL);
+
 COMMIT;

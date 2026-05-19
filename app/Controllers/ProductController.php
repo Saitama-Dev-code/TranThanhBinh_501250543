@@ -78,6 +78,13 @@ class ProductController extends BaseController {
             $offset          // Vị trí bắt đầu
         );
 
+        // BỔ SUNG: Lấy biến thể cho từng sản phẩm
+        if ($products) {
+            foreach ($products as &$p) {
+                $p['variants'] = $productModel->getVariantsByProductId($p['id']);
+            }
+        }
+
         // Đếm tổng số sản phẩm thỏa điều kiện lọc (để tính tổng trang)
         $totalProducts = $productModel->getTotalProducts(
             $keyword,

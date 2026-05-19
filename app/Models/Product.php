@@ -193,5 +193,33 @@ class Product extends BaseModel {
         $stmt->execute();
         return $stmt->fetch();
     }
+
+    /**
+     * HÀM: Lấy danh sách biến thể của một sản phẩm
+     * - Trả về mảng chứa màu sắc và phiên bản
+     */
+    public function getVariantsByProductId($productId) {
+        $sql = "SELECT * FROM product_variants WHERE product_id = :product_id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':product_id', $productId, PDO::PARAM_INT);
+        $stmt->execute();
+        $variants = $stmt->fetchAll();
+
+        // Phân loại biến thể để dễ sử dụng ở View
+        $result = [
+            'colors' => [],
+            'versions' => []
+        ];
+
+        foreach ($variants as $v) {
+            if ($v['variant_type'] == 'color') {
+                $result['colors'][] = $v;
+            } else {
+                $result['versions'][] = $v;
+            }
+        }
+
+        return $result;
+    }
 }
 ?>

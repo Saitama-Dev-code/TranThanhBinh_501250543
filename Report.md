@@ -2,6 +2,29 @@
 
 **Ngày cập nhật:** 19/05/2026
 
+## 🚀 Cập Nhật Lần 8 (Tối Ưu Giao Diện & Dữ Liệu Thực Tế Toàn Diện)
+
+### 1. Phân Tách Giao Diện (UI Separation)
+- **Tách biệt Danh mục & Bộ lọc:** "Danh mục" (Categories) được đưa ra một block riêng biệt phía trên "Bộ lọc" (Filters), giúp giao diện gọn gàng và giữ nguyên trải nghiệm như phiên bản gốc.
+- **Glassmorphism Sidebar:** Cả hai block Danh mục và Bộ lọc đều sử dụng hiệu ứng kính mờ (backdrop-filter: blur(10px)), đồng bộ với phong cách thiết kế hiện đại của toàn dự án.
+- **Tương tác mượt mà:** Thêm hiệu ứng hover và active cho danh mục (trượt nhẹ sang phải và đổi màu xanh dương).
+
+### 2. Mở Rộng Dữ Liệu Thực Tế (Data Expansion)
+- **Tăng số lượng sản phẩm:** Seed thêm **23 sản phẩm mẫu chất lượng cao** từ nhiều thương hiệu nổi tiếng (Nord, Korg, Martin, Ibanez, Focusrite, KRK...).
+- **Sửa lỗi link ảnh:** Toàn bộ sản phẩm được cập nhật link ảnh độ phân giải cao từ Unsplash, khắc phục triệt để các lỗi ảnh bị hỏng hoặc mờ.
+- **Đồng bộ Biến thể:** Mỗi sản phẩm mới đều được gán sẵn các biến thể (Màu sắc/Phiên bản) tương ứng trong database để người dùng preview ngay lập tức.
+
+### 3. Nâng Cấp Hệ Thống CSDL
+- **Thay đổi kiểu dữ liệu:** Cập nhật cột `price`, `rent_price_day`, `deposit_price` từ `DECIMAL(10,2)` lên `DECIMAL(15,2)` để hỗ trợ các nhạc cụ cao cấp có giá trị lớn (trên 100 triệu VNĐ).
+- **Làm sạch Database:** Thực hiện dọn dẹp và reset dữ liệu rác để đảm bảo tính nhất quán giữa bảng sản phẩm và bảng biến thể.
+
+### 4. Logic Lọc Thông Minh
+- **Preserve Category:** Khi người dùng đang ở một danh mục cụ thể và sử dụng bộ lọc (giá, thương hiệu...), hệ thống tự động giữ lại ID danh mục đó để kết quả lọc luôn chính xác trong phạm vi mong muốn.
+
+---
+
+**Ngày cập nhật:** 19/05/2026
+
 ## 🚀 Cập Nhật Lần 7 (Dữ Liệu Biến Thể Thật Từ Database)
 
 ### 1. Quản Lý Biến Thể (Product Variants)

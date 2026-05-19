@@ -15,18 +15,88 @@ include __DIR__ . '/partials/header.php';
    PHẦN 1: CSS CHO BỘ LỌC NÂNG CAO (ADVANCED FILTER SIDEBAR)
    ================================================================================ */
 
-/* Container chính của sidebar lọc */
-.filter-sidebar {
+/* Sidebar lọc và Danh mục */
+.filter-sidebar, .category-sidebar {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 16px;
     padding: 20px;
-    position: sticky;
-    top: 90px;
-    max-height: calc(100vh - 110px);
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border-color) transparent;
+    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.category-sidebar {
+    position: relative;
+    top: auto;
+    z-index: 1;
+}
+
+.category-sidebar .list-group-item {
+    transition: all 0.3s ease;
+    border-radius: 8px !important;
+    margin-bottom: 4px;
+}
+
+.category-sidebar .list-group-item:hover {
+    background: rgba(59, 130, 246, 0.1) !important;
+    color: #3b82f6 !important;
+    padding-left: 15px !important;
+}
+
+.category-sidebar .list-group-item.text-primary {
+    background: rgba(59, 130, 246, 0.15) !important;
+}
+
+.filter-sidebar {
+    position: relative;
+    top: auto;
+}
+
+/* Toggle button cho bộ lọc */
+.filter-toggle-btn {
+    width: 100%;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(139,92,246,0.15));
+    border: 1px solid rgba(59,130,246,0.3);
+    border-radius: 12px;
+    color: var(--text-color);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    transition: all 0.3s;
+    margin-bottom: 12px;
+}
+
+.filter-toggle-btn:hover {
+    background: linear-gradient(135deg, rgba(59,130,246,0.25), rgba(139,92,246,0.25));
+    border-color: rgba(59,130,246,0.5);
+}
+
+.filter-toggle-btn .toggle-icon {
+    transition: transform 0.3s ease;
+    font-size: 0.8rem;
+    color: #60a5fa;
+}
+
+.filter-toggle-btn.open .toggle-icon {
+    transform: rotate(180deg);
+}
+
+/* Collapsible filter body */
+.filter-collapsible {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.4s ease, opacity 0.3s ease;
+    opacity: 0;
+}
+
+.filter-collapsible.open {
+    max-height: 1200px;
+    opacity: 1;
 }
 
 .filter-sidebar::-webkit-scrollbar {
@@ -750,68 +820,62 @@ include __DIR__ . '/partials/header.php';
 <div class="container my-5 pt-4">
     <div class="row">
         <!-- ================================================================= -->
-        <!-- CỘT TRÁI: SIDEBAR BỘ LỌC NÂNG CAO -->
+        <!-- CỘT TRÁI: DANH MỤC & BỘ LỌC -->
         <!-- ================================================================= -->
         <div class="col-lg-3 mb-4">
-            <!-- Form bọc toàn bộ bộ lọc - Submit bằng AJAX -->
+            <!-- 1. PHẦN DANH MỤC -->
+            <div class="category-sidebar">
+                <div class="filter-title mb-3">
+                    <i class="fas fa-th-large"></i> Danh mục
+                </div>
+                <div class="list-group list-group-flush bg-transparent">
+                    <a href="#" data-category="" 
+                       class="category-link list-group-item list-group-item-action bg-transparent border-0 px-0 py-2 <?= empty($currentCategory) ? 'text-primary fw-bold' : 'text-white-50' ?>">
+                        <i class="fas fa-chevron-right me-2 small"></i>Tất cả nhạc cụ
+                    </a>
+                    <?php
+                    if (isset($categories) && is_array($categories)) {
+                        foreach ($categories as $cat) {
+                            $isActive = ($currentCategory ?? null) == $cat['id'];
+                            $activeClass = $isActive ? 'text-primary fw-bold' : 'text-white-50';
+                            echo '<a href="#" data-category="' . $cat['id'] . '"';
+                            echo ' class="category-link list-group-item list-group-item-action bg-transparent border-0 px-0 py-2 ' . $activeClass . '">';
+                            echo '<i class="' . $cat['icon'] . ' me-2"></i>' . $cat['name'];
+                            echo '</a>';
+                        }
+                    }
+                    ?>
+                </div>
+            </div>
+
+            <!-- 2. PHẦN BỘ LỌC NÂNG CAO -->
             <form id="filter-form" method="GET" action="index.php">
                 <input type="hidden" name="controller" value="product">
                 <input type="hidden" name="action" value="index">
+                <input type="hidden" name="category" id="filter-category" value="<?= $currentCategory ?? '' ?>">
 
-                <!-- Sidebar lọc với scroll riêng -->
                 <div class="filter-sidebar">
-                    <!-- Tiêu đề sidebar -->
-                    <div class="d-flex align-items-center justify-content-between mb-4">
-                        <h5 class="fw-bold mb-0">
-                            <i class="fas fa-sliders-h me-2 text-primary"></i>Bộ Lọc
-                        </h5>
-                        <span id="active-filter-count" class="badge bg-primary rounded-pill" style="display: none;">0</span>
-                    </div>
-
-                    <!-- Nút xóa tất cả lọc -->
-                    <a href="index.php?controller=product&action=index" class="btn-clear-filter w-100 mb-4 text-center" id="clear-all-filters" style="display: none;">
-                        <i class="fas fa-times me-2"></i>Xóa tất cả
-                    </a>
-
-                    <!-- ========================================================= -->
-                    <!-- NHÓM 1: TÌM KIẾM THEO TÊN -->
-                    <!-- ========================================================= -->
-                    <div class="filter-group">
+                    <!-- Nút toggle bộ lọc -->
+                    <button type="button" class="filter-toggle-btn" id="filter-toggle-btn">
+                        <span><i class="fas fa-sliders-h me-2 text-primary"></i>Bộ lọc nâng cao
+                            <span id="active-filter-count" class="badge bg-primary rounded-pill ms-2" style="display:none;">0</span>
+                        </span>
+                        <i class="fas fa-chevron-down toggle-icon"></i>
+                    </button>
+                    <!-- TÌM KIẾM THEO TÊN - luôn hiển thị -->
+                    <div class="filter-group" style="margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid var(--border-color);">
                         <div class="filter-title">
                             <i class="fas fa-search"></i> Tìm kiếm
                         </div>
                         <div class="input-group">
-                            <input type="text" name="search" class="form-control bg-transparent border-secondary" 
+                            <input type="text" name="search" class="form-control bg-transparent border-secondary text-white" 
                                    placeholder="Tên nhạc cụ..." 
                                    value="<?= htmlspecialchars($currentKeyword ?? '') ?>">
                         </div>
                     </div>
 
-                    <!-- ========================================================= -->
-                    <!-- NHÓM 2: DANH MỤC -->
-                    <!-- ========================================================= -->
-                    <div class="filter-group">
-                        <div class="filter-title">
-                            <i class="fas fa-guitar"></i> Danh mục
-                        </div>
-                        <a href="index.php?controller=product&action=index" 
-                           class="filter-checkbox <?= empty($currentCategory) ? 'active' : '' ?>">
-                            <input type="radio" name="category" value="" <?= empty($currentCategory) ? 'checked' : '' ?>>
-                            <span>Tất cả nhạc cụ</span>
-                        </a>
-                        <?php
-                        // Lặp qua danh sách danh mục để render radio button
-                        if (isset($categories) && is_array($categories)) {
-                            foreach ($categories as $cat) {
-                                $isChecked = ($currentCategory ?? null) == $cat['id'] ? 'checked' : '';
-                                echo '<label class="filter-checkbox">';
-                                echo '<input type="radio" name="category" value="' . $cat['id'] . '" ' . $isChecked . '>';
-                                echo '<span><i class="' . $cat['icon'] . ' me-2 opacity-50"></i>' . $cat['name'] . '</span>';
-                                echo '</label>';
-                            }
-                        }
-                        ?>
-                    </div>
+                    <!-- Các bộ lọc thu gọn -->
+                    <div class="filter-collapsible" id="filter-collapsible">
 
                     <!-- ========================================================= -->
                     <!-- NHÓM 3: KHOẢNG GIÁ -->
@@ -899,12 +963,19 @@ include __DIR__ . '/partials/header.php';
                         </label>
                     </div>
 
+                    <!-- Nút xóa tất cả lọc -->
+                    <a href="#" class="btn-clear-filter w-100 mb-3 text-center" id="clear-all-filters" style="display: none;">
+                        <i class="fas fa-times me-2"></i>Xóa tất cả
+                    </a>
+
                     <!-- Nút hành động -->
                     <div class="filter-actions">
                         <button type="submit" class="btn-apply-filter">
                             <i class="fas fa-check"></i> Áp dụng
                         </button>
                     </div>
+
+                    </div><!-- end filter-collapsible -->
                 </div>
             </form>
         </div>
@@ -1262,6 +1333,53 @@ document.addEventListener('DOMContentLoaded', function() {
     const filterForm = document.getElementById('filter-form');
     const productsFrame = document.getElementById('products-frame');
     const productsScroll = document.getElementById('products-scroll');
+
+    // =================================================================
+    // TOGGLE BỘ LỌC
+    // =================================================================
+    const filterToggleBtn = document.getElementById('filter-toggle-btn');
+    const filterCollapsible = document.getElementById('filter-collapsible');
+    if (filterToggleBtn && filterCollapsible) {
+        // Mở sẵn nếu đang có filter active
+        const hasActiveFilter = currentFilters.price_min || currentFilters.price_max ||
+            currentFilters.brand || currentFilters.in_stock || currentFilters.is_rentable;
+        if (hasActiveFilter) {
+            filterCollapsible.classList.add('open');
+            filterToggleBtn.classList.add('open');
+        }
+        filterToggleBtn.addEventListener('click', function() {
+            this.classList.toggle('open');
+            filterCollapsible.classList.toggle('open');
+        });
+    }
+
+    // =================================================================
+    // DANH MỤC AJAX - không reload trang
+    // =================================================================
+    document.querySelectorAll('.category-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const catId = this.dataset.category;
+
+            // Cập nhật active class
+            document.querySelectorAll('.category-link').forEach(l => {
+                l.classList.remove('text-primary', 'fw-bold');
+                l.classList.add('text-white-50');
+            });
+            this.classList.remove('text-white-50');
+            this.classList.add('text-primary', 'fw-bold');
+
+            // Cập nhật filter category
+            currentFilters.category = catId;
+            currentPage = 1;
+
+            // Sync hidden input
+            const catInput = document.getElementById('filter-category');
+            if (catInput) catInput.value = catId;
+
+            loadProducts(buildFilterUrl(1), false);
+        });
+    });
     
     // =================================================================
     // SỰ KIỆN: Scroll trong khung sản phẩm -> Hiệu ứng fade

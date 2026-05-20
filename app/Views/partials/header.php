@@ -481,7 +481,41 @@ $isFiltering = ($currentController == 'product');
                     <button id="theme-toggle" class="btn btn-outline-secondary rounded-circle me-3">
                         <i class="fas fa-moon"></i>
                     </button>
-                    <a href="#" class="btn btn-outline-primary me-2 rounded-pill px-3"><i class="fas fa-shopping-cart"></i> (0)</a>
+                    <?php
+                    /*
+                     * NÚT GIỎ HÀNG:
+                     * - Link đến trang cart (CartController::index())
+                     * - Badge hiển thị tổng số sản phẩm trong giỏ (từ $_SESSION['cart'])
+                     * - JS sẽ gọi AJAX CartController::count() để giữ badge luôn đúng
+                     */
+                    $cartCount = 0;
+                    if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
+                        // Tính tổng số lượng từ session hiện tại
+                        foreach ($_SESSION['cart'] as $item) {
+                            $cartCount += (int)($item['quantity'] ?? 0);
+                        }
+                    }
+                    ?>
+                    <a href="index.php?controller=cart&action=index"
+                       class="btn btn-outline-primary me-2 rounded-pill px-3 position-relative nav-cart-btn"
+                       style="display:inline-flex; align-items:center; gap:6px;">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count"><?= $cartCount ?></span>
+                        <!-- Badge nổi ở góc trên phải nút -->
+                        <?php if ($cartCount > 0): ?>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-badge"
+                              id="cart-badge"
+                              style="font-size:0.65rem; min-width:18px; height:18px; display:inline-flex; align-items:center; justify-content:center;">
+                            <?= $cartCount ?>
+                        </span>
+                        <?php else: ?>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-badge"
+                              id="cart-badge"
+                              style="font-size:0.65rem; min-width:18px; height:18px; display:none; align-items:center; justify-content:center;">
+                            0
+                        </span>
+                        <?php endif; ?>
+                    </a>
                     <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#loginModal">
                         <i class="fas fa-user"></i> Đăng nhập
                     </button>

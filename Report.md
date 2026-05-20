@@ -2,6 +2,30 @@
 
 **Ngày cập nhật:** 20/05/2026
 
+## 🚀 Cập Nhật Lần 11 (Cập nhật UI/UX & Giỏ hàng)
+**Ngày:** 20-05-2026
+
+**1. Sửa lỗi Giao diện (UI/UX Polish):**
+- **Trang Cửa hàng (`sanpham.php`):**
+  - Gỡ bỏ giới hạn chiều cao (`max-height`), cho phép danh sách sản phẩm dài ra tự nhiên theo màn hình.
+  - Cột Danh mục, Thanh tìm kiếm và Bảng Lọc nâng cao được thiết lập `position: sticky` để tự động trượt theo màn hình khi cuộn chuột xuống.
+  - Tối ưu kích thước Bảng Lọc nâng cao, giới hạn chiều cao tối đa để vừa vặn màn hình.
+  - Sửa lỗi thanh trượt khoảng giá (Price Slider) không hoạt động bằng cách bổ sung Javascript đồng bộ giữa slider và input.
+- **Trang Chi tiết sản phẩm (`product_detail.php`):**
+  - Căn giữa số lượng ở ô chọn số lượng, ẩn nút tăng giảm mũi tên mặc định của trình duyệt (`spin button`) để giao diện gọn gàng hơn.
+  - Gỡ bỏ `position: sticky` ở phần hình ảnh sản phẩm để tránh lỗi sê dịch hình ảnh khi cuộn chuột.
+- **Footer (`footer.php`):** Cập nhật đúng các đường dẫn liên kết danh mục sản phẩm (Guitar, Piano, Trống) để chuyển hướng chính xác đến trang danh mục tương ứng.
+- **Hiệu ứng toàn cục (`header.php` / `footer.php`):** Kích hoạt chế độ `mirror: true` cho thư viện AOS, giúp các hiệu ứng xuất hiện lại khi cuộn chuột lên/xuống (giống tham khảo Allia Health).
+
+**2. Tính năng Giỏ hàng (Cart):**
+- Đã khởi tạo cấu trúc logic cho giỏ hàng trong bộ nhớ đệm (Session).
+- Thêm `CartController.php` để xử lý các tác vụ thêm, cập nhật, xóa sản phẩm bằng AJAX.
+- Tạo giao diện `cart.php`.
+- Cập nhật badge (huy hiệu số lượng) trên Navbar.
+
+**Trạng thái kế tiếp:**
+- Tiếp tục hoàn thiện Flow Thanh Toán (Checkout) và Quản lý đơn hàng.
+
 ## 🚀 Cập Nhật Lần 10 (Redesign Layout Cửa Hàng + Fix Chữ Nền Sáng)
 
 **Commit:** `a4196de` – 20/05/2026

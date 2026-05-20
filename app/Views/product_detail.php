@@ -87,8 +87,7 @@ include __DIR__ . '/partials/header.php';
 
 /* Container tổng của gallery */
 .product-gallery {
-    position: sticky;    /* Dính khi cuộn, tránh mất tiêu điểm */
-    top: 100px;
+    /* Đã bỏ position: sticky để hình ảnh trôi tự nhiên theo trang */
 }
 
 /* Khung ảnh chính lớn */
@@ -364,6 +363,13 @@ include __DIR__ . '/partials/header.php';
     font-size: 1rem;
     font-weight: 700;
     outline: none;
+    -moz-appearance: textfield; /* Ẩn nút mũi tên trên Firefox */
+}
+/* Ẩn nút mũi tên (spin button) trên Chrome/Safari/Edge */
+#qty-input::-webkit-outer-spin-button,
+#qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 /* Nút Thêm vào giỏ hàng */

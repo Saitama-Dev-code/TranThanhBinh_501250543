@@ -28,9 +28,9 @@
                 <div class="col-lg-2 offset-lg-1 col-md-4" data-aos="fade-up" data-aos-delay="100">
                     <h5 class="fw-bold mb-3" style="color: var(--text-color);">Cửa hàng</h5>
                     <ul class="list-unstyled footer-link-list">
-                        <li><a href="index.php?controller=product">Guitar & Bass</a></li>
-                        <li><a href="index.php?controller=product">Piano & Organ</a></li>
-                        <li><a href="index.php?controller=product">Trống & Bộ gõ</a></li>
+                        <li><a href="index.php?controller=product&action=index&category=1">Guitar & Bass</a></li>
+                        <li><a href="index.php?controller=product&action=index&category=2">Piano & Organ</a></li>
+                        <li><a href="index.php?controller=product&action=index&category=3">Trống & Bộ gõ</a></li>
                     </ul>
                 </div>
 
@@ -212,7 +212,11 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     
     <script>
-        AOS.init({ once: true, offset: 100 });
+        AOS.init({ 
+            once: false, /* Cho phép lặp lại hiệu ứng nhiều lần */
+            mirror: true, /* Hiệu ứng biến mất khi cuộn qua, xuất hiện lại khi cuộn về */
+            offset: 100 
+        });
 
         // Logic Theme Toggle ổn định
         const themeBtn = document.getElementById('theme-toggle');

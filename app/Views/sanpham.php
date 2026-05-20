@@ -375,10 +375,8 @@ include __DIR__ . '/partials/header.php';
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 20px;
-    overflow: hidden;
     position: relative;
-    /* Chiều cao tối đa = 100vh - navbar - some padding */
-    max-height: calc(100vh - 140px);
+    /* Loại bỏ max-height để sản phẩm dài ra tự nhiên */
 }
 
 /* Lớp phủ mờ dần ở viền dưới (Fade effect) */
@@ -402,13 +400,8 @@ include __DIR__ . '/partials/header.php';
 
 /* Vùng cuộn chính - Scroll theo chiều dọc trong khung riêng */
 .products-scroll-container {
-    height: calc(100vh - 140px);
-    overflow-y: auto;
-    overflow-x: hidden;
+    /* Loại bỏ fixed height và overflow để trượt theo trang (window scroll) */
     padding: 24px;
-    scroll-behavior: smooth;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border-color) transparent;
 }
 
 .products-scroll-container::-webkit-scrollbar {
@@ -858,7 +851,15 @@ include __DIR__ . '/partials/header.php';
 
    Hai cột trái (260px) thẳng dọc nhau, không lệch.
    ================================================================ */
-.shop-top-row  { display:flex; gap:16px; margin-bottom:14px; align-items:stretch; }
+.shop-top-row  { 
+    display:flex; 
+    gap:16px; 
+    margin-bottom:14px; 
+    align-items:stretch; 
+    position: sticky;
+    top: 90px; /* Trượt theo thanh cuộn, nằm dưới header */
+    z-index: 1000;
+}
 .shop-main-row { display:flex; gap:16px; align-items:flex-start; }
 
 /* Khối Danh mục */
@@ -866,6 +867,7 @@ include __DIR__ . '/partials/header.php';
     width:260px; flex-shrink:0;
     background:var(--card-bg); border:1px solid var(--border-color);
     border-radius:16px; padding:18px; backdrop-filter:blur(10px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* Thêm bóng mờ */
 }
 /* Khối Tìm kiếm + Toggle */
 .search-filter-box {
@@ -910,12 +912,15 @@ include __DIR__ . '/partials/header.php';
     width:260px; flex-shrink:0;
     background:var(--card-bg); border:1px solid var(--border-color);
     border-radius:16px; backdrop-filter:blur(10px);
-    max-height:0; overflow:hidden; opacity:0;
+    max-height:0; overflow-y:auto; opacity:0;
     padding:0 18px; border-width:0;
     transition: max-height 0.45s cubic-bezier(0.4,0,0.2,1),
                 opacity 0.35s ease, padding 0.35s ease, border-width 0.1s ease;
+    /* Giữ filter sticky và ko vượt quá chiều cao màn hình */
+    position: sticky;
+    top: 170px; /* Dưới top-row */
 }
-.filter-panel.open { max-height:1400px; opacity:1; padding:18px; border-width:1px; }
+.filter-panel.open { max-height:calc(100vh - 190px); opacity:1; padding:18px; border-width:1px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
 /* Khung sản phẩm */
 .products-wrapper { flex:1; min-width:0; }
 /* Link danh mục theo theme */
@@ -1271,7 +1276,9 @@ include __DIR__ . '/partials/header.php';
                                                     <?php endif; ?>
                                                 </div>
 
-                                                <button class="btn-add-cart">
+                                                <button class="btn-add-cart"
+                                                        data-product-id="<?= (int)$p['id'] ?>"
+                                                        onclick="addToCart(this)">
                                                     <i class='bx bx-cart-add'></i> Thêm vào giỏ
                                                 </button>
                                             </div>
@@ -1395,6 +1402,52 @@ document.addEventListener('DOMContentLoaded', function() {
             const advCat = document.getElementById('adv-category');
             if (topCat && advCat) advCat.value = topCat.value;
         });
+    }
+
+    /* =========================================================
+       XỬ LÝ THANH TRƯỢT GIÁ (PRICE SLIDER)
+       ========================================================= */
+    const priceSlider = document.getElementById('price-range-max');
+    const priceInputMax = document.querySelector('input[name="price_max"]');
+    const priceDisplay = document.getElementById('price-display');
+    const priceSliderFill = document.getElementById('price-slider-fill');
+    
+    if (priceSlider && priceInputMax && priceDisplay) {
+        // Khởi tạo thanh fill ban đầu
+        const updateSliderFill = (val) => {
+            const min = parseInt(priceSlider.min) || 0;
+            const max = parseInt(priceSlider.max) || 100000000;
+            const percentage = ((val - min) / (max - min)) * 100;
+            if (priceSliderFill) priceSliderFill.style.width = percentage + '%';
+        };
+
+        const formatVND = (num) => new Intl.NumberFormat('vi-VN').format(num) + ' ₫';
+
+        // Lấy giá min (nếu có nhập)
+        const getMinVal = () => {
+            const minInp = document.querySelector('input[name="price_min"]');
+            return minInp && minInp.value ? parseInt(minInp.value) : 0;
+        };
+
+        // Khi kéo slider
+        priceSlider.addEventListener('input', function() {
+            const val = this.value;
+            updateSliderFill(val);
+            priceInputMax.value = val;
+            priceDisplay.textContent = formatVND(getMinVal()) + ' — ' + formatVND(val);
+        });
+
+        // Cập nhật ngược lại nếu nhập input
+        priceInputMax.addEventListener('input', function() {
+            let val = parseInt(this.value) || 0;
+            if (val > priceSlider.max) val = priceSlider.max;
+            priceSlider.value = val;
+            updateSliderFill(val);
+            priceDisplay.textContent = formatVND(getMinVal()) + ' — ' + formatVND(val);
+        });
+
+        // Set state ban đầu
+        updateSliderFill(priceSlider.value);
     }
 
 }); // end DOMContentLoaded
@@ -1584,6 +1637,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const productsFrame = document.getElementById('products-frame');
     const productsScroll = document.getElementById('products-scroll');
 
+    // =================================================================
+    // SỰ KIỆN: Scroll trang -> Load thêm sản phẩm (window scroll)
+    // =================================================================
+    window.addEventListener('scroll', function() {
+        // Khi scroll gần đến đáy trang (cách 300px) thì load thêm
+        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 300) {
+            if (currentPage < totalPages && !isLoading) {
+                currentPage++;
+                loadProducts(buildFilterUrl(currentPage), true);
+            }
+        }
+    });
+    
     // =================================================================
     // TOGGLE BỘ LỌC (dùng #btn-filter-toggle + #filter-panel mới)
     // Logic cũ dùng filter-toggle-btn + filter-collapsible đã được

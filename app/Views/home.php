@@ -1,12 +1,12 @@
 <?php
 /**
- * =========================================================================
- * TÊN FILE: app/Views/home.php
- * MÔ TẢ: Giao diện trang chủ của website TTB Music.
- * KIẾN TRÚC: Gọi Header ở đầu và Footer ở cuối để đóng gói toàn bộ giao diện.
- * =========================================================================
+ * VIEW: TRANG CHỦ (HOMEPAGE)
+ * - Chứa Banner Hero với hiệu ứng video background, 3D tilt logo, và ripple effect.
+ * - Showcase sản phẩm nổi bật với hiệu ứng Parallax và Glassmorphism.
+ * - Hệ thống nốt nhạc rơi ngẫu nhiên trên toàn trang.
  */
-// 1. GỌI HEADER (Chứa thẻ <html>, <head>, Navbar, Preloader)
+
+// Gọi Header
 include __DIR__ . '/partials/header.php';
 ?>
 
@@ -84,49 +84,61 @@ include __DIR__ . '/partials/header.php';
         --scroll-progress: 0;
     }
     
-    /* Đốm màu nền mờ */
+    /* Hiệu ứng lót nền dưới khối overlap để không bị lộ khung */
+    .overlap-showcase-container {
+        position: relative;
+        background: var(--bg-color); /* Cùng màu nền trang */
+        z-index: 1;
+        overflow: visible; /* Quan trọng để không bị clipping */
+        padding: 100px 0;
+    }
+    
+    /* Đốm màu nền mờ - Từ nhỏ phóng to dần ở giữa */
     .scroll-blob {
-        opacity: calc(0.15 * var(--scroll-progress)) !important;
-        transform: scale(calc(0.6 + 0.4 * var(--scroll-progress))) !important;
+        opacity: calc(0.3 * var(--scroll-progress)) !important;
+        transform: scale(var(--scroll-progress)) !important;
         transition: transform 0.15s ease-out, opacity 0.15s ease-out;
     }
     
     /* Card nền màu phẳng */
     .scroll-shape {
         opacity: calc(0.9 * var(--scroll-progress)) !important;
-        transform: translateY(calc(80px * (1 - var(--scroll-progress)))) !important;
+        transform: scale(var(--scroll-progress)) !important;
         transition: transform 0.15s ease-out, opacity 0.15s ease-out;
     }
     
-    /* Chủ thể bên trái (Guitar/Hình ảnh) */
+    /* Chủ thể bên trái - Góc trái trên đi xuống chéo, xoay từ -25deg về -8deg */
     .scroll-img-left {
         opacity: var(--scroll-progress) !important;
-        transform: translateY(calc(120px * (1 - var(--scroll-progress)))) rotate(calc(-12deg + 4deg * var(--scroll-progress))) scale(calc(0.9 + 0.1 * var(--scroll-progress))) !important;
+        transform: translate(calc(-100px * (1 - var(--scroll-progress))), calc(-100px * (1 - var(--scroll-progress)))) rotate(calc(-25deg + 17deg * var(--scroll-progress))) scale(calc(0.85 + 0.15 * var(--scroll-progress))) !important;
         transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+        /* Ngăn bị khung container che khuất khi chưa xuất hiện */
+        will-change: transform, opacity;
     }
     
     /* Đè cấu hình hover mượt mà và tự rơi lại trạng thái cuộn */
     .scroll-img-left:hover {
-        transform: translateY(-15px) rotate(-5deg) scale(1.05) !important;
+        transform: translate(0, -15px) rotate(-5deg) scale(1.05) !important;
         z-index: 10 !important;
     }
     
-    /* Chủ thể bên phải (Phụ kiện/Hình ảnh đè) */
+    /* Chủ thể bên phải - Góc dưới phải đi lên chéo, xoay từ 25deg về 5deg */
     .scroll-img-right {
         opacity: var(--scroll-progress) !important;
-        transform: translateY(calc(200px * (1 - var(--scroll-progress)))) rotate(calc(10deg - 5deg * var(--scroll-progress))) scale(calc(0.85 + 0.15 * var(--scroll-progress))) !important;
+        transform: translate(calc(100px * (1 - var(--scroll-progress))), calc(100px * (1 - var(--scroll-progress)))) rotate(calc(25deg - 20deg * var(--scroll-progress))) scale(calc(0.8 + 0.2 * var(--scroll-progress))) !important;
         transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+        will-change: transform, opacity;
     }
     
     .scroll-img-right:hover {
-        transform: translateY(-15px) rotate(8deg) scale(1.05) !important;
+        transform: translate(0, -15px) rotate(8deg) scale(1.05) !important;
         z-index: 10 !important;
     }
     
-    /* Cột chữ bay lên mượt mà theo scroll */
+    /* Cột chữ bên phải di chuyển từ phải qua */
     .scroll-text-col {
         opacity: var(--scroll-progress) !important;
-        transform: translateY(calc(80px * (1 - var(--scroll-progress)))) !important;
+        transform: translateX(calc(120px * (1 - var(--scroll-progress)))) !important;
         transition: transform 0.15s ease-out, opacity 0.15s ease-out;
     }
     
@@ -155,18 +167,307 @@ include __DIR__ . '/partials/header.php';
     .accordion-button { background-color: var(--card-bg); color: var(--text-color); font-weight: bold; }
     .accordion-button:not(.collapsed) { background-color: var(--faq-bg); color: #3b82f6; box-shadow: none; }
     .accordion-body { color: var(--text-color); opacity: 0.9; }
+
+    /* ================= THIẾT KẾ LOGO LỚN TRÊN HERO BANNER ================= */
+    .hero-logo-title {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Outfit', sans-serif;
+        font-weight: 900;
+        font-size: 8.5rem; 
+        color: rgba(255, 255, 255, 0.25); /* Tăng độ sáng Watermark lên 0.25 cho rõ hơn nữa */
+        gap: 0px; 
+        margin-bottom: 0px;
+        user-select: none;
+        transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.6s ease;
+        position: relative;
+        z-index: 10;
+        padding: 0;
+        background: transparent;
+        backdrop-filter: none;
+        border: none;
+        box-shadow: none;
+    }
+
+    .hero-logo-title .char-t1, .hero-logo-title .char-t2, .hero-logo-title .char-b {
+        transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Dựng chữ T1 to trong banner */
+    .hero-logo-title .char-t1 {
+        position: relative;
+        display: inline-block;
+        width: 85px;
+        height: 110px;
+    }
+    .hero-logo-title .char-t1 .bar-top {
+        position: absolute;
+        top: 10px;
+        left: 0;
+        width: 85px;
+        height: 20px;
+        background-color: currentColor;
+        transform-origin: right center;
+    }
+    .hero-logo-title .char-t1 .bar-stem {
+        position: absolute;
+        top: 10px;
+        left: 32.5px;
+        width: 20px;
+        height: 100px;
+        background-color: currentColor;
+        transform-origin: top center;
+    }
+
+    /* Dựng chữ T2 to trong banner */
+    .hero-logo-title .char-t2 {
+        position: relative;
+        display: inline-block;
+        width: 85px;
+        height: 110px;
+    }
+    .hero-logo-title .char-t2 .bar-top {
+        position: absolute;
+        top: 10px;
+        left: 0;
+        width: 85px;
+        height: 20px;
+        background-color: currentColor;
+        transform-origin: center center;
+    }
+    .hero-logo-title .char-t2 .bar-stem {
+        position: absolute;
+        top: 10px;
+        left: 32.5px;
+        width: 20px;
+        height: 100px;
+        background-color: currentColor;
+        transform-origin: top center;
+    }
+
+    /* Dựng chữ B to trong banner */
+    .hero-logo-title .char-b {
+        font-size: 9rem;
+        line-height: 110px;
+        font-weight: 900;
+        display: inline-block;
+        color: currentColor;
+        font-family: 'Outfit', sans-serif;
+        margin-left: -5px;
+    }
+
+    /* Chữ MUSIC */
+    .hero-logo-title .text-music {
+        font-size: 7rem;
+        color: currentColor;
+        margin-left: 20px;
+        font-weight: 900;
+        letter-spacing: 6px;
+        transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    /* Khi hover vào logo container -> Hiện rõ và morphing */
+    .hero-logo-title:hover {
+        color: rgba(255, 255, 255, 0.95);
+        transform: scale(1.05);
+    }
+    .hero-logo-title:hover .char-t1 .bar-top {
+        transform: scaleX(0.55) translateX(5px);
+        background-color: #3b82f6;
+    }
+    .hero-logo-title:hover .char-t1 .bar-stem {
+        transform: rotate(15deg) translateX(8px);
+        background-color: #3b82f6;
+    }
+    .hero-logo-title:hover .char-t2 {
+        transform: translateX(-20px);
+    }
+    .hero-logo-title:hover .char-t2 .bar-top {
+        transform: scaleX(0); 
+    }
+    .hero-logo-title:hover .char-t2 .bar-stem {
+        background-color: #3b82f6;
+    }
+    .hero-logo-title:hover .char-b {
+        color: #3b82f6;
+        transform: translateX(-45px) scale(1.05);
+    }
+    .hero-logo-title:hover .text-music {
+        transform: translateX(-65px);
+        color: #ffffff;
+        letter-spacing: 12px;
+    }
+
+    /* Watermark trên video */
+    .video-watermark {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(-12deg);
+        font-size: 13vw;
+        font-weight: 900;
+        font-style: italic;
+        color: rgba(255, 255, 255, 0.022); /* Rất mờ ảo hòa quyện video */
+        pointer-events: none;
+        user-select: none;
+        z-index: 1; /* Sau text slogan, đè lên video */
+        white-space: nowrap;
+        font-family: 'Outfit', sans-serif;
+        letter-spacing: 5px;
+    }
+
+    /* Video background có hỗ trợ filter bẻ cong */
+    .video-warp-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+    }
+
+    #ripple-circle {
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 5;
+        /* Sử dụng backdrop-filter để chỉ bẻ cong phần nền dưới hình tròn này */
+        backdrop-filter: url(#video-warp-filter);
+        -webkit-backdrop-filter: url(#video-warp-filter);
+        transform: translate(-50%, -50%);
+        display: none; /* Chỉ hiện khi di chuột */
+    }
+
+    @media (max-width: 768px) {
+        .hero-logo-title { font-size: 3rem; }
+        .hero-logo-title .text-music { font-size: 3rem; }
+        .hero-logo-title .char-t1, .hero-logo-title .char-t2 { width: 36px; height: 44px; }
+        .hero-logo-title .char-t1 .bar-top, .hero-logo-title .char-t2 .bar-top { width: 36px; height: 6px; }
+        .hero-logo-title .char-t1 .bar-stem, .hero-logo-title .char-t2 .bar-stem { left: 15px; width: 6px; height: 40px; }
+        .hero-logo-title .char-b { font-size: 3.1rem; line-height: 44px; }
+        .video-watermark { font-size: 10vw; }
+    }
+
+    /* ================= SHOWCASE GRAND PIANO GLASS BANNER ================= */
+    .grand-piano-showcase {
+        position: relative;
+        height: 550px;
+        overflow: hidden;
+        border-radius: 24px;
+        margin: 80px auto;
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
+        /* Tránh bị cắt khung khi chưa xuất hiện */
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.6s ease-out;
+    }
+    
+    .grand-piano-showcase.visible {
+        visibility: visible;
+        opacity: 1;
+    }
+    
+    /* Nền của banner - Bỏ hiệu ứng kéo theo (Parallax) khi cuộn để hình ảnh ổn định */
+    .piano-banner-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        z-index: 0;
+        transform: scale(1.05); /* Giữ phóng nhẹ để bao phủ */
+        transition: transform 0.5s ease;
+    }
+    
+    .grand-piano-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, rgba(15, 23, 42, 0.85) 30%, rgba(15, 23, 42, 0.1) 80%);
+        z-index: 1;
+    }
+    
+    .grand-piano-container {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .piano-glass-card {
+        background: rgba(30, 41, 59, 0.55);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        padding: 40px;
+        max-width: 520px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Hiệu ứng trượt ngang từ trái sang và hiện dần theo cuộn chuột */
+    .scroll-slide-left {
+        opacity: var(--scroll-progress) !important;
+        transform: translateX(calc(-100px * (1 - var(--scroll-progress)))) !important;
+        transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+    }
+
+    @media (max-width: 768px) {
+        .grand-piano-showcase {
+            height: auto;
+            padding: 40px 0;
+        }
+        .piano-glass-card {
+            margin: 0 15px;
+            padding: 24px;
+        }
+    }
 </style>
 
-<section class="hero-section text-center">
-    <div class="video-background">
-        <iframe src="https://www.youtube.com/embed/wNCDWk8mxXs?autoplay=1&mute=1&playlist=wNCDWk8mxXs&loop=1&controls=0&disablekb=1&fs=0&modestbranding=1&playsinline=1" frameborder="0" allow="autoplay; fullscreen"></iframe>
+<section class="hero-section text-center" id="hero-banner">
+    <!-- SVG Filter bẻ cong cục bộ trên video -->
+    <svg style="display: none;">
+      <defs>
+        <filter id="video-warp-filter" x="-10%" y="-10%" width="120%" height="120%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.008" numOctaves="1" result="noise" seed="1"/>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R" yChannelSelector="G" id="warp-displacement-map" />
+        </filter>
+      </defs>
+    </svg>
+
+    <!-- Khung video có hiệu ứng bẻ cong (warp) -->
+    <div class="video-warp-container">
+        <div class="video-background">
+            <iframe src="https://www.youtube.com/embed/wNCDWk8mxXs?autoplay=1&mute=1&playlist=wNCDWk8mxXs&loop=1&controls=0&disablekb=1&fs=0&modestbranding=1&playsinline=1" frameborder="0" allow="autoplay; fullscreen"></iframe>
+        </div>
     </div>
+    
+    <!-- Hiệu ứng Ripple (vòng tròn bẻ cong) chạy theo con trỏ chuột -->
+    <div id="ripple-circle"></div>
+    
     <div class="hero-overlay"></div>
-    <div class="container hero-content" data-aos="zoom-in" data-aos-duration="1500">
-        <span class="badge bg-primary mb-3 px-3 py-2 rounded-pill">TTB COLLECTION 2024</span>
-        <h1 class="display-2 fw-bolder mb-4 text-white">Giai Điệu Của Riêng Bạn</h1>
-        <p class="lead mb-5 text-light mx-auto" style="max-width: 600px;">Hệ thống mua bán và cho thuê nhạc cụ chuyên nghiệp nhất. Thỏa mãn đam mê không lo về giá.</p>
-        <a href="index.php?controller=product&action=index" class="btn btn-primary btn-lg px-5 py-3 rounded-pill me-3 fw-bold text-decoration-none">Khám Phá Ngay</a>
+    <div class="container hero-content" id="hero-content" data-aos="zoom-in" data-aos-duration="1500">
+        
+        <!-- Slogan chuyển thành tên thương hiệu to bản dạng morphing (Watermark style) -->
+        <h1 class="hero-logo-title" id="hero-logo">
+            <span class="char-t1">
+                <span class="bar-top"></span>
+                <span class="bar-stem"></span>
+            </span>
+            <span class="char-t2">
+                <span class="bar-top"></span>
+                <span class="bar-stem"></span>
+            </span>
+            <span class="char-b">B</span>
+            <span class="text-music">MUSIC</span>
+        </h1>
+        
+        <!-- Đã gỡ bỏ nút Khám phá ngay theo yêu cầu để tôn vinh Logo Watermark -->
     </div>
 </section>
 
@@ -200,13 +501,20 @@ include __DIR__ . '/partials/header.php';
 
 <!-- =================================================================
      SECTION: HIỆU ỨNG XẾP LỚP (STAGGERED OVERLAP EFFECT)
-     Đã tích hợp lớp scroll-track để cuộn tương tác (scroll-driven)
+     Sửa lỗi clipping: Bỏ hoàn toàn overflow-hidden để hình ảnh không bị cắt khi trôi chéo.
+     Sử dụng JS để tính toán --scroll-progress nhằm tạo hiệu ứng trượt mượt mà.
      ================================================================= -->
-<section class="container mt-5 pt-5 pb-5 overflow-hidden scroll-track">
-    <div class="row align-items-center position-relative" style="min-height: 60vh;">
-        
-        <!-- Cột hình ảnh hiệu ứng xếp lớp (Bên trái) -->
-        <div class="col-lg-6 position-relative mb-5 mb-lg-0" style="height: 500px;">
+<section class="container mt-5 pt-5 pb-5 scroll-track" style="overflow: visible !important;">
+    <div class="row align-items-center">
+        <?php
+        /**
+         * KHỐI HÌNH ẢNH OVERLAP (XẾP LỚP)
+         * - scroll-img-left: Ảnh chính trôi từ trên-trái xuống.
+         * - scroll-img-right: Ảnh phụ trôi từ dưới-phải lên.
+         * - scroll-blob: Đốm màu mờ ảo làm nền cho hình ảnh.
+         */
+        ?>
+        <div class="col-lg-6 position-relative mb-5 mb-lg-0" style="height: 500px; overflow: visible;">
             
             <!-- Khối màu nền mờ ảo (Soft Background Blob) -->
             <div class="position-absolute bg-primary rounded-circle scroll-blob" 
@@ -248,22 +556,32 @@ include __DIR__ . '/partials/header.php';
     </div>
 </section>
 
-<section class="container mt-5 pt-5 scroll-track">
-    <div class="row align-items-center">
-        <!-- Cột hình ảnh (Trượt tịnh tiến đứng tịnh tiến mượt mà) -->
-        <div class="col-lg-6 mb-4 mb-lg-0 scroll-slide-up">
-            <img src="https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?q=80&w=1000&auto=format&fit=crop" alt="Premium Piano" class="showcase-img">
-        </div>
-        <!-- Cột chữ (Bay lên đồng bộ theo scroll) -->
-        <div class="col-lg-5 offset-lg-1 scroll-text-col">
-            <h6 class="text-primary fw-bold text-uppercase tracking-wide mb-2">Đẳng cấp hoàng gia</h6>
-            <h2 class="display-5 fw-bold mb-4">Grand Piano Premium</h2>
-            <p class="fs-5 mb-4" style="opacity: 0.8;">Sự kết hợp hoàn hảo giữa kỹ tác thủ công truyền thống và công nghệ âm thanh tiên tiến.</p>
-            <ul class="list-unstyled mb-4">
-                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Âm thanh cộng hưởng chuẩn Studio</li>
-                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Thiết kế sang trọng, điểm nhấn phòng khách</li>
+<section class="grand-piano-showcase container scroll-track p-0">
+    <?php
+    /**
+     * SHOWCASE SẢN PHẨM GRAND PIANO PREMIUM
+     * Thiết kế dạng Glassmorphism Banner với nền ảnh tĩnh ổn định.
+     */
+    ?>
+    <!-- Nền của banner - Bỏ hiệu ứng kéo theo (Parallax) khi cuộn để hình ảnh ổn định -->
+    <div class="piano-banner-bg" style="background-image: url('https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div class="grand-piano-overlay"></div>
+    
+    <div class="container grand-piano-container h-100 d-flex align-items-center">
+        <!-- Khối chữ dạng thẻ kính mờ trượt từ bên trái sang khi cuộn tới -->
+        <div class="piano-glass-card scroll-slide-left">
+            <h6 class="text-primary fw-bold text-uppercase tracking-wide mb-2">
+                <i class="fas fa-crown me-2"></i>Đẳng cấp hoàng gia
+            </h6>
+            <h2 class="display-5 fw-bold mb-4 text-white">Grand Piano Premium</h2>
+            <p class="fs-5 mb-4 text-light" style="opacity: 0.9;">Sự kết hợp hoàn hảo giữa kỹ tác thủ công truyền thống và công nghệ âm thanh tiên tiến.</p>
+            <ul class="list-unstyled mb-4 text-white-50">
+                <li class="mb-3 d-flex align-items-center"><i class="fas fa-check-circle text-primary me-3 fs-5"></i> Âm thanh cộng hưởng chuẩn Studio</li>
+                <li class="mb-3 d-flex align-items-center"><i class="fas fa-check-circle text-primary me-3 fs-5"></i> Thiết kế sang trọng, điểm nhấn phòng khách</li>
             </ul>
-            <a href="index.php?controller=product&action=index" class="btn btn-outline-primary rounded-pill px-4 py-2">Xem chi tiết <i class="fas fa-arrow-right ms-2"></i></a>
+            <a href="index.php?controller=product&action=index" class="btn btn-primary rounded-pill px-5 py-3 fw-bold shadow-sm" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; text-decoration: none;">
+                Xem chi tiết <i class="fas fa-arrow-right ms-2"></i>
+            </a>
         </div>
     </div>
 </section>
@@ -510,18 +828,23 @@ document.addEventListener('DOMContentLoaded', function() {
             if (rect.top > enterStart) {
                 // Vẫn ở dưới màn hình
                 progress = 0;
+                section.classList.remove('visible');
             } else if (rect.top <= enterStart && rect.top > enterEnd) {
                 // Đang cuộn lên (giai đoạn xuất hiện): Tỉ lệ tăng dần từ 0 lên 1
                 progress = (enterStart - rect.top) / (enterStart - enterEnd);
+                section.classList.add('visible');
             } else if (rect.top <= enterEnd && rect.top > exitStart) {
                 // Nằm trọn vẹn trên màn hình: Giữ nguyên 100% (1)
                 progress = 1;
+                section.classList.add('visible');
             } else if (rect.top <= exitStart && rect.top > exitEnd) {
                 // Đang cuộn qua đỉnh màn hình (giai đoạn biến mất): Tỉ lệ giảm dần từ 1 về 0
                 progress = (rect.top - exitEnd) / (exitStart - exitEnd);
+                section.classList.add('visible');
             } else {
                 // Đã cuộn qua khỏi màn hình
                 progress = 0;
+                section.classList.remove('visible');
             }
             
             // Gán giá trị biến CSS cho element tương ứng
@@ -546,6 +869,64 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Gọi khởi tạo lần đầu ngay khi trang load xong
     updateScrollProgress();
+
+    // =========================================================================
+    // JAVASCRIPT: HIỆU ỨNG 3D TILT LOGO & DISPLACEMENT WARP VIDEO HERO
+    // =========================================================================
+    const heroBanner = document.getElementById('hero-banner');
+    const heroLogo   = document.getElementById('hero-logo');
+    const rippleCircle = document.getElementById('ripple-circle');
+    const dispMap    = document.getElementById('warp-displacement-map');
+    
+    // XỬ LÝ DI CHUỘT TRÊN HERO BANNER
+    if (heroBanner && heroLogo) {
+        heroBanner.addEventListener('mousemove', function(e) {
+            // Lấy tọa độ tương đối của chuột trong banner
+            const rect = heroBanner.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            const percentX = (mouseX - centerX) / centerX;
+            const percentY = (mouseY - centerY) / centerY;
+            
+            // 1. NGHIÊNG 3D LOGO: Nghiêng theo hướng di chuột
+            const maxTilt = 15; 
+            const tiltY = percentX * maxTilt;
+            const tiltX = -percentY * maxTilt;
+            heroLogo.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) translateY(-10px)`;
+            
+            // 2. HIỆU ỨNG RIPPLE THEO CHUỘT: Di chuyển vòng tròn bẻ cong
+            if (rippleCircle) {
+                rippleCircle.style.display = 'block';
+                rippleCircle.style.left = mouseX + 'px';
+                rippleCircle.style.top = mouseY + 'px';
+                
+                // Thay đổi cường độ bẻ cong dựa trên tốc độ di chuột
+                if (dispMap) {
+                    const currentSpeed = Math.abs(e.movementX || 0) + Math.abs(e.movementY || 0);
+                    const scaleVal = Math.min(40 + currentSpeed * 2, 120); 
+                    dispMap.setAttribute('scale', scaleVal);
+                    
+                    // Cập nhật seed của nhiễu động để tạo cảm giác sóng nước chuyển động liên tục
+                    const turbulence = dispMap.previousElementSibling;
+                    if (turbulence) {
+                        turbulence.setAttribute('seed', Math.floor(Math.random() * 1000));
+                    }
+                }
+            }
+        });
+
+        // TRẢ VỀ TRẠNG THÁI CŨ KHI RỜI CHUỘT
+        heroBanner.addEventListener('mouseleave', function() {
+            heroLogo.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+            if (rippleCircle) {
+                rippleCircle.style.display = 'none';
+            }
+        });
+    }
 });
 </script>
 

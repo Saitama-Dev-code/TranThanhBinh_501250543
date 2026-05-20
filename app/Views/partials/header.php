@@ -29,6 +29,11 @@ $isFiltering = ($currentController == 'product');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $pageTitle ?? 'TTB - Giai Điệu Của Riêng Bạn' ?></title>
+    
+    <!-- Google Fonts cho Logo và thiết kế hiện đại -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome Gốc -->
@@ -66,6 +71,22 @@ $isFiltering = ($currentController == 'product');
             --nav-bg: rgba(15, 23, 42, 0.85);
             --watermark-color: rgba(255, 255, 255, 0.02);
             --faq-bg: #334155;
+        }
+
+        /* Ẩn hoàn toàn thanh cuộn dọc mặc định của trình duyệt Google Chrome/Edge/Safari/Firefox */
+        html {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+        html::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+        body {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        body::-webkit-scrollbar {
+            display: none;
         }
 
         /* GIỮ NGUYÊN CSS BODY GỐC: Tránh xung đột với Parallax và hiệu ứng nốt nhạc */
@@ -156,6 +177,131 @@ $isFiltering = ($currentController == 'product');
         .navbar-brand:hover i {
             transform: scale(1.2) rotate(-15deg);
             color: #3b82f6 !important;
+        }
+
+        /* ================= LOGO MORPHING HIGHTECH (TTB -> 7IB) ================= */
+        .navbar-brand-modern {
+            display: inline-flex;
+            align-items: center;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+            font-size: 1.6rem;
+            color: var(--text-color) !important;
+            text-decoration: none;
+            /* font-style: italic; Bỏ nghiêng để vuông vức hơn */
+            transition: color 0.4s ease;
+            gap: 1px;
+        }
+
+        .navbar-brand-modern:hover {
+            color: #3b82f6 !important;
+        }
+
+        .logo-icon-spin {
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.4s;
+            margin-right: 4px;
+        }
+        .navbar-brand-modern:hover .logo-icon-spin {
+            transform: rotate(360deg) scale(1.2);
+            color: #3b82f6 !important;
+        }
+
+        /* Khung dựng chữ T thứ 1 */
+        .char-t1 {
+            position: relative;
+            display: inline-block;
+            width: 18px; /* Rút gọn bớt để sát nhau hơn */
+            height: 24px;
+            margin-right: 0px;
+        }
+        .char-t1 .bar-top {
+            position: absolute;
+            top: 2px;
+            left: 0;
+            width: 18px;
+            height: 5px; /* Dày hơn cho vuông vức */
+            background-color: var(--text-color);
+            border-radius: 0px; /* Bỏ bo tròn để vuông vức */
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), background-color 0.4s;
+            transform-origin: right center;
+        }
+        .char-t1 .bar-stem {
+            position: absolute;
+            top: 2px;
+            left: 6.5px;
+            width: 5px;
+            height: 20px;
+            background-color: var(--text-color);
+            border-radius: 0px;
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), background-color 0.4s;
+            transform-origin: top center;
+        }
+
+        /* Khung dựng chữ T thứ 2 */
+        .char-t2 {
+            position: relative;
+            display: inline-block;
+            width: 18px;
+            height: 24px;
+            margin-right: 0px;
+            transition: transform 0.4s ease;
+        }
+        .char-t2 .bar-top {
+            position: absolute;
+            top: 2px;
+            left: 0;
+            width: 18px;
+            height: 5px;
+            background-color: var(--text-color);
+            border-radius: 0px;
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), background-color 0.4s;
+            transform-origin: center center;
+        }
+        .char-t2 .bar-stem {
+            position: absolute;
+            top: 2px;
+            left: 6.5px;
+            width: 5px;
+            height: 20px;
+            background-color: var(--text-color);
+            border-radius: 0px;
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), background-color 0.4s;
+            transform-origin: top center;
+        }
+
+        /* Chữ B */
+        .char-b {
+            font-size: 1.7rem;
+            line-height: 24px;
+            font-weight: 900;
+            display: inline-block;
+            color: var(--text-color);
+            transition: transform 0.4s ease, color 0.4s ease;
+            font-family: 'Outfit', sans-serif;
+            margin-left: -2px; /* Sát lại hơn */
+        }
+
+        /* Hover chuyển TTB thành 7IB */
+        .navbar-brand-modern:hover .char-t1 .bar-top {
+            transform: scaleX(0.5) translateX(2px); /* Rút gọn vừa phải */
+            background-color: #3b82f6 !important;
+        }
+        .navbar-brand-modern:hover .char-t1 .bar-stem {
+            transform: rotate(15deg) translateX(4px); /* Nghiêng rõ nét hơn */
+            background-color: #3b82f6 !important;
+        }
+        .navbar-brand-modern:hover .char-t2 {
+            transform: translateX(-6px); /* Sát lại hơn */
+        }
+        .navbar-brand-modern:hover .char-t2 .bar-top {
+            transform: scaleX(0); 
+        }
+        .navbar-brand-modern:hover .char-t2 .bar-stem {
+            background-color: #3b82f6 !important;
+        }
+        .navbar-brand-modern:hover .char-b {
+            color: #3b82f6 !important;
+            transform: translateX(-12px) scale(1.05); /* Sát lại hơn nữa */
         }
 
         .nav-link {
@@ -454,8 +600,17 @@ $isFiltering = ($currentController == 'product');
 
     <nav class="navbar navbar-expand-lg" id="smartNavbar">
         <div class="container">
-            <a class="navbar-brand fw-bold fs-4" href="index.php?controller=home">
-                <i class="fas fa-music text-primary me-2"></i>TTB
+            <a class="navbar-brand-modern" href="index.php?controller=home">
+                <i class="fas fa-music text-primary me-2 logo-icon-spin"></i>
+                <span class="char-t1">
+                    <span class="bar-top"></span>
+                    <span class="bar-stem"></span>
+                </span>
+                <span class="char-t2">
+                    <span class="bar-top"></span>
+                    <span class="bar-stem"></span>
+                </span>
+                <span class="char-b">B</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <i class="fas fa-bars" style="color: var(--text-color);"></i>

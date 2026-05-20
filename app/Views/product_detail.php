@@ -36,7 +36,16 @@ include __DIR__ . '/partials/header.php';
 [data-theme="light"] { --variant-btn-bg: rgba(15,23,42,0.05);   --variant-btn-border: rgba(15,23,42,0.18); }
 
 /* ================================================================================
-   PHẦN 1: CANVAS NỀN RIPPLE SÓNG ÂM (ĐẶC TRƯNG TRANG CHI TIẾT)
+   ẨN CANVAS NỐT NHẠC RƠI TOÀN CỤC CỦA HEADER (TRANG NÀY DÙNG NỀN RIÊNG)
+   ================================================================================ */
+#particle-canvas {
+    display: none !important;
+}
+
+/* ================================================================================
+   PHẦN 1: CANVAS NỀN GLOWING MELODY CONSTELLATION (ĐẶC TRƯNG TRANG CHI TIẾT)
+   Hiệu ứng: Các nốt nhạc phát sáng bay lơ lửng, liên kết bằng đường nối
+   khi ở gần nhau (<150px) tạo mạng tinh thể mờ ảo. Chuột đẩy nhẹ hạt ra xa.
    ================================================================================ */
 
 /* Canvas cố định toàn màn hình, z-index âm để nằm dưới nội dung */
@@ -85,9 +94,14 @@ include __DIR__ . '/partials/header.php';
    PHẦN 3: GALLERY ẢNH SẢN PHẨM (CỘT TRÁI)
    ================================================================================ */
 
-/* Container tổng của gallery */
-.product-gallery {
-    /* Đã bỏ position: sticky để hình ảnh trôi tự nhiên theo trang */
+/* Container tổng của gallery - giúp hình ảnh dính mượt mà khi cuộn trang */
+@media (min-width: 992px) {
+    .product-gallery {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 110px; /* Khoảng cách cách header */
+        align-self: start; /* Cần thiết để không bị sê dịch hoặc nhảy giật khi cuộn */
+    }
 }
 
 /* Khung ảnh chính lớn */
@@ -356,20 +370,22 @@ include __DIR__ . '/partials/header.php';
 #qty-input {
     width: 56px;
     height: 44px;
-    text-align: center;
+    text-align: center !important;
     border: none;
     background: transparent;
     color: var(--text-color);
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 700;
     outline: none;
-    -moz-appearance: textfield; /* Ẩn nút mũi tên trên Firefox */
+    line-height: 44px !important;
+    padding: 0 !important;
+    -moz-appearance: textfield !important; /* Ẩn nút mũi tên trên Firefox */
 }
 /* Ẩn nút mũi tên (spin button) trên Chrome/Safari/Edge */
 #qty-input::-webkit-outer-spin-button,
 #qty-input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+    -webkit-appearance: none !important;
+    margin: 0 !important;
 }
 
 /* Nút Thêm vào giỏ hàng */
@@ -1024,9 +1040,11 @@ include __DIR__ . '/partials/header.php';
      ============================================================ -->
 <script>
 /* ================================================================================
-   PHẦN 1: CANVAS RIPPLE SÓNG ÂM - NỀN RIÊNG CỦA TRANG CHI TIẾT
-   Cơ chế: Các vòng tròn ripple lan rộng từ các điểm ngẫu nhiên
-   Màu sắc: Gradient Tím (#7c3aed) → Indigo (#6366f1) → Nhạt dần
+   PHẦN 1: CANVAS GLOWING MELODY CONSTELLATION - NỀN RIÊNG TRANG CHI TIẾT
+   Cơ chế: Các nốt nhạc phát sáng bay lơ lửng ngẫu nhiên. Khi khoảng cách
+   giữa 2 hạt < 150px, vẽ đường nối liên kết phát sáng mờ ảo dạng mạng
+   tinh thể (constellation). Di chuột gần đẩy nhẹ hạt ra xa (repel effect).
+   Màu sắc: Dải tím-indigo (#7c3aed → #6366f1 → #a78bfa)
    ================================================================================ */
 (function() {
     const canvas = document.getElementById('detail-canvas');
@@ -1035,8 +1053,20 @@ include __DIR__ . '/partials/header.php';
     const ctx = canvas.getContext('2d');
     let width, height;
 
-    // Mảng lưu tất cả các vòng ripple đang hoạt động
-    let ripples = [];
+    // Vị trí chuột hiện tại (để tính lực đẩy repel)
+    const mouse = { x: null, y: null, radius: 150 };
+
+    // Mảng ký tự nốt nhạc để random gán cho mỗi hạt
+    const musicSymbols = ['♪', '♫', '♬', '♩', '🎵', '🎶', '🎼'];
+
+    // Mảng lưu tất cả các hạt (nodes) đang hoạt động
+    let particles = [];
+
+    // Khoảng cách tối đa để vẽ đường nối giữa 2 hạt
+    const LINK_DISTANCE = 150;
+
+    // Số lượng hạt (vừa phải để không rối mắt trên trang chi tiết)
+    const PARTICLE_COUNT = 50;
 
     /**
      * Resize canvas theo kích thước cửa sổ
@@ -1049,77 +1079,176 @@ include __DIR__ . '/partials/header.php';
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas(); // Gọi ngay lập tức khi khởi động
 
-    /**
-     * CLASS Ripple: Đại diện một vòng tròn sóng âm
-     * - x, y: Tọa độ tâm (ngẫu nhiên trên màn hình)
-     * - radius: Bán kính hiện tại (tăng dần theo thời gian)
-     * - maxRadius: Bán kính tối đa trước khi biến mất
-     * - opacity: Độ trong suốt (giảm dần theo bán kính)
-     * - speed: Tốc độ lan rộng (px mỗi frame)
-     * - hue: Màu sắc (dao động trong dải tím 260-290)
-     */
-    class Ripple {
-        constructor() {
-            this.reset();
-        }
+    // Lắng nghe vị trí chuột để tính lực đẩy (repel)
+    window.addEventListener('mousemove', function(e) {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+    });
 
-        reset() {
-            // Vị trí xuất phát ngẫu nhiên trong màn hình
+    // Reset vị trí chuột khi rời khỏi cửa sổ
+    window.addEventListener('mouseout', function() {
+        mouse.x = null;
+        mouse.y = null;
+    });
+
+    /**
+     * CLASS MusicNode: Đại diện một nốt nhạc phát sáng trong mạng lưới
+     * - x, y: Tọa độ hiện tại (bay lơ lửng ngẫu nhiên)
+     * - baseX, baseY: Tọa độ gốc (dùng để kéo về khi hết repel)
+     * - vx, vy: Vận tốc di chuyển (px/frame)
+     * - size: Kích thước ký tự nốt nhạc
+     * - symbol: Ký tự nốt nhạc ngẫu nhiên
+     * - hue: Màu sắc HSL (dao động trong dải tím 250-290)
+     * - glowRadius: Bán kính vầng sáng xung quanh nốt nhạc
+     * - pulsePhase: Pha nhịp đập (để hiệu ứng nhấp nháy nhẹ lệch nhau)
+     */
+    class MusicNode {
+        constructor() {
+            // Vị trí khởi tạo ngẫu nhiên
             this.x = Math.random() * width;
             this.y = Math.random() * height;
 
-            // Bắt đầu từ bán kính nhỏ
-            this.radius = Math.random() * 20 + 5;
+            // Lưu vị trí gốc ban đầu
+            this.baseX = this.x;
+            this.baseY = this.y;
 
-            // Bán kính tối đa trước khi biến mất
-            this.maxRadius = Math.random() * 180 + 80;
+            // Vận tốc bay nhẹ nhàng (di chuyển rất chậm)
+            this.vx = (Math.random() - 0.5) * 0.6;
+            this.vy = (Math.random() - 0.5) * 0.6;
 
-            // Tốc độ lan rộng (px/frame)
-            this.speed = Math.random() * 1.2 + 0.4;
+            // Kích thước nốt nhạc (px)
+            this.size = Math.random() * 10 + 12;
 
-            // Độ đậm ban đầu (nhẹ nhàng, không chói)
-            this.opacity = Math.random() * 0.12 + 0.04;
+            // Random ký tự nốt nhạc
+            this.symbol = musicSymbols[Math.floor(Math.random() * musicSymbols.length)];
 
             // Dải màu tím-indigo: HSL hue 250-290
             this.hue = Math.floor(Math.random() * 40) + 250;
 
-            // Độ dày nét vẽ (thay đổi theo bán kính)
-            this.lineWidth = Math.random() * 1.5 + 0.5;
+            // Bán kính vầng sáng phát ra xung quanh
+            this.glowRadius = Math.random() * 20 + 15;
+
+            // Pha nhịp đập lệch nhau (mỗi hạt nhấp nháy khác thời điểm)
+            this.pulsePhase = Math.random() * Math.PI * 2;
+
+            // Độ sáng cơ bản (dao động nhẹ)
+            this.baseOpacity = Math.random() * 0.3 + 0.4;
         }
 
         update() {
-            // Tăng bán kính mỗi frame
-            this.radius += this.speed;
+            // Di chuyển theo vận tốc hiện tại
+            this.x += this.vx;
+            this.y += this.vy;
 
-            // Giảm độ đậm dần khi lan rộng (fade out effect)
-            this.opacity = (1 - this.radius / this.maxRadius) * 0.12;
+            // Nảy lại khi chạm rìa màn hình (bounce effect)
+            if (this.x < 0 || this.x > width) this.vx *= -1;
+            if (this.y < 0 || this.y > height) this.vy *= -1;
 
-            // Khi đạt bán kính tối đa → reset về vị trí mới
-            if (this.radius >= this.maxRadius) {
-                this.reset();
+            // Giữ trong phạm vi màn hình
+            this.x = Math.max(0, Math.min(width, this.x));
+            this.y = Math.max(0, Math.min(height, this.y));
+
+            // ============================================================
+            // TƯƠNG TÁC: LỰC ĐẨY (REPEL) KHI CHUỘT ĐẾN GẦN
+            // Khi khoảng cách hạt-chuột < mouse.radius (150px):
+            //   Tính vector hướng từ chuột → hạt, đẩy hạt ra xa.
+            //   Lực đẩy tỉ lệ nghịch với khoảng cách (càng gần càng mạnh)
+            // ============================================================
+            if (mouse.x !== null && mouse.y !== null) {
+                const dx = this.x - mouse.x;
+                const dy = this.y - mouse.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < mouse.radius) {
+                    // Cường độ đẩy: gần hơn → mạnh hơn
+                    const force = (mouse.radius - dist) / mouse.radius;
+                    const angle = Math.atan2(dy, dx);
+
+                    // Đẩy hạt ra xa theo hướng ngược con trỏ chuột
+                    this.x += Math.cos(angle) * force * 5;
+                    this.y += Math.sin(angle) * force * 5;
+                }
             }
+
+            // Cập nhật pha nhịp đập (để vầng sáng nhấp nháy)
+            this.pulsePhase += 0.02;
         }
 
         draw() {
+            // Tính opacity nhấp nháy theo sin wave
+            const pulse = Math.sin(this.pulsePhase) * 0.15 + this.baseOpacity;
+
             ctx.save();
 
-            // Vẽ vòng tròn không tô màu bên trong
+            // ============================================================
+            // VẼ VẦNG SÁNG (GLOW) XUNG QUANH NỐT NHẠC
+            // Dùng radialGradient tạo hiệu ứng phát sáng mờ ảo
+            // ============================================================
+            const gradient = ctx.createRadialGradient(
+                this.x, this.y, 0,
+                this.x, this.y, this.glowRadius
+            );
+            gradient.addColorStop(0, `hsla(${this.hue}, 80%, 70%, ${pulse * 0.4})`);
+            gradient.addColorStop(0.5, `hsla(${this.hue}, 70%, 60%, ${pulse * 0.15})`);
+            gradient.addColorStop(1, `hsla(${this.hue}, 60%, 50%, 0)`);
+
             ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.strokeStyle = `hsla(${this.hue}, 70%, 65%, ${this.opacity})`;
-            ctx.lineWidth = this.lineWidth;
-            ctx.stroke();
+            ctx.arc(this.x, this.y, this.glowRadius, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            // ============================================================
+            // VẼ KÝ TỰ NỐT NHẠC Ở TÂM
+            // ============================================================
+            ctx.font = `${this.size}px serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = `hsla(${this.hue}, 75%, 75%, ${pulse})`;
+            ctx.fillText(this.symbol, this.x, this.y);
 
             ctx.restore();
         }
     }
 
-    // Tạo 35 ripple ban đầu (ít hơn sanpham để không rối với nội dung)
-    for (let i = 0; i < 35; i++) {
-        const r = new Ripple();
-        // Phân tán bán kính ban đầu để không xuất phát cùng lúc
-        r.radius = Math.random() * r.maxRadius;
-        ripples.push(r);
+    // Khởi tạo các hạt nốt nhạc ban đầu
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+        particles.push(new MusicNode());
+    }
+
+    /**
+     * VẼ ĐƯỜNG NỐI GIỮA CÁC HẠT GẦN NHAU (CONSTELLATION LINES)
+     * Duyệt từng cặp hạt, nếu khoảng cách < LINK_DISTANCE:
+     * - Vẽ đường nối mỏng, độ đậm giảm dần theo khoảng cách
+     * - Tạo hiệu ứng mạng lưới tinh thể phát sáng mờ ảo
+     */
+    function drawConstellationLinks() {
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const a = particles[i];
+                const b = particles[j];
+
+                // Tính khoảng cách Euclid giữa 2 hạt
+                const dx = a.x - b.x;
+                const dy = a.y - b.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                // Chỉ vẽ đường nối nếu đủ gần
+                if (dist < LINK_DISTANCE) {
+                    // Opacity giảm dần khi xa hơn (fade effect tự nhiên)
+                    const opacity = (1 - dist / LINK_DISTANCE) * 0.25;
+
+                    // Màu trung bình giữa 2 hạt
+                    const avgHue = (a.hue + b.hue) / 2;
+
+                    ctx.beginPath();
+                    ctx.moveTo(a.x, a.y);
+                    ctx.lineTo(b.x, b.y);
+                    ctx.strokeStyle = `hsla(${avgHue}, 60%, 65%, ${opacity})`;
+                    ctx.lineWidth = 0.8;
+                    ctx.stroke();
+                }
+            }
+        }
     }
 
     /**
@@ -1131,10 +1260,13 @@ include __DIR__ . '/partials/header.php';
         // Xóa toàn bộ canvas mỗi frame
         ctx.clearRect(0, 0, width, height);
 
-        // Cập nhật và vẽ từng ripple
-        ripples.forEach(r => {
-            r.update();
-            r.draw();
+        // Vẽ đường nối trước (nằm phía sau các nốt nhạc)
+        drawConstellationLinks();
+
+        // Cập nhật và vẽ từng nốt nhạc
+        particles.forEach(p => {
+            p.update();
+            p.draw();
         });
 
         // Lên lịch frame tiếp theo

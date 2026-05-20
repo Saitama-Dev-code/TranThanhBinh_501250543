@@ -2,6 +2,56 @@
 
 **Ngày cập nhật:** 20/05/2026
 
+## 🚀 Cập Nhật Lần 10 (Hoàn Thiện Tuyệt Đối & Trải Nghiệm Người Dùng)
+
+### 1. Nâng Cấp Hero Banner (Homepage)
+- **Watermark Logo Sáng Hơn:** Tăng độ sáng cho Logo Watermark "TTB MUSIC" (Opacity 25%) giúp nổi bật trên nền video nhưng vẫn giữ được nét tinh tế.
+- **Ripple Effect Theo Chuột:** Tích hợp hiệu ứng gợn sóng nước (Warp) bằng `backdrop-filter` chạy theo vị trí con trỏ chuột trên video Hero.
+- **Dọn dẹp Giao diện:** Loại bỏ nút "Khám phá ngay" và các Slogan dư thừa để tập trung hoàn toàn vào nhận diện thương hiệu.
+
+### 2. Khắc Phục Lỗi Hiển Thị (Homepage)
+- **Sửa lỗi Overlap Clipping:** Khắc phục triệt để lỗi hình ảnh bị cắt mất trong phần "Không gian của bạn" bằng cách tối ưu hóa thuộc tính `overflow` và `will-change`.
+- **Ổn định Grand Piano Showcase:** Loại bỏ hiệu ứng Parallax "kéo theo" gây mất ổn định hình ảnh, thay bằng hiệu ứng phóng nhẹ mượt mà.
+
+### 3. Cải Thiện Tính Năng Cửa Hàng (Store Page)
+- **Tìm kiếm Thông minh:** 
+    - Thêm nút **X** xóa nhanh nội dung trong ô tìm kiếm.
+    - Hiển thị thông báo **"Kết quả tìm kiếm cho..."** rõ ràng phía trên danh sách sản phẩm.
+    - Tự động xóa content ô search sau khi kết quả đã được tải thành công (theo yêu cầu UX).
+- **Bộ lọc Nâng cao:** Ẩn hoàn toàn các nút tăng giảm (spin buttons) thô sơ trong ô nhập khoảng giá trên tất cả các trình duyệt.
+- **Mã nguồn chi tiết:** Bổ sung hệ thống comment PHP/JS đầy đủ để lập trình viên dễ dàng nắm bắt logic hoạt động.
+
+### 4. Hệ Thống Git & Quản lý
+- **Commit Git:** Thực hiện commit các thay đổi với tin nhắn rõ ràng, phân loại theo từng thành phần giao diện.
+
+---
+
+**Ngày cập nhật:** 20/05/2026
+
+## 🚀 Cập Nhật Lần 9 (Nâng Cấp Thương Hiệu & Tương Tác Đỉnh Cao)
+
+### 1. Nhận Diện Thương Hiệu Mới (TTB -> 7IB)
+- **Logo Morphing:** Thiết kế lại Logo TTB trên Navbar với hiệu ứng chuyển đổi mượt mà sang "7IB" khi di chuột, sử dụng font `Outfit Black` phong cách Italic hiện đại.
+- **Ẩn thanh cuộn:** Ẩn hoàn toàn thanh cuộn mặc định của trình duyệt để tạo trải nghiệm tràn viền (Edge-to-edge) chuyên nghiệp.
+
+### 2. Trang Chủ (Hero & Showcase Redesign)
+- **3D Card Tilt:** Áp dụng hiệu ứng nghiêng 3D cho Slogan chính, phản hồi theo vị trí con trỏ chuột của người dùng.
+- **Video Displacement Warp:** Tích hợp SVG Filter và Javascript để tạo hiệu ứng gợn sóng nước (Warp) cục bộ trên video nền khi di chuột qua.
+- **Parallax Overlap:** Tinh chỉnh công thức tính toán tọa độ cuộn cho các khối hình ảnh xếp lớp, tạo chiều sâu không gian chân thực.
+- **Grand Piano Showcase:** Tái cấu trúc thành dạng Glassmorphic Banner với ảnh nền Parallax Zoom và khối nội dung trượt ngang từ trái sang.
+
+### 3. Trang Cửa Hàng (Tái Cấu Trúc Layout)
+- **Sticky Sidebar (280px):** Chuyển toàn bộ bộ lọc và danh mục vào một cột Sidebar cố định bên trái. Khắc phục triệt để lỗi bộ lọc đè lên sản phẩm khi cuộn trang.
+- **Natural Scrolling:** Khung sản phẩm bên phải cuộn tự nhiên theo cửa sổ trình duyệt, loại bỏ các khung scroll phụ gây khó chịu.
+- **Click-to-Load:** Gỡ bỏ Infinite Scroll tự động, chuyển sang cơ chế "Xem thêm sản phẩm" bằng nút bấm để người dùng chủ động kiểm soát nội dung.
+- **Price Filter Fix:** Sửa lỗi nhập số âm và ẩn nút spin button trong ô lọc giá.
+
+### 4. Trang Chi Tiết (Glowing Melody Constellation)
+- **Nền mạng tinh thể:** Thiết lập Canvas nền riêng biệt với các nốt nhạc phát sáng bay lơ lửng, tự động kết nối với nhau bằng các đường link mờ ảo khi ở gần (Constellation effect).
+- **Tương tác vật lý:** Thêm hiệu ứng đẩy hạt (Repel) khi di chuyển chuột, tạo sự sinh động khác biệt hoàn toàn với trang chủ.
+
+---
+
 ## 🚀 Cập Nhật Lần 11 (Cập nhật UI/UX, Hiệu Ứng Cuộn Tương Tác & Giỏ hàng)
 **Ngày:** 20-05-2026
 

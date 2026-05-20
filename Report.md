@@ -2,6 +2,51 @@
 
 **Ngày cập nhật:** 20/05/2026
 
+## 🚀 Cập Nhật Lần 10 (Redesign Layout Cửa Hàng + Fix Chữ Nền Sáng)
+
+**Commit:** `a4196de` – 20/05/2026
+
+### 1. Redesign Layout 2 Tầng (`sanpham.php`)
+Thay toàn bộ layout Bootstrap `row/col-lg-3/col-lg-9` bằng **Flexbox 2 tầng dọc**:
+
+| Tầng | Bố cục | Mô tả |
+|------|--------|-------|
+| **Tầng 1** (luôn hiện) | `[category-box 260px]` &#124; `[search-filter-box flex:1]` | Danh mục + thanh tìm kiếm luôn visible |
+| **Tầng 2** (ẩn/hiện) | `[filter-panel 260px]` &#124; `[products-wrapper flex:1]` | Panel lọc nâng cao mở ra bên dưới |
+
+**Lợi ích:**
+- Hai cột trái (260px) thẳng dọc nhau → gọn đẹp, không lệch
+- Panel lọc nâng cao không che/đẩy khung sản phẩm (khung SP vẫn giữ chiều rộng)
+- Mở/đóng panel bằng animation `max-height` CSS mượt mà (0.45s cubic-bezier)
+
+### 2. Thêm Nút Tìm Kiếm Riêng + Nút Toggle Bộ Lọc
+- **`btn-search`** (xanh gradient): submit form GET tìm kiếm nhanh
+- **`btn-filter-toggle`**: toggle panel lọc nâng cao, xoay mũi tên chevron khi mở
+- Badge hiển thị số bộ lọc đang áp dụng
+
+### 3. Tách Form Lọc Khỏi Form Tìm Kiếm
+- `#top-search-form` – tìm kiếm nhanh (search + category)
+- `#advanced-filter-form` – lọc nâng cao (price_min, price_max, brand, in_stock, is_rentable)
+- Lý do: HTML không cho phép lồng `<form>` trong `<form>`, nếu lồng sẽ bị trình duyệt bỏ qua
+- JS đồng bộ search + category giữa 2 form trước khi submit
+
+### 4. Fix Toàn Bộ Màu Cứng → CSS Variables (Light Mode)
+| Class / Element | Trước | Sau |
+|-----------------|-------|-----|
+| `.price-input-wrapper label` | `rgba(255,255,255,0.6)` | `var(--text-muted)` |
+| `.price-input-wrapper .currency-symbol` | `rgba(255,255,255,0.5)` | `var(--text-muted)` |
+| `.cat-link` (danh mục) | `text-white-50` Bootstrap | `color:var(--text-muted)` CSS |
+| `.variant-btn` | màu cứng | `var(--variant-btn-bg)` + `var(--text-color)` |
+| `.product-desc`, `.loading-text` | không có | `var(--text-muted)` |
+
+### 5. Class Danh Mục Mới (`.cat-link`)
+Thay `category-link list-group-item text-white-50` bằng `.cat-link` tùy chỉnh:
+- Padding/hover/active theo thiết kế project
+- `color: var(--text-muted)` tự động đổi theo `data-theme="light"` / `data-theme="dark"`
+- Không phụ thuộc vào Bootstrap `.text-white-50`
+
+---
+
 ## 🚀 Cập Nhật Lần 9 (Trang Chi Tiết Sản Phẩm + Giao Diện Nền Ripple Sóng Âm)
 
 ### 1. Tạo Trang Chi Tiết Sản Phẩm (`product_detail.php`)

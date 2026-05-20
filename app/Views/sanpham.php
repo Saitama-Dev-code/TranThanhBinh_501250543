@@ -416,6 +416,20 @@ include __DIR__ . '/partials/header.php';
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
     padding-bottom: 40px;
+    align-items: stretch;
+}
+
+/* Đảm bảo product-item stretch để các card đều nhau */
+.product-item {
+    display: flex;
+    height: 100%;
+}
+
+.product-wrapper {
+    width: 100%;
+    flex: 1;
+    position: relative;
+    perspective: 1000px;
 }
 
 /* Responsive: 2 cột trên tablet, 1 cột trên mobile */
@@ -434,12 +448,6 @@ include __DIR__ . '/partials/header.php';
 /* ================================================================================
    PHẦN 3: CSS CHO CARD SẢN PHẨM - HOVER HIỆN MÀU/LOẠI ĐỔI HÌNH
    ================================================================================ */
-
-/* Wrapper bọc card - dùng để hover effect */
-.product-wrapper {
-    position: relative;
-    perspective: 1000px;
-}
 
 /* Card sản phẩm chính */
 .product-card {
@@ -524,26 +532,34 @@ include __DIR__ . '/partials/header.php';
 }
 
 /* ================================================================================
-   PHẦN 3A: PANEL MÀU SẮC & LOẠI - HIỆN KHI HOVER
+   PHẦN 3A: PANEL MÀU SẮC & LOẠI - HIỆN KHI HOVER (NẰM Ở GIỮA CARD)
    ================================================================================ */
 
-/* Panel chứa các lựa chọn màu/loại - Mặc định ẩn đi, chỉ hiện khi hover */
+/* Panel chứa các lựa chọn màu/loại - Mặc định ẩn, chỉ hiện khi hover
+   Vị trí: Ở giữa card - trên là hình+tên, dưới là giá+nút mua */
 .variant-panel {
     position: absolute;
-    bottom: 0;
+    top: 80px; /* Bắt đầu từ giữa, dưới brand và name */
     left: 0;
     right: 0;
-    background: linear-gradient(to top, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.95));
-    backdrop-filter: blur(10px);
-    padding: 16px;
-    transform: translateY(100%);
+    bottom: 140px; /* Chừa không gian cho giá tiền và nút mua hàng */
+    background: linear-gradient(to bottom, rgba(15, 23, 42, 0.93), rgba(15, 23, 42, 0.90));
+    backdrop-filter: blur(12px);
+    padding: 14px 16px;
+    transform: translateY(-10px);
     opacity: 0;
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: all 0.35s ease;
     z-index: 20;
     border-top: 1px solid rgba(59, 130, 246, 0.2);
+    border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 12px;
 }
 
-/* Khi hover -> Panel trượt lên từ dưới */
+/* Khi hover -> Panel xuất hiện */
 .product-wrapper:hover .variant-panel {
     transform: translateY(0);
     opacity: 1;
@@ -818,6 +834,22 @@ include __DIR__ . '/partials/header.php';
 <canvas id="product-canvas"></canvas>
 
 <div class="container my-5 pt-4">
+    <!-- Tiêu đề trang - Đặt ở trên cùng, căn giữa -->
+    <div class="text-center mb-4">
+        <h2 class="fw-bold mb-2" style="font-size: 2rem; background: linear-gradient(135deg, #3b82f6, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            <i class="fas fa-music me-2" style="-webkit-text-fill-color: #3b82f6;"></i>Cửa hàng nhạc cụ
+        </h2>
+        <p class="text-muted mb-0">
+            <?= isset($totalProducts) ? $totalProducts : 0 ?> sản phẩm
+            <?php if(!empty($currentKeyword)): ?>
+                - Tìm kiếm: "<strong><?= htmlspecialchars($currentKeyword) ?></strong>"
+            <?php endif; ?>
+            <?php if(!empty($currentCategory)): ?>
+                - Danh mục: "<strong><?= htmlspecialchars($categories[$currentCategory]['name'] ?? '') ?></strong>"
+            <?php endif; ?>
+        </p>
+    </div>
+
     <div class="row">
         <!-- ================================================================= -->
         <!-- CỘT TRÁI: DANH MỤC & BỘ LỌC -->
@@ -984,19 +1016,6 @@ include __DIR__ . '/partials/header.php';
         <!-- CỘT PHẢI: KHUNG SẢN PHẨM VỚI INFINITE SCROLL -->
         <!-- ========================================================= -->
         <div class="col-lg-9">
-            <!-- Tiêu đề + Thông tin -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h4 class="fw-bold mb-1">Cửa hàng nhạc cụ</h4>
-                    <small class="text-muted">
-                        <?= isset($totalProducts) ? $totalProducts : 0 ?> sản phẩm
-                        <?php if(!empty($currentKeyword)): ?>
-                            - Tìm kiếm: "<?= htmlspecialchars($currentKeyword) ?>"
-                        <?php endif; ?>
-                    </small>
-                </div>
-            </div>
-
             <!-- ========================================================= -->
             <!-- KHUNG CHỨA SẢN PHẨM - SCROLL TRONG KHUNG RIÊNG -->
             <!-- ========================================================= -->
@@ -1044,44 +1063,44 @@ include __DIR__ . '/partials/header.php';
                                                         <?= $stockText ?>
                                                     </span>
                                                 </div>
+                                            </div>
 
-                                                <!-- Panel màu sắc & loại - Hiện khi hover -->
-                                                <div class="variant-panel">
-                                                    <!-- Tùy chọn màu sắc -->
-                                                    <?php if(!empty($colors)): ?>
-                                                    <div class="mb-3">
-                                                        <div class="variant-label">
-                                                            <i class="fas fa-palette"></i> Màu sắc
-                                                        </div>
-                                                        <div class="variant-options">
-                                                            <?php foreach($colors as $c): ?>
-                                                                <button class="variant-btn color-btn" 
-                                                                        data-color="<?= $c['name'] ?>"
-                                                                        data-image="<?= $c['image_url'] ?? $p['image'] ?>">
-                                                                    <span class="color-dot" style="background: <?= $c['value'] ?>"></span>
-                                                                    <?= $c['name'] ?>
-                                                                </button>
-                                                            <?php endforeach; ?>
-                                                        </div>
+                                            <!-- Panel màu sắc & loại - Hiện khi hover, đè lên product-info -->
+                                            <div class="variant-panel">
+                                                <!-- Tùy chọn màu sắc -->
+                                                <?php if(!empty($colors)): ?>
+                                                <div class="mb-3">
+                                                    <div class="variant-label">
+                                                        <i class="fas fa-palette"></i> Màu sắc
                                                     </div>
-                                                    <?php endif; ?>
-
-                                                    <!-- Tùy chọn loại -->
-                                                    <?php if(!empty($versions)): ?>
-                                                    <div>
-                                                        <div class="variant-label">
-                                                            <i class="fas fa-layer-group"></i> Phiên bản
-                                                        </div>
-                                                        <div class="variant-options">
-                                                            <?php foreach($versions as $v): ?>
-                                                                <button class="variant-btn type-btn" data-type="<?= $v['name'] ?>">
-                                                                    <?= $v['name'] ?>
-                                                                </button>
-                                                            <?php endforeach; ?>
-                                                        </div>
+                                                    <div class="variant-options">
+                                                        <?php foreach($colors as $c): ?>
+                                                            <button class="variant-btn color-btn" 
+                                                                    data-color="<?= $c['name'] ?>"
+                                                                    data-image="<?= $c['image_url'] ?? $p['image'] ?>">
+                                                                <span class="color-dot" style="background: <?= $c['value'] ?>"></span>
+                                                                <?= $c['name'] ?>
+                                                            </button>
+                                                        <?php endforeach; ?>
                                                     </div>
-                                                    <?php endif; ?>
                                                 </div>
+                                                <?php endif; ?>
+
+                                                <!-- Tùy chọn loại -->
+                                                <?php if(!empty($versions)): ?>
+                                                <div>
+                                                    <div class="variant-label">
+                                                        <i class="fas fa-layer-group"></i> Phiên bản
+                                                    </div>
+                                                    <div class="variant-options">
+                                                        <?php foreach($versions as $v): ?>
+                                                            <button class="variant-btn type-btn" data-type="<?= $v['name'] ?>">
+                                                                <?= $v['name'] ?>
+                                                            </button>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                </div>
+                                                <?php endif; ?>
                                             </div>
 
                                             <!-- Thông tin sản phẩm -->

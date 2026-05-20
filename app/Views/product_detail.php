@@ -28,11 +28,15 @@ include __DIR__ . '/partials/header.php';
      ============================================================ -->
 <style>
 /* ================================================================================
+   BIẾN MÀU THEO THEME - sửa lỗi chữ tắt ở nền sáng
+   ================================================================================ */
+[data-theme="dark"]  { --text-muted: rgba(255,255,255,0.55); --text-faint: rgba(255,255,255,0.35); }
+[data-theme="light"] { --text-muted: rgba(15,23,42,0.55);   --text-faint: rgba(15,23,42,0.35); }
+[data-theme="dark"]  { --variant-btn-bg: rgba(255,255,255,0.06); --variant-btn-border: rgba(255,255,255,0.15); }
+[data-theme="light"] { --variant-btn-bg: rgba(15,23,42,0.05);   --variant-btn-border: rgba(15,23,42,0.18); }
+
+/* ================================================================================
    PHẦN 1: CANVAS NỀN RIPPLE SÓNG ÂM (ĐẶC TRƯNG TRANG CHI TIẾT)
-   Khác biệt:
-     - home: nốt nhạc rơi (header canvas - trắng/xanh)
-     - sanpham: nốt bay lên từ dưới (product-canvas - xanh dương/tím)
-     - product_detail: vòng tròn ripple lan rộng (detail-canvas - tím/indigo)
    ================================================================================ */
 
 /* Canvas cố định toàn màn hình, z-index âm để nằm dưới nội dung */
@@ -42,8 +46,8 @@ include __DIR__ . '/partials/header.php';
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: -1;         /* Nằm dưới tất cả nội dung */
-    pointer-events: none; /* Không chặn click chuột */
+    z-index: -1;
+    pointer-events: none;
 }
 
 /* ================================================================================
@@ -55,7 +59,7 @@ include __DIR__ . '/partials/header.php';
 }
 
 .detail-breadcrumb a {
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--text-muted);   /* ✅ theo theme */
     text-decoration: none;
     font-size: 0.85rem;
     transition: color 0.2s;
@@ -257,13 +261,13 @@ include __DIR__ . '/partials/header.php';
     margin-bottom: 20px;
 }
 
-/* Nhãn tiêu đề mỗi nhóm */
+/* Nhãn tiêu đề mỗi nhóm - dùng --text-muted theo theme */
 .variant-section-label {
     font-size: 0.8rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--text-muted);   /* ✅ theo theme */
     margin-bottom: 10px;
     display: flex;
     align-items: center;
@@ -277,13 +281,13 @@ include __DIR__ . '/partials/header.php';
     flex-wrap: wrap;
 }
 
-/* Nút chọn màu / phiên bản */
+/* Nút chọn màu / phiên bản - nền và viền theo theme */
 .detail-variant-btn {
     padding: 8px 18px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: var(--variant-btn-bg);       /* ✅ theo theme */
+    border: 1px solid var(--variant-btn-border); /* ✅ theo theme */
     border-radius: 10px;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--text-color);               /* ✅ theo theme */
     font-size: 0.85rem;
     font-weight: 500;
     cursor: pointer;
@@ -296,7 +300,7 @@ include __DIR__ . '/partials/header.php';
 .detail-variant-btn:hover {
     border-color: rgba(139, 92, 246, 0.6);
     background: rgba(139, 92, 246, 0.15);
-    color: white;
+    color: var(--text-color);
 }
 
 /* Nút đang được chọn */
@@ -307,12 +311,12 @@ include __DIR__ . '/partials/header.php';
     box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
 }
 
-/* Chấm màu nhỏ trong nút chọn màu */
+/* Chấm màu nhỏ trong nút chọn màu - viền theo theme */
 .color-dot-lg {
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid var(--text-faint);    /* ✅ theo theme */
     flex-shrink: 0;
 }
 
@@ -475,14 +479,14 @@ include __DIR__ . '/partials/header.php';
     margin-bottom: 28px;
 }
 
-/* Mỗi tab */
+/* Mỗi tab - chữ theo theme */
 .detail-tab-btn {
     padding: 14px 28px;
     background: transparent;
     border: none;
     border-bottom: 3px solid transparent;
     margin-bottom: -2px;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--text-muted);   /* ✅ theo theme */
     font-weight: 600;
     font-size: 0.95rem;
     cursor: pointer;
@@ -517,14 +521,14 @@ include __DIR__ . '/partials/header.php';
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Nội dung mô tả */
+/* Nội dung mô tả - chữ theo theme */
 .description-content {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 16px;
     padding: 28px;
     line-height: 1.8;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--text-color);   /* ✅ theo theme */
     font-size: 0.95rem;
 }
 
@@ -547,7 +551,7 @@ include __DIR__ . '/partials/header.php';
 }
 
 .specs-table td:first-child {
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--text-muted);   /* ✅ theo theme */
     font-weight: 600;
     width: 40%;
     background: rgba(139, 92, 246, 0.04);

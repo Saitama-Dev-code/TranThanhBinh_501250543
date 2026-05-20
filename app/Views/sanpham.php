@@ -12,6 +12,20 @@ include __DIR__ . '/partials/header.php';
 
 <style>
 /* ================================================================================
+   BIẾN MÀU BỔ SUNG THEO THEME (sửa lỗi chữ tắt ở nền sáng)
+   Vấn đề: rgba(255,255,255,...) cứng → tắt khi nền sáng
+   Giải pháp: dùng biến CSS tự động đổi theo data-theme
+   ================================================================================ */
+
+/* Màu chữ phụ (mờ hơn text chính) */
+[data-theme="dark"]  { --text-muted: rgba(255,255,255,0.55); --text-faint: rgba(255,255,255,0.35); }
+[data-theme="light"] { --text-muted: rgba(15,23,42,0.55);   --text-faint: rgba(15,23,42,0.35); }
+
+/* Nền nút biến thể (màu/phiên bản) */
+[data-theme="dark"]  { --variant-btn-bg: rgba(255,255,255,0.07); --variant-btn-border: rgba(255,255,255,0.14); }
+[data-theme="light"] { --variant-btn-bg: rgba(15,23,42,0.06);   --variant-btn-border: rgba(15,23,42,0.18); }
+
+/* ================================================================================
    PHẦN 1: CSS CHO BỘ LỌC NÂNG CAO (ADVANCED FILTER SIDEBAR)
    ================================================================================ */
 
@@ -560,13 +574,13 @@ include __DIR__ . '/partials/header.php';
     gap: 8px;
 }
 
-/* Tiêu đề nhóm tùy chọn */
+/* Tiêu đề nhóm tùy chọn - dùng --text-muted theo theme */
 .variant-label {
     font-size: 0.7rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--text-muted);   /* ✅ tự đổi theo dark/light */
     margin-bottom: 8px;
     display: flex;
     align-items: center;
@@ -580,13 +594,13 @@ include __DIR__ . '/partials/header.php';
     flex-wrap: wrap;
 }
 
-/* Mỗi nút chọn màu/loại */
+/* Mỗi nút chọn màu/loại - nền và viền theo theme */
 .variant-btn {
     padding: 6px 14px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: var(--variant-btn-bg);      /* ✅ theo theme */
+    border: 1px solid var(--variant-btn-border); /* ✅ theo theme */
     border-radius: 8px;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--text-color);               /* ✅ theo theme */
     font-size: 0.8rem;
     font-weight: 500;
     cursor: pointer;
@@ -599,7 +613,7 @@ include __DIR__ . '/partials/header.php';
 .variant-btn:hover {
     background: rgba(59, 130, 246, 0.3);
     border-color: rgba(59, 130, 246, 0.5);
-    color: white;
+    color: #fff;
     transform: scale(1.05);
 }
 
@@ -610,12 +624,12 @@ include __DIR__ . '/partials/header.php';
     box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
 }
 
-/* Dot màu nhỏ trước text */
+/* Dot màu nhỏ trước text - viền theo theme */
 .variant-btn .color-dot {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid var(--text-faint);    /* ✅ theo theme */
 }
 
 /* ================================================================================
@@ -653,10 +667,10 @@ include __DIR__ . '/partials/header.php';
     overflow: hidden;
 }
 
-/* Mô tả ngắn */
+/* Mô tả ngắn - dùng --text-muted theo theme */
 .product-desc {
     font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--text-muted);   /* ✅ theo theme */
     margin-bottom: 12px;
     line-height: 1.5;
     display: -webkit-box;
@@ -757,7 +771,7 @@ include __DIR__ . '/partials/header.php';
 
 .loading-text {
     font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--text-muted);   /* ✅ theo theme */
 }
 
 /* Nút "Xem thêm sản phẩm" */

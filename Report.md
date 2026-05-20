@@ -2,10 +2,20 @@
 
 **Ngày cập nhật:** 20/05/2026
 
-## 🚀 Cập Nhật Lần 11 (Cập nhật UI/UX & Giỏ hàng)
+## 🚀 Cập Nhật Lần 11 (Cập nhật UI/UX, Hiệu Ứng Cuộn Tương Tác & Giỏ hàng)
 **Ngày:** 20-05-2026
 
-**1. Sửa lỗi Giao diện (UI/UX Polish):**
+**1. Sửa lỗi & Nâng cấp Giao diện (UI/UX Polish):**
+- **Dải thương hiệu Marquee Chạy Ngang Vô Hạn (`home.php`):**
+  - Chuyển dải thương hiệu tĩnh thành dạng chạy ngang vô tận (Infinite Marquee) sử dụng kỹ thuật sao nhân đôi nhóm và dịch chuyển `-100%` kết hợp khoảng hở (gap) để không bị đứt quãng hay mất chữ ở cuối chu kỳ.
+  - Loại bỏ hoàn toàn hiệu ứng sóng nhấp nhô tự động (Auto-Wave) gây giật lag. Chỉ nâng nhẹ lên (translateY & scale) khi người dùng di chuột vào (`:hover`). Khi di chuột ra ngoài, phần tử sẽ hạ dần xuống vị trí ban đầu cực kỳ mượt mà nhờ cấu trúc `transition` mượt mà thay vì giật cục.
+- **Hiệu ứng Cuộn Tương Tác (Scroll-Driven Progress Parallax - `home.php`):**
+  - Triển khai thuật toán cuộn bằng JavaScript đo tọa độ các khối chứa `.scroll-track` theo thời gian thực (real-time) và tính toán tỉ lệ xuất hiện/biến mất (Progress từ `0` đến `1`).
+  - Gán giá trị tiến trình này vào biến CSS `--scroll-progress`.
+  - Thiết kế CSS tịnh tiến tỉ lệ thuận: hình ảnh bên trái nghiêng và dịch chuyển theo scroll, hình ảnh bên phải dịch chuyển đè lên, đốm nền mờ dần/rõ dần theo thao tác cuộn của chuột.
+  - Hỗ trợ đầy đủ hiệu ứng biến mất khi cuộn qua đầu trang (Exit phase) và hiện lại khi cuộn ngược lại.
+  - Áp dụng kỹ thuật `requestAnimationFrame` để xử lý mượt mà ở mức 60/120 FPS trên mọi trình duyệt.
+  - Đồng bộ hóa hiệu ứng này cho cả phần **Grand Piano Premium** và phần **Khơi nguồn cảm hứng (Overlap Showcase)**.
 - **Trang Cửa hàng (`sanpham.php`):**
   - Gỡ bỏ giới hạn chiều cao (`max-height`), cho phép danh sách sản phẩm dài ra tự nhiên theo màn hình.
   - Cột Danh mục, Thanh tìm kiếm và Bảng Lọc nâng cao được thiết lập `position: sticky` để tự động trượt theo màn hình khi cuộn chuột xuống.
@@ -15,7 +25,7 @@
   - Căn giữa số lượng ở ô chọn số lượng, ẩn nút tăng giảm mũi tên mặc định của trình duyệt (`spin button`) để giao diện gọn gàng hơn.
   - Gỡ bỏ `position: sticky` ở phần hình ảnh sản phẩm để tránh lỗi sê dịch hình ảnh khi cuộn chuột.
 - **Footer (`footer.php`):** Cập nhật đúng các đường dẫn liên kết danh mục sản phẩm (Guitar, Piano, Trống) để chuyển hướng chính xác đến trang danh mục tương ứng.
-- **Hiệu ứng toàn cục (`header.php` / `footer.php`):** Kích hoạt chế độ `mirror: true` cho thư viện AOS, giúp các hiệu ứng xuất hiện lại khi cuộn chuột lên/xuống (giống tham khảo Allia Health).
+- **Hiệu ứng toàn cục (`header.php` / `footer.php`):** Kích hoạt chế độ `mirror: true` cho thư viện AOS.
 
 **2. Tính năng Giỏ hàng (Cart):**
 - Đã khởi tạo cấu trúc logic cho giỏ hàng trong bộ nhớ đệm (Session).

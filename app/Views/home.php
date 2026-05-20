@@ -20,29 +20,122 @@ include __DIR__ . '/partials/header.php';
     .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); z-index: 1; pointer-events: none; }
     .hero-content { position: relative; z-index: 2; color: white; text-shadow: 2px 2px 15px rgba(0,0,0,0.9); }
     
-    /* ================= DẢI THƯƠNG HIỆU & GỢN SÓNG (WAVE) ================= */
-    .brand-wrapper { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); background: var(--card-bg); padding: 30px 0; width: 100%; gap: 40px; }
-    
-    /* Hiệu ứng Gợn sóng (Wave) mượt mà dạng lướt 3 cụm, nghỉ dài 10s */
-    @keyframes travelingWave {
-        0%, 15%, 100% { transform: translateY(0); }
-        7.5% { transform: translateY(-20px); }
+    /* ================= DẢI THƯƠNG HIỆU MARQUEE CHẠY NGANG VÔ HẠN ================= */
+    .brand-marquee-container {
+        overflow: hidden;
+        border-top: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
+        background: var(--card-bg);
+        padding: 30px 0;
+        width: 100%;
+        display: flex;
+        position: relative;
     }
     
-    .brand-item { display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 900; color: var(--text-color); cursor: pointer; opacity: 0.5; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); white-space: nowrap; animation: travelingWave 10s infinite; }
+    .brand-marquee-track {
+        display: flex;
+        width: max-content;
+        gap: 60px;
+    }
     
-    /* Delay sóng truyền từ trái qua phải cực mượt (8 items) */
-    .brand-item:nth-child(1) { animation-delay: 0.0s; }
-    .brand-item:nth-child(2) { animation-delay: 0.2s; }
-    .brand-item:nth-child(3) { animation-delay: 0.4s; }
-    .brand-item:nth-child(4) { animation-delay: 0.6s; }
-    .brand-item:nth-child(5) { animation-delay: 0.8s; }
-    .brand-item:nth-child(6) { animation-delay: 1.0s; }
-    .brand-item:nth-child(7) { animation-delay: 1.2s; }
-    .brand-item:nth-child(8) { animation-delay: 1.4s; }
+    .brand-marquee-group {
+        display: flex;
+        align-items: center;
+        gap: 60px;
+        animation: scrollMarquee 35s linear infinite;
+        flex-shrink: 0;
+    }
     
-    /* Chỉ phát sáng và đổi màu khi Hover */
-    .brand-item:hover { animation-play-state: paused; opacity: 1; color: #3b82f6; transform: scale(1.2) translateY(-10px) !important; text-shadow: 0 10px 20px rgba(59, 130, 246, 0.5); z-index: 10; }
+    /* Tạm dừng chạy khi di chuột vào toàn bộ khung */
+    .brand-marquee-container:hover .brand-marquee-group {
+        animation-play-state: paused;
+    }
+    
+    @keyframes scrollMarquee {
+        0% { transform: translate3d(0, 0, 0); }
+        100% { transform: translate3d(calc(-100% - 60px), 0, 0); }
+    }
+    
+    .brand-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        font-weight: 900;
+        color: var(--text-color);
+        cursor: pointer;
+        opacity: 0.5;
+        /* Hiệu ứng chuyển động mượt mà khi hover và khi rê chuột ra (tự rớt xuống chậm rãi) */
+        transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.4s ease, color 0.4s ease, text-shadow 0.4s ease;
+        white-space: nowrap;
+    }
+    
+    /* Chỉ khi hover mới nhảy lên và sáng màu */
+    .brand-item:hover {
+        opacity: 1;
+        color: #3b82f6;
+        transform: translateY(-12px) scale(1.12);
+        text-shadow: 0 10px 22px rgba(59, 130, 246, 0.5);
+    }
+
+    /* ================= HIỆU ỨNG CUỘN TƯƠNG TÁC (SCROLL-DRIVEN INTERACTIVE) ================= */
+    /* Lớp cha lưu trữ tiến trình cuộn nhận từ JS */
+    .scroll-track {
+        --scroll-progress: 0;
+    }
+    
+    /* Đốm màu nền mờ */
+    .scroll-blob {
+        opacity: calc(0.15 * var(--scroll-progress)) !important;
+        transform: scale(calc(0.6 + 0.4 * var(--scroll-progress))) !important;
+        transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+    }
+    
+    /* Card nền màu phẳng */
+    .scroll-shape {
+        opacity: calc(0.9 * var(--scroll-progress)) !important;
+        transform: translateY(calc(80px * (1 - var(--scroll-progress)))) !important;
+        transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+    }
+    
+    /* Chủ thể bên trái (Guitar/Hình ảnh) */
+    .scroll-img-left {
+        opacity: var(--scroll-progress) !important;
+        transform: translateY(calc(120px * (1 - var(--scroll-progress)))) rotate(calc(-12deg + 4deg * var(--scroll-progress))) scale(calc(0.9 + 0.1 * var(--scroll-progress))) !important;
+        transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+    }
+    
+    /* Đè cấu hình hover mượt mà và tự rơi lại trạng thái cuộn */
+    .scroll-img-left:hover {
+        transform: translateY(-15px) rotate(-5deg) scale(1.05) !important;
+        z-index: 10 !important;
+    }
+    
+    /* Chủ thể bên phải (Phụ kiện/Hình ảnh đè) */
+    .scroll-img-right {
+        opacity: var(--scroll-progress) !important;
+        transform: translateY(calc(200px * (1 - var(--scroll-progress)))) rotate(calc(10deg - 5deg * var(--scroll-progress))) scale(calc(0.85 + 0.15 * var(--scroll-progress))) !important;
+        transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+    }
+    
+    .scroll-img-right:hover {
+        transform: translateY(-15px) rotate(8deg) scale(1.05) !important;
+        z-index: 10 !important;
+    }
+    
+    /* Cột chữ bay lên mượt mà theo scroll */
+    .scroll-text-col {
+        opacity: var(--scroll-progress) !important;
+        transform: translateY(calc(80px * (1 - var(--scroll-progress)))) !important;
+        transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+    }
+    
+    /* Hiệu ứng trượt thẳng đứng tịnh tiến (không xoay) */
+    .scroll-slide-up {
+        opacity: var(--scroll-progress) !important;
+        transform: translateY(calc(80px * (1 - var(--scroll-progress)))) !important;
+        transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+    }
 
     .product-card-clean { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; position: relative; padding: 20px; height: 100%; display: flex; flex-direction: column; transition: box-shadow 0.3s ease, border-color 0.3s ease; }
     .product-card-clean:hover { box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); border-color: #3b82f6; }
@@ -77,24 +170,92 @@ include __DIR__ . '/partials/header.php';
     </div>
 </section>
 
-<section class="brand-wrapper my-5 container-fluid px-5">
-    <!-- 8 Hãng với 8 Icon khác biệt -->
-    <div class="brand-item"><i class="fas fa-record-vinyl me-2"></i> YAMAHA</div>
-    <div class="brand-item"><i class="fas fa-guitar me-2"></i> FENDER</div>
-    <div class="brand-item"><i class="fas fa-keyboard me-2"></i> ROLAND</div>
-    <div class="brand-item"><i class="fas fa-drum me-2"></i> PEARL</div>
-    <div class="brand-item"><i class="fas fa-headphones me-2"></i> MARSHALL</div>
-    <div class="brand-item"><i class="fas fa-music me-2"></i> KORG</div>
-    <div class="brand-item"><i class="fas fa-sliders-h me-2"></i> KAWAI</div>
-    <div class="brand-item"><i class="fas fa-microphone-alt me-2"></i> SHURE</div>
+<!-- DẢI THƯƠNG HIỆU CHẠY NGANG VÔ HẠN (INFINITE MARQUEE) -->
+<div class="brand-marquee-container my-5">
+    <div class="brand-marquee-track">
+        <!-- Nhóm 1 -->
+        <div class="brand-marquee-group">
+            <div class="brand-item"><i class="fas fa-record-vinyl me-2"></i> YAMAHA</div>
+            <div class="brand-item"><i class="fas fa-guitar me-2"></i> FENDER</div>
+            <div class="brand-item"><i class="fas fa-keyboard me-2"></i> ROLAND</div>
+            <div class="brand-item"><i class="fas fa-drum me-2"></i> PEARL</div>
+            <div class="brand-item"><i class="fas fa-headphones me-2"></i> MARSHALL</div>
+            <div class="brand-item"><i class="fas fa-music me-2"></i> KORG</div>
+            <div class="brand-item"><i class="fas fa-sliders-h me-2"></i> KAWAI</div>
+            <div class="brand-item"><i class="fas fa-microphone-alt me-2"></i> SHURE</div>
+        </div>
+        <!-- Nhóm 2 (nhân bản giống hệt nhóm 1 để lặp vô tận không bị trống) -->
+        <div class="brand-marquee-group" aria-hidden="true">
+            <div class="brand-item"><i class="fas fa-record-vinyl me-2"></i> YAMAHA</div>
+            <div class="brand-item"><i class="fas fa-guitar me-2"></i> FENDER</div>
+            <div class="brand-item"><i class="fas fa-keyboard me-2"></i> ROLAND</div>
+            <div class="brand-item"><i class="fas fa-drum me-2"></i> PEARL</div>
+            <div class="brand-item"><i class="fas fa-headphones me-2"></i> MARSHALL</div>
+            <div class="brand-item"><i class="fas fa-music me-2"></i> KORG</div>
+            <div class="brand-item"><i class="fas fa-sliders-h me-2"></i> KAWAI</div>
+            <div class="brand-item"><i class="fas fa-microphone-alt me-2"></i> SHURE</div>
+        </div>
+    </div>
+</div>
+
+<!-- =================================================================
+     SECTION: HIỆU ỨNG XẾP LỚP (STAGGERED OVERLAP EFFECT)
+     Đã tích hợp lớp scroll-track để cuộn tương tác (scroll-driven)
+     ================================================================= -->
+<section class="container mt-5 pt-5 pb-5 overflow-hidden scroll-track">
+    <div class="row align-items-center position-relative" style="min-height: 60vh;">
+        
+        <!-- Cột hình ảnh hiệu ứng xếp lớp (Bên trái) -->
+        <div class="col-lg-6 position-relative mb-5 mb-lg-0" style="height: 500px;">
+            
+            <!-- Khối màu nền mờ ảo (Soft Background Blob) -->
+            <div class="position-absolute bg-primary rounded-circle scroll-blob" 
+                 style="width: 350px; height: 350px; top: 10%; left: 10%; filter: blur(80px); z-index: 1;"></div>
+                 
+            <!-- Khối nền định hình (Shape Background) -->
+            <div class="position-absolute rounded-4 scroll-shape" 
+                 style="width: 380px; height: 380px; bottom: 0; left: 5; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.15)); z-index: 1;"></div>
+
+            <!-- Chủ thể 1: Đàn Guitar điện / Nhạc cụ chính (Trượt từ trái, có góc xoay nhẹ mượt) -->
+            <img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=600&auto=format&fit=crop" 
+                 alt="Modern Instrument" 
+                 class="position-absolute rounded-4 shadow-lg scroll-img-left" 
+                 style="width: 260px; height: 380px; top: 5%; left: 10%; object-fit: cover; z-index: 2;">
+                 
+            <!-- Chủ thể 2: Phụ kiện / Keyboard nhỏ đè lên góc dưới của Chủ thể 1 -->
+            <img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=400&auto=format&fit=crop" 
+                 alt="Accessories" 
+                 class="position-absolute rounded-4 shadow-lg scroll-img-right" 
+                 style="width: 240px; height: 240px; bottom: 0%; right: 5%; object-fit: cover; z-index: 3; border: 10px solid var(--card-bg);">
+        </div>
+
+        <!-- Cột văn bản (Trượt và hiện dần lên đồng bộ với cuộn) -->
+        <div class="col-lg-5 offset-lg-1 scroll-text-col">
+            <h6 class="text-primary fw-bold text-uppercase tracking-wide mb-3" style="letter-spacing: 2px;">Không Gian Của Bạn</h6>
+            <h2 class="display-5 fw-bold mb-4" style="line-height: 1.2;">Kết nối không gian,<br>Khơi nguồn cảm hứng</h2>
+            <p class="fs-5 mb-4" style="color: var(--text-muted); line-height: 1.6;">
+                Nền tảng TTB Studio tích hợp mọi công cụ bạn cần: giáo trình âm nhạc, lịch bảo dưỡng, kho tab bản nhạc số và kết nối trực tiếp đến các lớp học trực tuyến.
+            </p>
+            <ul class="list-unstyled mb-4" style="color: var(--text-color); opacity: 0.85;">
+                <li class="mb-3 d-flex align-items-center"><i class="fas fa-check-circle text-primary me-3 fs-5"></i> Giáo trình học tương tác thông minh</li>
+                <li class="mb-3 d-flex align-items-center"><i class="fas fa-check-circle text-primary me-3 fs-5"></i> Kho lưu trữ & đồng bộ thiết lập MIDI</li>
+                <li class="mb-3 d-flex align-items-center"><i class="fas fa-check-circle text-primary me-3 fs-5"></i> Trợ lý luyện tập cá nhân hàng ngày</li>
+            </ul>
+            <a href="index.php?controller=product&action=index" class="btn btn-primary rounded-pill px-5 py-3 fw-bold shadow-sm" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none;">
+                Trải Nghiệm Ngay <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
 </section>
 
-<section class="container mt-5 pt-5">
+<section class="container mt-5 pt-5 scroll-track">
     <div class="row align-items-center">
-        <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right" data-aos-duration="1000">
+        <!-- Cột hình ảnh (Trượt tịnh tiến đứng tịnh tiến mượt mà) -->
+        <div class="col-lg-6 mb-4 mb-lg-0 scroll-slide-up">
             <img src="https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?q=80&w=1000&auto=format&fit=crop" alt="Premium Piano" class="showcase-img">
         </div>
-        <div class="col-lg-5 offset-lg-1" data-aos="fade-left" data-aos-duration="1000">
+        <!-- Cột chữ (Bay lên đồng bộ theo scroll) -->
+        <div class="col-lg-5 offset-lg-1 scroll-text-col">
             <h6 class="text-primary fw-bold text-uppercase tracking-wide mb-2">Đẳng cấp hoàng gia</h6>
             <h2 class="display-5 fw-bold mb-4">Grand Piano Premium</h2>
             <p class="fs-5 mb-4" style="opacity: 0.8;">Sự kết hợp hoàn hảo giữa kỹ tác thủ công truyền thống và công nghệ âm thanh tiên tiến.</p>
@@ -314,6 +475,79 @@ include __DIR__ . '/partials/header.php';
         </div>
     </div>
 </section>
+
+<script>
+/**
+ * =========================================================================
+ * JAVASCRIPT: HIỆU ỨNG CUỘN TƯƠNG TÁC (SCROLL-DRIVEN PARALLAX FALLBACK)
+ * - Tác dụng: Đo chiều cao viewport và tọa độ của các container .scroll-track.
+ * - Tính toán tỉ lệ phần trăm cuộn của element (Progress từ 0 đến 1).
+ * - Cập nhật biến CSS --scroll-progress trực tiếp cho CSS xử lý chuyển động.
+ * =========================================================================
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    const trackedSections = document.querySelectorAll('.scroll-track');
+    
+    function updateScrollProgress() {
+        const viewportHeight = window.innerHeight;
+        
+        trackedSections.forEach(section => {
+            const rect = section.getBoundingClientRect();
+            const elementHeight = rect.height;
+            
+            // Điểm bắt đầu xuất hiện (ở mép dưới màn hình)
+            const enterStart = viewportHeight;
+            // Điểm hoàn tất xuất hiện hoàn toàn (khoảng 20% từ mép trên màn hình)
+            const enterEnd = viewportHeight * 0.20;
+            
+            // Điểm bắt đầu biến mất (khi đỉnh phần tử chạm mép trên màn hình)
+            const exitStart = 0;
+            // Điểm biến mất hoàn toàn (khi phần tử cuộn qua khỏi mép trên màn hình)
+            const exitEnd = -elementHeight * 0.9;
+            
+            let progress = 0;
+            
+            if (rect.top > enterStart) {
+                // Vẫn ở dưới màn hình
+                progress = 0;
+            } else if (rect.top <= enterStart && rect.top > enterEnd) {
+                // Đang cuộn lên (giai đoạn xuất hiện): Tỉ lệ tăng dần từ 0 lên 1
+                progress = (enterStart - rect.top) / (enterStart - enterEnd);
+            } else if (rect.top <= enterEnd && rect.top > exitStart) {
+                // Nằm trọn vẹn trên màn hình: Giữ nguyên 100% (1)
+                progress = 1;
+            } else if (rect.top <= exitStart && rect.top > exitEnd) {
+                // Đang cuộn qua đỉnh màn hình (giai đoạn biến mất): Tỉ lệ giảm dần từ 1 về 0
+                progress = (rect.top - exitEnd) / (exitStart - exitEnd);
+            } else {
+                // Đã cuộn qua khỏi màn hình
+                progress = 0;
+            }
+            
+            // Gán giá trị biến CSS cho element tương ứng
+            section.style.setProperty('--scroll-progress', progress.toFixed(4));
+        });
+    }
+    
+    // Sử dụng RequestAnimationFrame để tối ưu hóa hiệu năng, giảm giật lag khi cuộn
+    let isScrolling = false;
+    window.addEventListener('scroll', function() {
+        if (!isScrolling) {
+            isScrolling = true;
+            window.requestAnimationFrame(function() {
+                updateScrollProgress();
+                isScrolling = false;
+            });
+        }
+    }, { passive: true });
+    
+    // Lắng nghe cả sự kiện thay đổi kích thước cửa sổ
+    window.addEventListener('resize', updateScrollProgress, { passive: true });
+    
+    // Gọi khởi tạo lần đầu ngay khi trang load xong
+    updateScrollProgress();
+});
+</script>
 
 <?php
 // 2. GỌI FOOTER VÀ KẾT THÚC TRANG

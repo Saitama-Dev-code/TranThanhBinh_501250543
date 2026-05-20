@@ -204,7 +204,7 @@ include __DIR__ . '/partials/header.php';
 .price-input-wrapper label {
     display: block;
     font-size: 0.75rem;
-    color: rgba(255,255,255,0.6);
+    color: var(--text-muted);   /* ✅ theo theme */
     margin-bottom: 4px;
 }
 
@@ -228,7 +228,7 @@ include __DIR__ . '/partials/header.php';
     position: absolute;
     left: 12px;
     bottom: 10px;
-    color: rgba(255,255,255,0.5);
+    color: var(--text-muted);   /* ✅ theo theme */
     font-size: 0.85rem;
 }
 
@@ -837,16 +837,108 @@ include __DIR__ . '/partials/header.php';
     z-index: -1;
     pointer-events: none;
 }
+
+/* ================================================================
+   Sửa màu cứng còn lại trong các class cũ → theo theme
+   ================================================================ */
+.variant-label    { color: var(--text-muted) !important; }
+.variant-btn      { background: var(--variant-btn-bg); border: 1px solid var(--variant-btn-border); color: var(--text-color); }
+.variant-btn .color-dot { border: 1px solid var(--text-faint); }
+.product-desc     { color: var(--text-muted); }
+.loading-text     { color: var(--text-muted); }
+
+/* ================================================================
+   LAYOUT MỚI 2 TẦNG DỌC
+
+   Tầng 1 (luôn hiện):
+     [.category-box 260px]  |  [.search-filter-box flex:1]
+
+   Tầng 2 (ẩn/hiện khi bấm nút Bộ lọc):
+     [.filter-panel 260px]  |  [.products-wrapper flex:1]
+
+   Hai cột trái (260px) thẳng dọc nhau, không lệch.
+   ================================================================ */
+.shop-top-row  { display:flex; gap:16px; margin-bottom:14px; align-items:stretch; }
+.shop-main-row { display:flex; gap:16px; align-items:flex-start; }
+
+/* Khối Danh mục */
+.category-box {
+    width:260px; flex-shrink:0;
+    background:var(--card-bg); border:1px solid var(--border-color);
+    border-radius:16px; padding:18px; backdrop-filter:blur(10px);
+}
+/* Khối Tìm kiếm + Toggle */
+.search-filter-box {
+    flex:1; background:var(--card-bg); border:1px solid var(--border-color);
+    border-radius:16px; padding:18px; backdrop-filter:blur(10px);
+    display:flex; flex-direction:column; justify-content:center; gap:10px;
+}
+/* Hàng input + nút */
+.search-row { display:flex; gap:10px; align-items:center; }
+/* Input tìm kiếm */
+.search-input {
+    flex:1; padding:10px 16px;
+    background:var(--bg-color); border:1px solid var(--border-color);
+    border-radius:10px; color:var(--text-color); font-size:0.9rem;
+    transition:border-color 0.25s;
+}
+.search-input:focus { outline:none; border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,0.15); }
+.search-input::placeholder { color:var(--text-muted); }
+/* Nút Tìm kiếm */
+.btn-search {
+    padding:10px 20px; background:linear-gradient(135deg,#3b82f6,#60a5fa);
+    border:none; border-radius:10px; color:#fff; font-weight:600; font-size:0.9rem;
+    cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:7px; transition:all 0.25s;
+}
+.btn-search:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(59,130,246,0.4); }
+/* Nút Toggle Bộ lọc */
+.btn-filter-toggle {
+    padding:10px 16px; background:var(--variant-btn-bg); border:1px solid var(--variant-btn-border);
+    border-radius:10px; color:var(--text-color); font-weight:600; font-size:0.88rem;
+    cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:7px; transition:all 0.25s;
+}
+.btn-filter-toggle:hover,.btn-filter-toggle.open {
+    background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(139,92,246,0.15));
+    border-color:rgba(59,130,246,0.4); color:#3b82f6;
+}
+.btn-filter-toggle .chevron { transition:transform 0.3s; font-size:0.8rem; color:#60a5fa; }
+.btn-filter-toggle.open .chevron { transform:rotate(180deg); }
+/* Tags lọc */
+.active-filter-tags { display:flex; flex-wrap:wrap; gap:6px; min-height:0; }
+/* Panel lọc (có ẩn/hiện mượt) */
+.filter-panel {
+    width:260px; flex-shrink:0;
+    background:var(--card-bg); border:1px solid var(--border-color);
+    border-radius:16px; backdrop-filter:blur(10px);
+    max-height:0; overflow:hidden; opacity:0;
+    padding:0 18px; border-width:0;
+    transition: max-height 0.45s cubic-bezier(0.4,0,0.2,1),
+                opacity 0.35s ease, padding 0.35s ease, border-width 0.1s ease;
+}
+.filter-panel.open { max-height:1400px; opacity:1; padding:18px; border-width:1px; }
+/* Khung sản phẩm */
+.products-wrapper { flex:1; min-width:0; }
+/* Link danh mục theo theme */
+.cat-link {
+    display:flex; align-items:center; gap:8px; padding:8px 10px;
+    border-radius:8px; text-decoration:none; font-size:0.88rem;
+    font-weight:500; color:var(--text-muted);   /* ✅ theo theme */
+    transition:all 0.25s ease; margin-bottom:2px; cursor:pointer;
+}
+.cat-link:hover { background:rgba(59,130,246,0.1); color:#3b82f6; padding-left:16px; }
+.cat-link.active { background:rgba(59,130,246,0.12); color:#3b82f6; font-weight:700; }
+.cat-link i { font-size:0.85rem; width:16px; text-align:center; flex-shrink:0; }
 </style>
 
 <!-- Canvas cho animation nền riêng của trang sản phẩm -->
 <canvas id="product-canvas"></canvas>
 
 <div class="container my-5 pt-4">
-    <!-- Tiêu đề trang - Đặt ở trên cùng, căn giữa -->
+
+    <!-- TIÊU ĐỀ TRANG -->
     <div class="text-center mb-4">
-        <h2 class="fw-bold mb-2" style="font-size: 2rem; background: linear-gradient(135deg, #3b82f6, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-            <i class="fas fa-music me-2" style="-webkit-text-fill-color: #3b82f6;"></i>Cửa hàng nhạc cụ
+        <h2 class="fw-bold mb-2" style="font-size:2rem; background:linear-gradient(135deg,#3b82f6,#60a5fa); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">
+            <i class="fas fa-music me-2" style="-webkit-text-fill-color:#3b82f6;"></i>Cửa hàng nhạc cụ
         </h2>
         <p class="text-muted mb-0">
             <?= isset($totalProducts) ? $totalProducts : 0 ?> sản phẩm
@@ -859,172 +951,234 @@ include __DIR__ . '/partials/header.php';
         </p>
     </div>
 
-    <div class="row">
-        <!-- ================================================================= -->
-        <!-- CỘT TRÁI: DANH MỤC & BỘ LỌC -->
-        <!-- ================================================================= -->
-        <div class="col-lg-3 mb-4">
-            <!-- 1. PHẦN DANH MỤC -->
-            <div class="category-sidebar">
-                <div class="filter-title mb-3">
-                    <i class="fas fa-th-large"></i> Danh mục
-                </div>
-                <div class="list-group list-group-flush bg-transparent">
-                    <a href="#" data-category="" 
-                       class="category-link list-group-item list-group-item-action bg-transparent border-0 px-0 py-2 <?= empty($currentCategory) ? 'text-primary fw-bold' : 'text-white-50' ?>">
-                        <i class="fas fa-chevron-right me-2 small"></i>Tất cả nhạc cụ
-                    </a>
-                    <?php
-                    if (isset($categories) && is_array($categories)) {
-                        foreach ($categories as $cat) {
-                            $isActive = ($currentCategory ?? null) == $cat['id'];
-                            $activeClass = $isActive ? 'text-primary fw-bold' : 'text-white-50';
-                            echo '<a href="#" data-category="' . $cat['id'] . '"';
-                            echo ' class="category-link list-group-item list-group-item-action bg-transparent border-0 px-0 py-2 ' . $activeClass . '">';
-                            echo '<i class="' . $cat['icon'] . ' me-2"></i>' . $cat['name'];
-                            echo '</a>';
-                        }
-                    }
-                    ?>
-                </div>
-            </div>
+    <!-- ==================================================================
+         TẦNG 1: HÀNG TRÊN - [DANH MỤC 260px] | [TÌM KIẾM + TOGGLE flex:1]
+         Luôn hiển thị dù bộ lọc có mở hay không.
+         ================================================================== -->
+    <div class="shop-top-row">
 
-            <!-- 2. PHẦN BỘ LỌC NÂNG CAO -->
-            <form id="filter-form" method="GET" action="index.php">
+        <!-- KHỐI DANH MỤC BÊN TRÁI (260px cố định) -->
+        <div class="category-box">
+            <div class="filter-title mb-2"><i class="fas fa-th-large"></i> Danh mục</div>
+            <?php
+            /*
+             * Render danh sách danh mục từ $categories (mảng truyền từ Controller).
+             * $currentCategory: ID đang chọn từ $_GET['category'].
+             * Dùng class 'cat-link active' để highlight, màu tự theo theme.
+             * data-category: giá trị JS đọc khi click để cập nhật form.
+             */
+            ?>
+            <!-- "Tất cả" - active khi không chọn danh mục nào -->
+            <a href="#" data-category=""
+               class="cat-link <?= empty($currentCategory) ? 'active' : '' ?>">
+                <i class="fas fa-border-all"></i> Tất cả nhạc cụ
+            </a>
+            <?php
+            /*
+             * Vòng lặp: mỗi $cat gồm id, name, icon (class FA).
+             * (int)$cat['id'] ép kiểu tránh injection.
+             * htmlspecialchars() bảo vệ khỏi XSS.
+             */
+            if (isset($categories) && is_array($categories)):
+                foreach ($categories as $cat):
+                    $isActive = ($currentCategory ?? null) == $cat['id'];
+            ?>
+                <a href="#" data-category="<?= (int)$cat['id'] ?>"
+                   class="cat-link <?= $isActive ? 'active' : '' ?>">
+                    <i class="<?= htmlspecialchars($cat['icon']) ?>"></i>
+                    <?= htmlspecialchars($cat['name']) ?>
+                </a>
+            <?php endforeach; endif; ?>
+        </div><!-- /.category-box -->
+
+        <!-- HỘP TÌM KIẾM + NÚT TOGGLE (chiều rộng co giãn) -->
+        <div class="search-filter-box">
+            <?php
+            /*
+             * Form tìm kiếm nhanh (GET):
+             * - name="search"   : từ khóa sản phẩm
+             * - hidden category : giữ lại danh mục đang chọn
+             * JS cập nhật #top-category khi người dùng click cat-link.
+             */
+            ?>
+            <form id="top-search-form" method="GET" action="index.php">
                 <input type="hidden" name="controller" value="product">
-                <input type="hidden" name="action" value="index">
-                <input type="hidden" name="category" id="filter-category" value="<?= $currentCategory ?? '' ?>">
+                <input type="hidden" name="action"     value="index">
+                <input type="hidden" name="category"   id="top-category"
+                       value="<?= htmlspecialchars($currentCategory ?? '') ?>">
 
-                <div class="filter-sidebar">
-                    <!-- Nút toggle bộ lọc -->
-                    <button type="button" class="filter-toggle-btn" id="filter-toggle-btn">
-                        <span><i class="fas fa-sliders-h me-2 text-primary"></i>Bộ lọc nâng cao
-                            <span id="active-filter-count" class="badge bg-primary rounded-pill ms-2" style="display:none;">0</span>
-                        </span>
-                        <i class="fas fa-chevron-down toggle-icon"></i>
+                <!-- HÀNG: Ô nhập + Nút Tìm + Nút Bộ lọc -->
+                <div class="search-row">
+                    <!-- Ô nhập từ khóa -->
+                    <input type="text" name="search" id="main-search-input"
+                           class="search-input"
+                           placeholder="🎵 Tìm tên nhạc cụ, thương hiệu..."
+                           value="<?= htmlspecialchars($currentKeyword ?? '') ?>">
+
+                    <!-- Nút Tìm kiếm (xanh): submit form GET -->
+                    <button type="submit" class="btn-search">
+                        <i class="fas fa-search"></i> Tìm kiếm
                     </button>
-                    <!-- TÌM KIẾM THEO TÊN - luôn hiển thị -->
-                    <div class="filter-group" style="margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid var(--border-color);">
-                        <div class="filter-title">
-                            <i class="fas fa-search"></i> Tìm kiếm
+
+                    <!-- Nút Bộ lọc nâng cao: toggle .filter-panel bên dưới -->
+                    <button type="button" class="btn-filter-toggle" id="btn-filter-toggle">
+                        <i class="fas fa-sliders-h"></i>
+                        Bộ lọc nâng cao
+                        <span id="active-filter-count" class="badge bg-primary rounded-pill"
+                              style="display:none; font-size:0.7rem;">0</span>
+                        <i class="fas fa-chevron-down chevron"></i>
+                    </button>
+                </div>
+
+                <!-- Tags bộ lọc đang áp dụng -->
+                <div class="active-filter-tags" id="active-filters"></div>
+            </form>
+        </div><!-- /.search-filter-box -->
+    </div><!-- /.shop-top-row -->
+
+    <!-- ==================================================================
+         TẦNG 2: HÀNG CHÍNH - [PANEL LỌC 260px, ẩn/hiện] | [SP flex:1]
+         Panel lọc (260px) thẳng hàng với category-box bên trên.
+         Khung sản phẩm giữ nguyên chiều rộng dù panel có hiện hay không.
+         ================================================================== -->
+    <div class="shop-main-row">
+
+        <!-- PANEL BỘ LỌC NÂNG CAO (ẩn mặc định, hiện khi click Toggle) -->
+        <div class="filter-panel" id="filter-panel">
+            <?php
+            /*
+             * Form lọc nâng cao - TÁCH RIÊNG khỏi form tìm kiếm trên
+             * để tránh lồng <form> trong <form> (HTML không hợp lệ).
+             *
+             * Khi submit form này:
+             * 1. JS copy search từ #main-search-input vào #adv-search
+             * 2. JS copy category từ #top-category vào #adv-category
+             * 3. Server nhận đầy đủ: search + category + các lọc nâng cao
+             */
+            ?>
+            <form id="advanced-filter-form" method="GET" action="index.php">
+                <input type="hidden" name="controller" value="product">
+                <input type="hidden" name="action"     value="index">
+                <!-- JS đồng bộ từ form tìm kiếm khi submit -->
+                <input type="hidden" name="search"   id="adv-search"
+                       value="<?= htmlspecialchars($currentKeyword ?? '') ?>">
+                <input type="hidden" name="category" id="adv-category"
+                       value="<?= htmlspecialchars($currentCategory ?? '') ?>">
+
+                <!-- NHÓM: KHOẢNG GIÁ -->
+                <div class="filter-group">
+                    <div class="filter-title"><i class="fas fa-tag"></i> Khoảng giá</div>
+                    <?php
+                    /*
+                     * Label "Từ (₫)" / "Đến (₫)" dùng var(--text-muted)
+                     * → hiển thị đúng cả nền sáng lẫn nền tối.
+                     * $currentPriceMin, $currentPriceMax từ $_GET (rỗng nếu chưa lọc).
+                     */
+                    ?>
+                    <div class="price-inputs">
+                        <div class="price-input-wrapper">
+                            <label>Từ (₫)</label>
+                            <input type="number" name="price_min" class="price-input"
+                                   placeholder="0"
+                                   value="<?= htmlspecialchars($currentPriceMin ?? '') ?>">
                         </div>
-                        <div class="input-group">
-                            <input type="text" name="search" class="form-control bg-transparent border-secondary text-white" 
-                                   placeholder="Tên nhạc cụ..." 
-                                   value="<?= htmlspecialchars($currentKeyword ?? '') ?>">
+                        <div class="price-input-wrapper">
+                            <label>Đến (₫)</label>
+                            <input type="number" name="price_max" class="price-input"
+                                   placeholder="100,000,000"
+                                   value="<?= htmlspecialchars($currentPriceMax ?? '') ?>">
                         </div>
                     </div>
-
-                    <!-- Các bộ lọc thu gọn -->
-                    <div class="filter-collapsible" id="filter-collapsible">
-
-                    <!-- ========================================================= -->
-                    <!-- NHÓM 3: KHOẢNG GIÁ -->
-                    <!-- ========================================================= -->
-                    <div class="filter-group">
-                        <div class="filter-title">
-                            <i class="fas fa-tag"></i> Khoảng giá
-                        </div>
-                        <div class="price-range-container">
-                            <div class="price-inputs">
-                                <div class="price-input-wrapper">
-                                    <span class="currency-symbol">₫</span>
-                                    <label>Từ</label>
-                                    <input type="number" name="price_min" class="price-input" 
-                                           placeholder="0" 
-                                           value="<?= $currentPriceMin ?? '' ?>">
-                                </div>
-                                <div class="price-input-wrapper">
-                                    <span class="currency-symbol">₫</span>
-                                    <label>Đến</label>
-                                    <input type="number" name="price_max" class="price-input" 
-                                           placeholder="100,000,000" 
-                                           value="<?= $currentPriceMax ?? '' ?>">
-                                </div>
-                            </div>
-                            <div class="price-slider">
-                                <div class="price-slider-fill" id="price-slider-fill"></div>
-                                <input type="range" id="price-range-max" min="0" max="100000000" step="1000000" value="<?= $currentPriceMax ?? 100000000 ?>">
-                            </div>
-                            <div class="price-display" id="price-display">
-                                <?php
-                                // Hiển thị khoảng giá đã chọn
-                                $min = isset($currentPriceMin) ? number_format((float)$currentPriceMin, 0, ',', '.') : '0';
-                                $max = isset($currentPriceMax) ? number_format((float)$currentPriceMax, 0, ',', '.') : '100M+';
-                                echo $min . ' ₫ - ' . $max . ' ₫';
-                                ?>
-                            </div>
-                        </div>
+                    <!-- Slider kéo giá tối đa -->
+                    <div class="price-slider">
+                        <div class="price-slider-fill" id="price-slider-fill"></div>
+                        <input type="range" id="price-range-max"
+                               min="0" max="100000000" step="1000000"
+                               value="<?= $currentPriceMax ?? 100000000 ?>">
                     </div>
-
-                    <!-- ========================================================= -->
-                    <!-- NHÓM 4: THƯƠNG HIỆU -->
-                    <!-- ========================================================= -->
-                    <div class="filter-group">
-                        <div class="filter-title">
-                            <i class="fas fa-star"></i> Thương hiệu
-                        </div>
+                    <div class="price-display" id="price-display">
                         <?php
-                        // Lặp qua danh sách thương hiệu để render checkbox
-                        if (isset($brands) && is_array($brands)) {
-                            foreach ($brands as $b) {
-                                $isChecked = ($currentBrand ?? '') === $b ? 'checked' : '';
-                                echo '<label class="filter-checkbox">';
-                                echo '<input type="checkbox" name="brand" value="' . $b . '" ' . $isChecked . '>';
-                                echo '<span>' . $b . '</span>';
-                                echo '</label>';
-                            }
-                        }
+                        /*
+                         * Hiển thị khoảng giá ban đầu dưới slider.
+                         * number_format(n, 0, ',', '.') → "18.500.000".
+                         */
+                        $pMin = (isset($currentPriceMin) && $currentPriceMin !== '')
+                            ? number_format((float)$currentPriceMin, 0, ',', '.') . ' ₫'
+                            : '0 ₫';
+                        $pMax = (isset($currentPriceMax) && $currentPriceMax !== '')
+                            ? number_format((float)$currentPriceMax, 0, ',', '.') . ' ₫'
+                            : '100M+';
+                        echo $pMin . ' — ' . $pMax;
                         ?>
                     </div>
-
-                    <!-- ========================================================= -->
-                    <!-- NHÓM 5: TÌNH TRẠNG KHO -->
-                    <!-- ========================================================= -->
-                    <div class="filter-group">
-                        <div class="filter-title">
-                            <i class="fas fa-boxes"></i> Tình trạng
-                        </div>
-                        <label class="filter-checkbox">
-                            <input type="checkbox" name="in_stock" value="1" <?= ($currentInStock ?? null) == 1 ? 'checked' : '' ?>>
-                            <span>Chỉ còn hàng (<?php echo isset($totalProducts) ? $totalProducts : 0; ?>)</span>
-                        </label>
-                    </div>
-
-                    <!-- ========================================================= -->
-                    <!-- NHÓM 6: CHO THUÊ -->
-                    <!-- ========================================================= -->
-                    <div class="filter-group">
-                        <div class="filter-title">
-                            <i class="fas fa-clock"></i> Loại
-                        </div>
-                        <label class="filter-checkbox">
-                            <input type="checkbox" name="is_rentable" value="1" <?= ($currentIsRentable ?? null) == 1 ? 'checked' : '' ?>>
-                            <span>Có cho thuê</span>
-                        </label>
-                    </div>
-
-                    <!-- Nút xóa tất cả lọc -->
-                    <a href="#" class="btn-clear-filter w-100 mb-3 text-center" id="clear-all-filters" style="display: none;">
-                        <i class="fas fa-times me-2"></i>Xóa tất cả
-                    </a>
-
-                    <!-- Nút hành động -->
-                    <div class="filter-actions">
-                        <button type="submit" class="btn-apply-filter">
-                            <i class="fas fa-check"></i> Áp dụng
-                        </button>
-                    </div>
-
-                    </div><!-- end filter-collapsible -->
                 </div>
-            </form>
-        </div>
 
-        <!-- ========================================================= -->
-        <!-- CỘT PHẢI: KHUNG SẢN PHẨM VỚI INFINITE SCROLL -->
-        <!-- ========================================================= -->
-        <div class="col-lg-9">
+                <!-- NHÓM: THƯƠNG HIỆU -->
+                <div class="filter-group">
+                    <div class="filter-title"><i class="fas fa-star"></i> Thương hiệu</div>
+                    <?php
+                    /*
+                     * $brands: mảng tên thương hiệu từ DB qua Controller.
+                     * $currentBrand từ $_GET['brand'], so sánh === để checked.
+                     */
+                    if (isset($brands) && is_array($brands)):
+                        foreach ($brands as $b):
+                            $isChecked = ($currentBrand ?? '') === $b ? 'checked' : '';
+                    ?>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" name="brand"
+                                   value="<?= htmlspecialchars($b) ?>" <?= $isChecked ?>>
+                            <span><?= htmlspecialchars($b) ?></span>
+                        </label>
+                    <?php endforeach; endif; ?>
+                </div>
+
+                <!-- NHÓM: TÌNH TRẠNG KHO -->
+                <div class="filter-group">
+                    <div class="filter-title"><i class="fas fa-boxes"></i> Tình trạng</div>
+                    <?php
+                    /*
+                     * in_stock=1 → Controller thêm WHERE stock > 0 vào SQL.
+                     */
+                    ?>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" name="in_stock" value="1"
+                               <?= ($currentInStock ?? null) == 1 ? 'checked' : '' ?>>
+                        <span>Chỉ còn hàng (<?= $totalProducts ?? 0 ?>)</span>
+                    </label>
+                </div>
+
+                <!-- NHÓM: CHO THUÊ -->
+                <div class="filter-group">
+                    <div class="filter-title"><i class="fas fa-clock"></i> Loại</div>
+                    <?php
+                    /*
+                     * is_rentable=1 → Controller thêm WHERE is_rentable=1 vào SQL.
+                     */
+                    ?>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" name="is_rentable" value="1"
+                               <?= ($currentIsRentable ?? null) == 1 ? 'checked' : '' ?>>
+                        <span>Có cho thuê</span>
+                    </label>
+                </div>
+
+                <!-- NÚT ÁP DỤNG / XÓA LỌC -->
+                <div class="filter-actions">
+                    <button type="submit" class="btn-apply-filter">
+                        <i class="fas fa-check"></i> Áp dụng
+                    </button>
+                    <a href="index.php?controller=product&action=index"
+                       class="btn-clear-filter"
+                       style="text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+                        <i class="fas fa-times"></i> Xóa lọc
+                    </a>
+                </div>
+            </form><!-- /#advanced-filter-form -->
+        </div><!-- /.filter-panel -->
+
+        <!-- KHUNG SẢN PHẨM (chiều rộng co giãn phần còn lại) -->
+        <div class="products-wrapper">
             <!-- ========================================================= -->
             <!-- KHUNG CHỨA SẢN PHẨM - SCROLL TRONG KHUNG RIÊNG -->
             <!-- ========================================================= -->
@@ -1157,13 +1311,94 @@ include __DIR__ . '/partials/header.php';
                         </button>
                     </div>
                     <?php endif; ?>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                </div><!-- /.products-scroll-container -->
+            </div><!-- /.products-frame -->
+        </div><!-- /.products-wrapper -->
+    </div><!-- /.shop-main-row -->
+</div><!-- /.container -->
 
 <script>
+/**
+ * ================================================================================
+ * PHẦN 0: JAVASCRIPT CHO LAYOUT MỚI
+ * - Toggle panel bộ lọc nâng cao (#btn-filter-toggle / #filter-panel)
+ * - Click danh mục (.cat-link): cập nhật cả 2 form và submit
+ * - Submit form lọc nâng cao: đồng bộ search và category từ form tìm kiếm
+ * ================================================================================
+ */
+document.addEventListener('DOMContentLoaded', function() {
+
+    /* =========================================================
+       TOGGLE PANEL BỘ LỌC NÂNG CAO
+       Khi click nút #btn-filter-toggle:
+         - Thêm/bỏ class 'open' trên #filter-panel (CSS animation)
+         - Thêm/bỏ class 'open' trên nút (xoay mũi tên)
+       ========================================================= */
+    const btnToggle   = document.getElementById('btn-filter-toggle');
+    const filterPanel = document.getElementById('filter-panel');
+    if (btnToggle && filterPanel) {
+        btnToggle.addEventListener('click', function() {
+            // classList.toggle trả về true nếu class vừa được thêm
+            const isOpen = filterPanel.classList.toggle('open');
+            btnToggle.classList.toggle('open', isOpen);
+        });
+    }
+
+    /* =========================================================
+       CLICK DANH MỤC (.cat-link)
+       Khi click:
+         1. Cập nhật #top-category (form tìm kiếm nhanh)
+         2. Cập nhật #adv-category (form lọc nâng cao)
+         3. Cập nhật active state trên các cat-link
+         4. Submit form tìm kiếm nhanh để lọc ngay
+       ========================================================= */
+    document.querySelectorAll('.cat-link').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const catId = this.getAttribute('data-category');
+
+            // Cập nhật hidden input trong form tìm kiếm nhanh
+            const topCatInput = document.getElementById('top-category');
+            if (topCatInput) topCatInput.value = catId;
+
+            // Cập nhật hidden input trong form lọc nâng cao
+            const advCatInput = document.getElementById('adv-category');
+            if (advCatInput) advCatInput.value = catId;
+
+            // Cập nhật trạng thái active cho tất cả cat-link
+            document.querySelectorAll('.cat-link').forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+
+            // Submit form tìm kiếm nhanh để lọc sản phẩm theo danh mục
+            const topForm = document.getElementById('top-search-form');
+            if (topForm) topForm.submit();
+        });
+    });
+
+    /* =========================================================
+       SUBMIT FORM LỌC NÂNG CAO (#advanced-filter-form)
+       Trước khi gửi:
+         1. Copy giá trị search từ #main-search-input → #adv-search
+         2. Copy giá trị category từ #top-category → #adv-category
+       Đảm bảo server luôn nhận đủ search + category + các lọc khác.
+       ========================================================= */
+    const advForm = document.getElementById('advanced-filter-form');
+    if (advForm) {
+        advForm.addEventListener('submit', function() {
+            // Copy từ khóa tìm kiếm
+            const mainSearch = document.getElementById('main-search-input');
+            const advSearch  = document.getElementById('adv-search');
+            if (mainSearch && advSearch) advSearch.value = mainSearch.value;
+
+            // Copy danh mục
+            const topCat = document.getElementById('top-category');
+            const advCat = document.getElementById('adv-category');
+            if (topCat && advCat) advCat.value = topCat.value;
+        });
+    }
+
+}); // end DOMContentLoaded
+
 /**
  * ================================================================================
  * PHẦN 1: JAVASCRIPT CHO BỘ LỌC & INFINITE SCROLL
@@ -1350,51 +1585,30 @@ document.addEventListener('DOMContentLoaded', function() {
     const productsScroll = document.getElementById('products-scroll');
 
     // =================================================================
-    // TOGGLE BỘ LỌC
+    // TOGGLE BỘ LỌC (dùng #btn-filter-toggle + #filter-panel mới)
+    // Logic cũ dùng filter-toggle-btn + filter-collapsible đã được
+    // chuyển lên DOMContentLoaded block ở đầu script.
+    // Giữ lại logic mở sẵn khi có filter active:
     // =================================================================
-    const filterToggleBtn = document.getElementById('filter-toggle-btn');
-    const filterCollapsible = document.getElementById('filter-collapsible');
-    if (filterToggleBtn && filterCollapsible) {
-        // Mở sẵn nếu đang có filter active
+    const filterPanelEl = document.getElementById('filter-panel');
+    const btnToggleEl   = document.getElementById('btn-filter-toggle');
+    if (filterPanelEl && btnToggleEl) {
+        // Mở sẵn panel lọc nếu đang có filter active
         const hasActiveFilter = currentFilters.price_min || currentFilters.price_max ||
             currentFilters.brand || currentFilters.in_stock || currentFilters.is_rentable;
         if (hasActiveFilter) {
-            filterCollapsible.classList.add('open');
-            filterToggleBtn.classList.add('open');
+            filterPanelEl.classList.add('open');
+            btnToggleEl.classList.add('open');
         }
-        filterToggleBtn.addEventListener('click', function() {
-            this.classList.toggle('open');
-            filterCollapsible.classList.toggle('open');
-        });
     }
 
     // =================================================================
-    // DANH MỤC AJAX - không reload trang
+    // DANH MỤC - Đã xử lý trong DOMContentLoaded block đầu.
+    // Giữ lại block này chỉ để tương thích với JS category-link cũ
+    // (nếu có AJAX loadProducts), nhưng không dùng nữa vì .cat-link
+    // bây giờ dùng form submit trực tiếp.
     // =================================================================
-    document.querySelectorAll('.category-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const catId = this.dataset.category;
-
-            // Cập nhật active class
-            document.querySelectorAll('.category-link').forEach(l => {
-                l.classList.remove('text-primary', 'fw-bold');
-                l.classList.add('text-white-50');
-            });
-            this.classList.remove('text-white-50');
-            this.classList.add('text-primary', 'fw-bold');
-
-            // Cập nhật filter category
-            currentFilters.category = catId;
-            currentPage = 1;
-
-            // Sync hidden input
-            const catInput = document.getElementById('filter-category');
-            if (catInput) catInput.value = catId;
-
-            loadProducts(buildFilterUrl(1), false);
-        });
-    });
+    // (Không dùng querySelectorAll('.category-link') nữa)
     
     // =================================================================
     // SỰ KIỆN: Scroll trong khung sản phẩm -> Hiệu ứng fade

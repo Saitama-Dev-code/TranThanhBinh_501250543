@@ -532,37 +532,32 @@ include __DIR__ . '/partials/header.php';
 }
 
 /* ================================================================================
-   PHẦN 3A: PANEL MÀU SẮC & LOẠI - HIỆN KHI HOVER (NẰM Ở GIỮA CARD)
+   PHẦN 3A: PANEL CHỌN MÀU SẮC - HIỆN LUÔN TRÊN CARD
    ================================================================================ */
 
-/* Panel chứa các lựa chọn màu/loại - Mặc định ẩn, chỉ hiện khi hover
-   Vị trí: Ở giữa card - trên là hình+tên, dưới là giá+nút mua */
-.variant-panel {
-    position: absolute;
-    top: 80px; /* Bắt đầu từ giữa, dưới brand và name */
-    left: 0;
-    right: 0;
-    bottom: 140px; /* Chừa không gian cho giá tiền và nút mua hàng */
-    background: linear-gradient(to bottom, rgba(15, 23, 42, 0.93), rgba(15, 23, 42, 0.90));
-    backdrop-filter: blur(12px);
-    padding: 14px 16px;
-    transform: translateY(-10px);
-    opacity: 0;
-    transition: all 0.35s ease;
-    z-index: 20;
-    border-top: 1px solid rgba(59, 130, 246, 0.2);
-    border-bottom: 1px solid rgba(59, 130, 246, 0.2);
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 12px;
+/* Card không bị overflow:hidden để chiều cao tự nhiên */
+.product-card {
+    overflow: visible !important;
 }
 
-/* Khi hover -> Panel xuất hiện */
-.product-wrapper:hover .variant-panel {
-    transform: translateY(0);
-    opacity: 1;
+/* Bỏ overflow hidden ở image container vẫn cần giữ */
+.product-image-container {
+    overflow: hidden !important;
+    border-radius: 16px 16px 0 0;
+}
+
+/* Panel màu sắc - hiện luôn, in-flow */
+.variant-panel {
+    margin: 0 -16px;
+    padding: 10px 16px;
+    background: linear-gradient(135deg,
+        rgba(59, 130, 246, 0.07),
+        rgba(139, 92, 246, 0.04));
+    border-top: 1px solid rgba(59, 130, 246, 0.18);
+    border-bottom: 1px solid rgba(59, 130, 246, 0.18);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 /* Tiêu đề nhóm tùy chọn */
@@ -1045,11 +1040,13 @@ include __DIR__ . '/partials/header.php';
                                     <div class="product-wrapper">
                                         <!-- Card chính -->
                                         <div class="product-card">
-                                            <!-- Hình ảnh sản phẩm -->
+                                            <!-- Hình ảnh sản phẩm - Click để vào trang chi tiết -->
+                                            <a href="index.php?controller=product&action=detail&id=<?= (int)$p['id'] ?>"
+                                               style="display:block; text-decoration:none;">
                                             <div class="product-image-container">
                                                 <img src="<?= $p['image'] ?>" 
                                                      class="product-image" 
-                                                     alt="<?= $p['name'] ?>"
+                                                     alt="<?= htmlspecialchars($p['name']) ?>"
                                                      data-default-image="<?= $p['image'] ?>">
                                                 
                                                 <!-- Badges -->
@@ -1064,18 +1061,26 @@ include __DIR__ . '/partials/header.php';
                                                     </span>
                                                 </div>
                                             </div>
+                                            </a><!-- /link ảnh chi tiết -->
 
-                                            <!-- Panel màu sắc & loại - Hiện khi hover, đè lên product-info -->
-                                            <div class="variant-panel">
-                                                <!-- Tùy chọn màu sắc -->
+                                            <!-- Thông tin sản phẩm -->
+                                            <div class="product-info">
+                                                <span class="product-brand"><?= htmlspecialchars($p['brand']) ?></span>
+                                                <!-- Tên SP dạng link – click vào tên cũng vào trang chi tiết -->
+                                                <a href="index.php?controller=product&action=detail&id=<?= (int)$p['id'] ?>"
+                                                   style="text-decoration:none; color:inherit;">
+                                                    <h6 class="product-name"><?= htmlspecialchars($p['name']) ?></h6>
+                                                </a>
+
+                                                <!-- Panel chọn màu - hiện luôn, chỉ màu sắc -->
                                                 <?php if(!empty($colors)): ?>
-                                                <div class="mb-3">
+                                                <div class="variant-panel">
                                                     <div class="variant-label">
                                                         <i class="fas fa-palette"></i> Màu sắc
                                                     </div>
                                                     <div class="variant-options">
                                                         <?php foreach($colors as $c): ?>
-                                                            <button class="variant-btn color-btn" 
+                                                            <button class="variant-btn color-btn"
                                                                     data-color="<?= $c['name'] ?>"
                                                                     data-image="<?= $c['image_url'] ?? $p['image'] ?>">
                                                                 <span class="color-dot" style="background: <?= $c['value'] ?>"></span>
@@ -1085,29 +1090,6 @@ include __DIR__ . '/partials/header.php';
                                                     </div>
                                                 </div>
                                                 <?php endif; ?>
-
-                                                <!-- Tùy chọn loại -->
-                                                <?php if(!empty($versions)): ?>
-                                                <div>
-                                                    <div class="variant-label">
-                                                        <i class="fas fa-layer-group"></i> Phiên bản
-                                                    </div>
-                                                    <div class="variant-options">
-                                                        <?php foreach($versions as $v): ?>
-                                                            <button class="variant-btn type-btn" data-type="<?= $v['name'] ?>">
-                                                                <?= $v['name'] ?>
-                                                            </button>
-                                                        <?php endforeach; ?>
-                                                    </div>
-                                                </div>
-                                                <?php endif; ?>
-                                            </div>
-
-                                            <!-- Thông tin sản phẩm -->
-                                            <div class="product-info">
-                                                <span class="product-brand"><?= $p['brand'] ?></span>
-                                                <h6 class="product-name"><?= $p['name'] ?></h6>
-                                                <p class="product-desc"><?= substr($p['description'] ?? '', 0, 80) ?>...</p>
 
                                                 <div class="product-pricing">
                                                     <div class="product-price">

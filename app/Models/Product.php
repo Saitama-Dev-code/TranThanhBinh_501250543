@@ -184,13 +184,47 @@ class Product extends BaseModel {
     }
 
     /**
-     * HÀM: Lấy sản phẩm theo ID (Dùng để xem chi tiết hoặc so sánh)
+     * HÀM: Lấy sản phẩm theo ID (không JOIN - dùng cho các mục đích nhanh)
      */
     public function getById($id) {
         $sql = "SELECT * FROM {$this->table} WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
+        return $stmt->fetch();
+    }
+
+    /**
+     * HÀM: Lấy sản phẩm theo ID + JOIN tên danh mục (dùng cho trang Chi Tiết)
+     *
+     * CÁCH HOẠT ĐỘNG:
+     *   - JOIN bảng categories để lấy tên danh mục (category_name)
+     *     thay vì chỉ lấy category_id (số)
+     *   - LEFT JOIN đảm bảo SP không có danh mục vẫn được trả về (category_name = NULL)
+     *
+     * KẾT QUẢ TRẢ VỀ (mảng 1 dòng hoặc false nếu không tìm thấy):
+     *   id, name, price, image, description, stock, brand,
+     *   is_rentable, rent_price_day, deposit_price,
+     *   category_id, category_name  ← thêm từ JOIN
+     *
+     * @param int $id ID sản phẩm cần lấy
+     * @return array|false Mảng dữ liệu sản phẩm hoặc false nếu không tìm thấy
+     */
+    public function getByIdWithCategory($id) {
+        $sql = "SELECT
+                    p.*,
+                    c.name AS category_name
+                FROM {$this->table} p
+                LEFT JOIN categories c ON p.category_id = c.id
+                WHERE p.id = :id
+                LIMIT 1";
+
+        $stmt = $this->db->prepare($sql);
+        // PDO::PARAM_INT: ép kiểu an toàn, tránh SQL Injection
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        // fetch() trả về mảng kết quả (1 dòng) hoặc false nếu không có
         return $stmt->fetch();
     }
 

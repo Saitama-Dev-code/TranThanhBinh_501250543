@@ -142,26 +142,81 @@ class ProductController extends BaseController {
     }
 
     /**
-     * ACTION: detail (Hiển thị chi tiết một sản phẩm)
-     * - TIẾP NHẬN: ID sản phẩm từ URL ($_GET['id'])
-     * - TRẢ VỀ: Giao diện chi tiết sản phẩm
+     * ACTION: detail (Hiển thị trang chi tiết một sản phẩm)
+     *
+     * LUỒNG XỬ LÝ:
+     *   URL: index.php?controller=product&action=detail&id=5
+     *   1. Lấy ID từ URL → kiểm tra hợp lệ
+     *   2. Truy vấn DB lấy thông tin sản phẩm kèm tên danh mục
+     *   3. Lấy biến thể (màu sắc & phiên bản) từ bảng product_variants
+     *   4. Đóng gói data → render view product_detail.php
      */
     public function detail() {
-        $productModel = new Product();
+        // =================================================================
+        // BƯỚC 1: LẤY VÀ KIỂM TRA ID SẢN PHẨM TỪ URL
+        // =================================================================
+        // (int) ép kiểu về số nguyên → tránh SQL Injection ngay từ đầu
         $productId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-        $product = $productModel->getById($productId);
-
-        if (!$product) {
-            die("Sản phẩm không tồn tại!");
+        // ID không hợp lệ (0 hoặc âm) → không cần truy vấn DB
+        if ($productId <= 0) {
+            header('Location: index.php?controller=product&action=index');
+            exit;
         }
 
+        // =================================================================
+        // BƯỚC 2: KHỞI TẠO MODEL VÀ LẤY THÔNG TIN SẢN PHẨM
+        // =================================================================
+        $productModel  = new Product();
+        $categoryModel = new Category();
+
+        // Lấy thông tin sản phẩm kèm tên danh mục (JOIN trong Model)
+        $product = $productModel->getByIdWithCategory($productId);
+
+        // Nếu không tìm thấy sản phẩm → trả về trang lỗi thân thiện
+        if (!$product) {
+            // Đặt HTTP status 404 để SEO hiểu đây là trang không tồn tại
+            http_response_code(404);
+            die("<div style='text-align:center;padding:100px;font-family:sans-serif;'>
+                    <h2>😕 Sản phẩm không tồn tại</h2>
+                    <p>Sản phẩm có thể đã bị xóa hoặc ID không hợp lệ.</p>
+                    <a href='index.php?controller=product&action=index'
+                       style='color:#8b5cf6;'>← Quay về cửa hàng</a>
+                 </div>");
+        }
+
+        // =================================================================
+        // BƯỚC 3: LẤY BIẾN THỂ (MÀU SẮC & PHIÊN BẢN) TỪ DB
+        // =================================================================
+        // getVariantsByProductId trả về mảng ['colors' => [...], 'versions' => [...]]
+        $variants = $productModel->getVariantsByProductId($productId);
+
+        // Tách riêng để View dùng dễ hơn: $colors, $versions
+        $colors   = $variants['colors'];
+        $versions = $variants['versions'];
+
+        // =================================================================
+        // BƯỚC 4: ĐÓNG GÓI DATA VÀ RENDER VIEW
+        // =================================================================
         $data = [
-            'pageTitle' => $product['name'] . ' - TTB Music',
-            'product' => $product
+            // Tiêu đề tab trình duyệt: "Tên SP - TTB Music"
+            'pageTitle' => htmlspecialchars($product['name']) . ' - TTB Music',
+
+            // Toàn bộ thông tin sản phẩm (kèm category_name từ JOIN)
+            'product'   => $product,
+
+            // Mảng biến thể màu sắc (dùng trong gallery thumbnail + chọn màu)
+            'colors'    => $colors,
+
+            // Mảng phiên bản (Standard, Premium...)
+            'versions'  => $versions,
         ];
 
+        // Gọi BaseController::render() → load file app/Views/product_detail.php
+        // $data sẽ được extract() thành các biến trong View:
+        //   $pageTitle, $product, $colors, $versions
         $this->render('product_detail', $data);
     }
 }
+
 ?>

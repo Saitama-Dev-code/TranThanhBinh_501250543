@@ -1,6 +1,42 @@
 # Nhật ký Cập nhật Dự án (Changelog)
 
-**Ngày cập nhật:** 19/05/2026
+**Ngày cập nhật:** 20/05/2026
+
+## 🚀 Cập Nhật Lần 9 (Trang Chi Tiết Sản Phẩm + Giao Diện Nền Ripple Sóng Âm)
+
+### 1. Tạo Trang Chi Tiết Sản Phẩm (`product_detail.php`)
+- **Nền Canvas Ripple Sóng Âm**: Vòng tròn màu tím/indigo lan rộng từ các điểm ngẫu nhiên trên màn hình (khác biệt hoàn toàn với home và sanpham).
+  - `home.php` → Nốt nhạc rơi từ trên xuống (particle-canvas, màu trắng/xanh)
+  - `sanpham.php` → Nốt nhạc bay từ dưới lên (product-canvas, màu xanh dương)
+  - `product_detail.php` → Ripple sóng âm lan rộng (detail-canvas, màu tím/indigo)
+- **Gallery ảnh**: Ảnh chính lớn + dãy thumbnail theo từng màu sắc biến thể, click chuyển ảnh có hiệu ứng fade.
+- **Chọn biến thể**: Nút chọn màu sắc và phiên bản, highlight tím khi được chọn, cập nhật ảnh theo màu.
+- **Khu vực giá**: Giá bán + giá thuê/ngày + tiền cọc (nếu có).
+- **Điều khiển số lượng**: Nút +/− với giới hạn theo tồn kho thực tế.
+- **Nút hành động**: "Thêm vào giỏ" (AJAX) + "Thuê ngay" (chỉ hiện khi is_rentable=1).
+- **Tính trả góp**: Chọn 3/6/12/24 tháng, tự tính tiền/tháng real-time bằng JS (chỉ hiện với SP ≥ 5 triệu).
+- **Tab mô tả / thông số kỹ thuật**: Chuyển tab mượt mà với fade animation.
+- **Breadcrumb**: Điều hướng Trang chủ → Cửa hàng → Tên sản phẩm.
+- **Comment PHP đầy đủ**: Mỗi khối logic, điều kiện, vòng lặp đều có comment giải thích.
+
+### 2. Cập Nhật `ProductController.php` – Action `detail()`
+- Thêm kiểm tra ID hợp lệ (`> 0`) trước khi truy vấn DB.
+- Gọi `getByIdWithCategory()` thay vì `getById()` để lấy tên danh mục.
+- Lấy biến thể (colors/versions) và truyền vào view riêng biệt.
+- Trả về trang lỗi thân thiện (HTTP 404) khi SP không tồn tại.
+- Comment theo chuẩn 4 BƯỚC rõ ràng.
+
+### 3. Cập Nhật `Product.php` – Thêm Hàm `getByIdWithCategory()`
+- Dùng `LEFT JOIN categories` để lấy kèm `category_name`.
+- Comment giải thích câu SQL JOIN, lý do dùng LEFT JOIN, kiểu dữ liệu trả về.
+
+### 4. Cập Nhật `sanpham.php` – Link Vào Trang Chi Tiết
+- Click vào **ảnh sản phẩm** hoặc **tên sản phẩm** sẽ điều hướng sang trang chi tiết.
+- Áp dụng `htmlspecialchars()` cho tên và brand trong card (bảo mật XSS).
+
+---
+
+
 
 ## 🚀 Cập Nhật Lần 8 (Tối Ưu Giao Diện & Dữ Liệu Thực Tế Toàn Diện)
 

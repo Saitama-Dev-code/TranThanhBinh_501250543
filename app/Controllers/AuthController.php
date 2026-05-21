@@ -2,6 +2,7 @@
 // Đường dẫn file: app/Controllers/AuthController.php
 
 require_once ROOT_PATH . '/core/BaseController.php';
+require_once ROOT_PATH . '/app/Models/User.php';
 
 class AuthController extends BaseController {
     
@@ -37,19 +38,41 @@ class AuthController extends BaseController {
     public function registerSubmit() {
         $this->verifyCSRF(); // Bước 1: Kiểm tra bảo mật form
         
-        // Bước 2: Lấy dữ liệu người dùng nhập (Toán tử ?? '' chống lỗi khi người dùng không nhập)
-        $fullname = $_POST['fullname'] ?? '';
-        $email = $_POST['email'] ?? '';
+        // Bước 2: Lấy dữ liệu người dùng nhập
+        $fullname = trim($_POST['fullname'] ?? '');
+        $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
         
-        // Bước 3: Mã hóa mật khẩu bằng thuật toán Bcrypt (Chống lộ mật khẩu thật nếu DB bị hack)
+        // Kiểm tra validation cơ bản
+        if (empty($fullname) || empty($email) || empty($password)) {
+            die("<h2 style='color:red; text-align:center; margin-top:50px;'>Vui lòng điền đầy đủ thông tin!</h2>");
+        }
+
+        $userModel = new User();
+        
+        // Kiểm tra email đã tồn tại chưa
+        $existingUser = $userModel->getByEmail($email);
+        if ($existingUser) {
+            die("<h2 style='color:red; text-align:center; margin-top:50px;'>Email này đã được sử dụng! Vui lòng đăng nhập hoặc dùng email khác.</h2>");
+        }
+
+        // Bước 3: Mã hóa mật khẩu bằng thuật toán Bcrypt
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
         
-        // TODO: Mở comment phần dưới khi kết nối Database
-        // $userModel = new User();
-        // $userModel->insert(['full_name' => $fullname, 'email' => $email, 'password' => $hashedPassword, 'role' => 0]);
+        // Lưu vào CSDL
+        $success = $userModel->insert([
+            'full_name' => $fullname, 
+            'email' => $email, 
+            'password' => $hashedPassword, 
+            'role' => 0
+        ]);
         
-        echo "<h2 style='color:white; text-align:center; margin-top:50px;'>Đăng ký thành công! Mật khẩu đã được mã hóa Bcrypt: <br> <small>{$hashedPassword}</small></h2>";
+        if ($success) {
+            // Chuyển hướng tới trang đăng nhập
+            echo "<script>alert('Đăng ký thành công! Vui lòng đăng nhập.'); window.location.href='index.php?controller=auth&action=register';</script>";
+        } else {
+            echo "<h2 style='color:red; text-align:center; margin-top:50px;'>Có lỗi xảy ra trong quá trình đăng ký. Vui lòng thử lại!</h2>";
+        }
     }
 
     // =========================================================================
@@ -58,7 +81,7 @@ class AuthController extends BaseController {
     public function forgotSubmit() {
         $this->verifyCSRF();
         
-        $email = $_POST['email'] ?? '';
+        $email = trim($_POST['email'] ?? '');
         
         // Tạo token ngẫu nhiên và thiết lập thời gian sống (30 phút)
         $resetToken = bin2hex(random_bytes(32));
@@ -73,16 +96,47 @@ class AuthController extends BaseController {
     public function loginSubmit() {
         $this->verifyCSRF();
         
-        $email = $_POST['email'] ?? '';
+        $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
 
-        // TODO: Lấy hash từ DB và dùng hàm password_verify để kiểm tra xem mật khẩu có khớp không
-        // $user = $userModel->getByEmail($email);
-        // if ($user && password_verify($password, $user['password'])) {
-        //     $_SESSION['user'] = $user;
-        // } else { echo 'Sai email hoặc mật khẩu'; }
+        if (empty($email) || empty($password)) {
+            die("<h2 style='color:red; text-align:center; margin-top:50px;'>Vui lòng nhập Email và Mật khẩu!</h2>");
+        }
+
+        $userModel = new User();
         
-        echo "<h2 style='color:white; text-align:center; margin-top:50px;'>Đang xử lý kiểm tra tài khoản (Đã xác minh CSRF)...</h2>";
+        // Tìm User theo Email
+        $user = $userModel->getByEmail($email);
+        
+        // Kiểm tra User tồn tại và khớp mật khẩu
+        if ($user && password_verify($password, $user['password'])) {
+            // Lưu session (chỉ lưu các thông tin an toàn, không lưu password)
+            $_SESSION['user'] = [
+                'id' => $user['id'],
+                'full_name' => $user['full_name'],
+                'email' => $user['email'],
+                'role' => $user['role']
+            ];
+            
+            // Chuyển hướng về trang chủ
+            header('Location: index.php');
+            exit;
+        } else { 
+            echo "<script>alert('Sai email hoặc mật khẩu!'); window.history.back();</script>";
+        }
+    }
+
+    // =========================================================================
+    // ĐĂNG XUẤT
+    // =========================================================================
+    public function logout() {
+        // Hủy session đăng nhập
+        if (isset($_SESSION['user'])) {
+            unset($_SESSION['user']);
+        }
+        // Chuyển hướng về trang chủ
+        header('Location: index.php');
+        exit;
     }
 }
 ?>

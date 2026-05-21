@@ -17,8 +17,8 @@ include __DIR__ . '/partials/header.php';
     .video-background iframe { width: 100vw; height: 56.25vw; min-height: 100vh; min-width: 177.77vh; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
     
     /* Overlay làm tối video và làm nổi bật Slogan */
-    .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); z-index: 1; pointer-events: none; }
-    .hero-content { position: relative; z-index: 2; color: white; text-shadow: 2px 2px 15px rgba(0,0,0,0.9); }
+    .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); z-index: 2; pointer-events: none; }
+    .hero-content { position: relative; z-index: 3; color: white; text-shadow: 2px 2px 15px rgba(0,0,0,0.9); }
     
     /* ================= DẢI THƯƠNG HIỆU MARQUEE CHẠY NGANG VÔ HẠN ================= */
     .brand-marquee-container {
@@ -176,7 +176,7 @@ include __DIR__ . '/partials/header.php';
         font-family: 'Outfit', sans-serif;
         font-weight: 900;
         font-size: 8.5rem; 
-        color: rgba(255, 255, 255, 0.25); /* Tăng độ sáng Watermark lên 0.25 cho rõ hơn nữa */
+        color: rgba(255, 255, 255, 0.45); /* Tăng độ sáng Watermark lên 0.45 để nổi bật hơn */
         gap: 0px; 
         margin-bottom: 0px;
         user-select: none;
@@ -329,16 +329,17 @@ include __DIR__ . '/partials/header.php';
 
     #ripple-circle {
         position: absolute;
-        width: 400px;
-        height: 400px;
+        width: 450px; /* To hơn chút cho mượt */
+        height: 450px;
         border-radius: 50%;
         pointer-events: none;
-        z-index: 5;
+        z-index: 1; /* Đưa ra sau overlay và content để không ảnh hưởng Logo */
         /* Sử dụng backdrop-filter để chỉ bẻ cong phần nền dưới hình tròn này */
         backdrop-filter: url(#video-warp-filter);
         -webkit-backdrop-filter: url(#video-warp-filter);
         transform: translate(-50%, -50%);
         display: none; /* Chỉ hiện khi di chuột */
+        transition: backdrop-filter 0.3s ease; /* Thêm transition cho mượt */
     }
 
     @media (max-width: 768px) {

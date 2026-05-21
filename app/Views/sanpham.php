@@ -353,6 +353,14 @@ include __DIR__ . '/partials/header.php';
    ================================================================================ */
 
 /* Card sản phẩm chính */
+.product-item {
+    height: 100%;
+}
+
+.product-wrapper {
+    height: 100%;
+}
+
 .product-card {
     background: var(--bg-color);
     border: 1px solid var(--border-color);
@@ -363,7 +371,7 @@ include __DIR__ . '/partials/header.php';
     flex-direction: column;
     transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s ease;
     position: relative;
-    transform-style: flat; /* Ngăn chặn các hiệu ứng sticky lạ nếu có */
+    transform-style: flat; /* Ngăn chặn các hiệu ứng sticky lạ nếu có */
 }
 
 .product-wrapper:hover .product-card {
@@ -849,9 +857,10 @@ include __DIR__ . '/partials/header.php';
                             $colors = $variants['colors'] ?? [];
                             $versions = $variants['versions'] ?? [];
                     ?>
-                            <div class="col-12 col-md-6 col-lg-4 product-item" data-index="<?= $index ?>">
+                            <div class="product-item" data-index="<?= $index ?>">
                                 <div class="product-wrapper">
                                     <div class="product-card">
+                                        <!-- Link chi tiết bao bọc toàn bộ phần ảnh -->
                                         <a href="index.php?controller=product&action=detail&id=<?= (int)$p['id'] ?>"
                                            style="display:block; text-decoration:none;">
                                             <div class="product-image-container">
@@ -860,6 +869,7 @@ include __DIR__ . '/partials/header.php';
                                                      alt="<?= htmlspecialchars($p['name']) ?>"
                                                      data-default-image="<?= $p['image'] ?>">
                                                 
+                                                <!-- Badge nhãn dán trạng thái -->
                                                 <div class="product-badges">
                                                     <?php if($p['is_rentable']): ?>
                                                         <span class="badge-rent">
@@ -874,12 +884,14 @@ include __DIR__ . '/partials/header.php';
                                         </a>
 
                                         <div class="product-info">
+                                            <!-- Thương hiệu & Tên sản phẩm -->
                                             <span class="product-brand"><?= htmlspecialchars($p['brand']) ?></span>
                                             <a href="index.php?controller=product&action=detail&id=<?= (int)$p['id'] ?>"
                                                style="text-decoration:none; color:inherit;">
                                                 <h6 class="product-name"><?= htmlspecialchars($p['name']) ?></h6>
                                             </a>
 
+                                            <!-- Hiển thị các biến thể màu sắc (nếu có) -->
                                             <?php if(!empty($colors)): ?>
                                             <div class="variant-panel">
                                                 <div class="variant-label">
@@ -898,6 +910,7 @@ include __DIR__ . '/partials/header.php';
                                             </div>
                                             <?php endif; ?>
 
+                                            <!-- Phần giá cả & Nút thêm giỏ hàng -->
                                             <div class="product-pricing">
                                                 <div class="product-price">
                                                     <?= number_format($p['price'], 0, ',', '.') ?> <span class="currency">₫</span>

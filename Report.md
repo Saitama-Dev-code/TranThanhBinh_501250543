@@ -1,5 +1,26 @@
 # Nhật ký Cập nhật Dự án (Changelog)
 
+**Ngày cập nhật:** 21/05/2026
+
+## 🚀 Cập Nhật Lần 13 (Hoàn Thiện Flow Thanh toán, Xác thực & Quản lý Đơn hàng)
+
+### 1. Hệ thống Xác thực (Authentication)
+- Bật kết nối Cơ sở dữ liệu thật cho quá trình Đăng nhập, Đăng ký.
+- Tạo Model `User.php` kết nối bảng `users`.
+- Cập nhật `AuthController.php` để lưu thông tin và băm mật khẩu (Bcrypt) khi đăng ký, cũng như xác thực thông tin khi đăng nhập.
+- Bổ sung tính năng Đăng xuất (`logout`).
+
+### 2. Hệ thống Đặt hàng & Thanh toán (Checkout)
+- Tạo Model `Order.php` và `OrderDetail.php` để lưu trữ dữ liệu mua hàng.
+- Xây dựng `CheckoutController.php`: tự động nhận diện tài khoản hoặc tạo nhanh tài khoản cho khách vãng lai dựa trên số điện thoại.
+- Hoàn thiện giao diện Thanh toán (`checkout.php`) theo phong cách Glassmorphism 2 cột hiện đại, hiển thị tóm tắt giỏ hàng.
+
+### 3. Hệ thống Quản lý Tài khoản (Profile)
+- Tạo `ProfileController.php` yêu cầu đăng nhập.
+- Giao diện `profile.php` dạng Dashboard cá nhân hiện thông tin User và liệt kê chi tiết Lịch sử đơn hàng (Mã đơn, tổng tiền, trạng thái).
+
+---
+
 **Ngày cập nhật:** 20/05/2026
 
 ## 🚀 Cập Nhật Lần 10 (Hoàn Thiện Tuyệt Đối & Trải Nghiệm Người Dùng)

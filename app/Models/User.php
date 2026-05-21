@@ -30,5 +30,16 @@ class User extends BaseModel {
         // Trả về dòng dữ liệu tìm được (fetch)
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Cập nhật mật khẩu cho user (Dùng để nâng cấp hash mật khẩu cũ)
+     */
+    public function updatePassword($userId, $newPasswordHash) {
+        $sql = "UPDATE {$this->table} SET password = :password WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':password', $newPasswordHash, PDO::PARAM_STR);
+        $stmt->bindParam(':id', $userId, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
 }
 ?>

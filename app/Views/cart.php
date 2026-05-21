@@ -347,32 +347,30 @@ include __DIR__ . '/partials/header.php';
 
     <?php
     /*
-     * PHÂN NHÁNH HIỂN THỊ:
-     * - Nếu giỏ hàng TRỐNG ($cartItems rỗng) → hiển thị trạng thái empty
-     * - Nếu CÓ sản phẩm → hiển thị layout 2 cột
+     * PHÂN NHÁNH HIỂN THỊ CƠ BẢN:
+     * Cả hai trạng thái luôn được in ra DOM. Trạng thái không phù hợp sẽ bị ẩn (display: none).
+     * Bằng cách này, JS có thể chuyển đổi mượt mà mà không cần reload.
      */
-    if (empty($cartItems)):
+    $isEmpty = empty($cartItems);
     ?>
 
-        <!-- TRẠNG THÁI GIỎ TRỐNG -->
-        <div class="cart-card">
-            <div class="cart-empty">
-                <div class="cart-empty-icon">
-                    <i class="fas fa-shopping-cart"></i>
-                </div>
-                <h3>Giỏ hàng trống!</h3>
-                <p>Bạn chưa thêm sản phẩm nào vào giỏ hàng.<br>Hãy khám phá cửa hàng để tìm nhạc cụ ưa thích!</p>
-                <a href="index.php?controller=product&action=index"
-                   class="btn btn-primary rounded-pill px-4 py-2">
-                    <i class="fas fa-music me-2"></i>Khám phá cửa hàng
-                </a>
+    <!-- TRẠNG THÁI GIỎ TRỐNG -->
+    <div class="cart-card" id="empty-cart-layout" style="<?= $isEmpty ? '' : 'display: none;' ?>">
+        <div class="cart-empty">
+            <div class="cart-empty-icon">
+                <i class="fas fa-shopping-cart"></i>
             </div>
+            <h3>Giỏ hàng trống!</h3>
+            <p>Bạn chưa thêm sản phẩm nào vào giỏ hàng.<br>Hãy khám phá cửa hàng để tìm nhạc cụ ưa thích!</p>
+            <a href="index.php?controller=product&action=index"
+               class="btn btn-primary rounded-pill px-4 py-2">
+                <i class="fas fa-music me-2"></i>Khám phá cửa hàng
+            </a>
         </div>
+    </div>
 
-    <?php else: ?>
-
-        <!-- LAYOUT 2 CỘT: [Danh sách SP] [Tóm tắt] -->
-        <div class="cart-layout">
+    <!-- LAYOUT 2 CỘT: [Danh sách SP] [Tóm tắt] -->
+    <div class="cart-layout" id="full-cart-layout" style="<?= $isEmpty ? 'display: none;' : '' ?>">
 
             <!-- CỘT TRÁI: DANH SÁCH SẢN PHẨM -->
             <div class="cart-items-col">
@@ -568,11 +566,8 @@ include __DIR__ . '/partials/header.php';
             </div><!-- /.cart-summary-col -->
 
         </div><!-- /.cart-layout -->
-
-    <?php endif; ?>
-
+    </div><!-- /.cart-layout wrapper -->
 </div><!-- /.container -->
-
 <!-- Toast thông báo -->
 <div class="cart-toast" id="cart-toast">
     <i class="fas fa-check-circle"></i>
@@ -676,9 +671,9 @@ function updateQty(cartKey, delta) {
             row.classList.add('removing');
             setTimeout(() => {
                 row.remove();
-                // Kiểm tra nếu giỏ trống → reload trang để hiện empty state
+                // Kiểm tra nếu giỏ trống → hiện empty state mượt mà
                 if (Object.keys(document.querySelectorAll('.cart-item')).length === 0) {
-                    location.reload();
+                    showEmptyCart();
                 }
             }, 350);
             showToast('Đã xóa sản phẩm khỏi giỏ.');
@@ -724,10 +719,10 @@ function removeItem(cartKey) {
                 updateNavBadge(data.cart_count);
             }
 
-            // Nếu giỏ trống sau khi xóa → reload để hiện empty state
+            // Nếu giỏ trống sau khi xóa → hiện empty state
             const remaining = document.querySelectorAll('.cart-item');
             if (remaining.length === 0) {
-                setTimeout(() => location.reload(), 300);
+                setTimeout(() => showEmptyCart(), 300);
             }
         }, 350);
 
@@ -737,6 +732,27 @@ function removeItem(cartKey) {
         row.classList.remove('removing');
         showToast('Mất kết nối, thử lại sau!', true);
     });
+}
+
+/* --------------------------------------------------------
+   HÀM: showEmptyCart()
+   Hiện giao diện giỏ trống mượt mà
+   -------------------------------------------------------- */
+function showEmptyCart() {
+    const fullLayout = document.getElementById('full-cart-layout');
+    const emptyLayout = document.getElementById('empty-cart-layout');
+    if (fullLayout) {
+        fullLayout.style.opacity = '0';
+        setTimeout(() => {
+            fullLayout.style.display = 'none';
+            emptyLayout.style.display = 'block';
+            emptyLayout.style.opacity = '0';
+            // Trigger reflow
+            void emptyLayout.offsetWidth;
+            emptyLayout.style.transition = 'opacity 0.5s ease';
+            emptyLayout.style.opacity = '1';
+        }, 300);
+    }
 }
 
 /* --------------------------------------------------------

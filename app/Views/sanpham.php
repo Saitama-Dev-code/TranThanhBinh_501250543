@@ -925,7 +925,7 @@ include __DIR__ . '/partials/header.php';
 
                                             <button class="btn-add-cart"
                                                     data-product-id="<?= (int)$p['id'] ?>"
-                                                    onclick="addToCart(this)">
+                                                    onclick="addToCartAJAX(event, <?= (int)$p['id'] ?>)">
                                                 <i class='bx bx-cart-add'></i> Thêm vào giỏ
                                             </button>
                                         </div>
@@ -1307,11 +1307,6 @@ class ProductCanvasAnimation {
         });
         requestAnimationFrame(() => this.animate());
     }
-}
-
-function addToCart(btn) {
-    const id = btn.dataset.productId;
-    alert("Đã thêm sản phẩm ID " + id + " vào giỏ hàng!");
 }
 </script>
 

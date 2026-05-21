@@ -604,7 +604,7 @@ include __DIR__ . '/partials/header.php';
                     <h5 class="fw-bold">Acoustic Yamaha F310</h5>
                     <p class="small text-muted mb-2">Gỗ vân sam, âm mộc chuẩn</p>
                     <p class="text-primary fw-bold fs-4 mb-3">3.500.000 ₫</p>
-                    <button class="btn btn-outline-primary rounded-pill w-100"><i class='bx bx-cart-add fs-5 align-middle me-2'></i>Thêm giỏ hàng</button>
+                    <button class="btn btn-outline-primary rounded-pill w-100" onclick="addToCartAJAX(event, 1)"><i class='bx bx-cart-add fs-5 align-middle me-2'></i>Thêm giỏ hàng</button>
                 </div>
             </div>
         </div>
@@ -619,7 +619,7 @@ include __DIR__ . '/partials/header.php';
                     <h5 class="fw-bold">Roland Midi Keyboard</h5>
                     <p class="small text-muted mb-2">Phím gõ chân thực, siêu nhạy</p>
                     <p class="text-primary fw-bold fs-4 mb-3">16.900.000 ₫</p>
-                    <button class="btn btn-outline-primary rounded-pill w-100"><i class='bx bx-cart-add fs-5 align-middle me-2'></i>Thêm giỏ hàng</button>
+                    <button class="btn btn-outline-primary rounded-pill w-100" onclick="addToCartAJAX(event, 2)"><i class='bx bx-cart-add fs-5 align-middle me-2'></i>Thêm giỏ hàng</button>
                 </div>
             </div>
         </div>
@@ -634,7 +634,7 @@ include __DIR__ . '/partials/header.php';
                     <h5 class="fw-bold">Trống Pearl Roadshow</h5>
                     <p class="small text-muted mb-2">Bộ 5 trống tiêu chuẩn</p>
                     <p class="text-primary fw-bold fs-4 mb-3">12.500.000 ₫</p>
-                    <button class="btn btn-outline-primary rounded-pill w-100"><i class='bx bx-cart-add fs-5 align-middle me-2'></i>Thêm giỏ hàng</button>
+                    <button class="btn btn-outline-primary rounded-pill w-100" onclick="addToCartAJAX(event, 3)"><i class='bx bx-cart-add fs-5 align-middle me-2'></i>Thêm giỏ hàng</button>
                 </div>
             </div>
         </div>

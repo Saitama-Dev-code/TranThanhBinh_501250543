@@ -162,12 +162,27 @@
                                 <button type="button" class="btn-close position-absolute top-0 end-0 mt-1" data-bs-dismiss="modal"></button>
                             </div>
                             <div class="modal-body px-0">
+                                
+                                <?php if(isset($_SESSION['login_error'])): ?>
+                                    <div class="alert alert-danger mx-3" style="border-radius: 0.5rem; font-size: 0.9rem;">
+                                        <i class="fas fa-exclamation-triangle me-2"></i><?= $_SESSION['login_error'] ?>
+                                    </div>
+                                    <?php unset($_SESSION['login_error']); ?>
+                                    <!-- Mở sẵn modal nếu có lỗi -->
+                                    <script>
+                                        document.addEventListener("DOMContentLoaded", function() {
+                                            var myModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                                            myModal.show();
+                                        });
+                                    </script>
+                                <?php endif; ?>
+
                                 <form action="index.php?controller=auth&action=loginSubmit" method="POST">
                                     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                                     <div class="custom-floating mb-4">
-                                        <input type="email" class="form-control modern-input" id="logEmail" name="email" placeholder=" " required>
+                                        <input type="email" class="form-control modern-input" id="logEmail" name="email" placeholder=" " value="<?= htmlspecialchars($_SESSION['auth_email_login'] ?? '') ?>" required>
                                         <label for="logEmail">Email của bạn</label>
-                                    </div>
+                                    </div>    
                                     <div class="custom-floating mb-4">
                                         <input type="password" class="form-control modern-input" id="logPass" name="password" placeholder=" " required>
                                         <label for="logPass">Mật khẩu</label>
@@ -237,19 +252,6 @@
             });
         }
 
-        // Smart Navbar
-        let prevS = window.pageYOffset;
-        const nav = document.getElementById("smartNavbar");
-        window.addEventListener('scroll', () => {
-            let currS = window.pageYOffset;
-            if(nav) {
-                if (currS <= 50) { nav.style.top = "0"; nav.style.boxShadow = "none"; }
-                else {
-                    nav.style.boxShadow = "0 4px 15px rgba(0,0,0,0.1)";
-                    nav.style.top = (prevS > currS) ? "0" : "-100px";
-                }
-            }
-            prevS = currS;
         });
 
         // Hiệu ứng hạt né chuột
@@ -287,6 +289,111 @@
             }
             repel();
         }
+    </script>
+    <script>
+    /**
+     * HIỆU ỨNG THÊM VÀO GIỎ HÀNG (BAY & AJAX)
+     * Dùng chung cho tất cả các trang
+     */
+    function addToCartAJAX(event, productId, qty = 1, color = '', version = '', imgUrl = '') {
+        event.preventDefault();
+        const btn = event.currentTarget || event.target;
+        
+        // 1. Gửi AJAX request thêm vào giỏ hàng
+        fetch('index.php?controller=cart&action=add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                product_id: productId,
+                quantity: qty,
+                color: color,
+                version: version,
+                csrf_token: '<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>'
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // 2. Cập nhật Badge số lượng giỏ hàng trên Header
+                const badges = document.querySelectorAll('.cart-badge');
+                badges.forEach(b => {
+                    b.textContent = data.cart_count;
+                    b.style.display = data.cart_count > 0 ? 'inline-block' : 'none';
+                    // Hiệu ứng giật nhún (bump)
+                    b.style.transform = 'translate(-50%, -50%) scale(1.5)';
+                    setTimeout(() => b.style.transform = 'translate(-50%, -50%) scale(1)', 300);
+                });
+
+                // 3. Thực hiện hiệu ứng Bay (Flying Animation)
+                if (imgUrl) {
+                    flyToCart(btn, imgUrl);
+                } else {
+                    // Cố gắng tìm ảnh gần nhất nếu không truyền
+                    const container = btn.closest('.product-card-clean') || btn.closest('.product-card-layout2') || btn.closest('.product-gallery');
+                    let src = '';
+                    if (container) {
+                        const img = container.querySelector('img');
+                        if (img) src = img.src;
+                    }
+                    if (src) flyToCart(btn, src);
+                }
+            } else {
+                alert(data.message || 'Lỗi thêm vào giỏ hàng.');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Mất kết nối tới máy chủ.');
+        });
+    }
+
+    function flyToCart(startElement, imgUrl) {
+        // Tìm biểu tượng giỏ hàng đích trên Navbar
+        const cartIcon = document.querySelector('.nav-link .fa-shopping-cart');
+        if (!cartIcon || !startElement) return;
+
+        const startRect = startElement.getBoundingClientRect();
+        const endRect = cartIcon.getBoundingClientRect();
+
+        // Tạo element ảnh bay
+        const flyingImg = document.createElement('img');
+        flyingImg.src = imgUrl;
+        flyingImg.style.position = 'fixed';
+        flyingImg.style.zIndex = '99999';
+        flyingImg.style.width = '60px';
+        flyingImg.style.height = '60px';
+        flyingImg.style.objectFit = 'cover';
+        flyingImg.style.borderRadius = '50%';
+        flyingImg.style.boxShadow = '0 10px 25px rgba(0,0,0,0.3)';
+        flyingImg.style.left = `${startRect.left + startRect.width / 2 - 30}px`;
+        flyingImg.style.top = `${startRect.top + startRect.height / 2 - 30}px`;
+        
+        // CSS transition cho hành trình bay
+        // Dùng cubic-bezier để tạo độ cong nhẹ
+        flyingImg.style.transition = 'all 0.8s cubic-bezier(0.25, 1, 0.5, 1)';
+
+        document.body.appendChild(flyingImg);
+
+        // Kích hoạt bay (cần requestAnimationFrame để transition chạy)
+        requestAnimationFrame(() => {
+            flyingImg.style.left = `${endRect.left + endRect.width / 2 - 15}px`;
+            flyingImg.style.top = `${endRect.top + endRect.height / 2 - 15}px`;
+            flyingImg.style.transform = 'scale(0.1)';
+            flyingImg.style.opacity = '0.3';
+        });
+
+        // Xóa ảnh bay sau khi chạm đích và tạo hiệu ứng nhún cho biểu tượng giỏ
+        setTimeout(() => {
+            flyingImg.remove();
+            cartIcon.style.transition = 'transform 0.2s';
+            cartIcon.style.transform = 'scale(1.4)';
+            cartIcon.style.color = '#3b82f6';
+            setTimeout(() => {
+                cartIcon.style.transform = 'scale(1)';
+                cartIcon.style.color = '';
+            }, 200);
+        }, 800);
+    }
     </script>
 </body>
 </html>

@@ -100,8 +100,16 @@
                     </div>
                     <form action="index.php?controller=auth&action=registerSubmit" method="POST">
                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
-                        <div class="custom-floating mb-3"><input type="text" class="form-control modern-input" id="fullname" name="fullname" placeholder=" " required><label for="fullname"><i class="fas fa-id-card me-2"></i>Họ và tên</label></div>
-                        <div class="custom-floating mb-3"><input type="email" class="form-control modern-input" id="email" name="email" placeholder=" " required><label for="email"><i class="fas fa-envelope me-2"></i>Email của bạn</label></div>
+                        
+                        <?php if(isset($_SESSION['auth_error'])): ?>
+                            <div class="alert alert-danger" style="border-radius: 0.75rem;">
+                                <i class="fas fa-exclamation-triangle me-2"></i><?= $_SESSION['auth_error'] ?>
+                            </div>
+                            <?php unset($_SESSION['auth_error']); ?>
+                        <?php endif; ?>
+
+                        <div class="custom-floating mb-3"><input type="text" class="form-control modern-input" id="fullname" name="fullname" placeholder=" " value="<?= htmlspecialchars($_SESSION['auth_fullname'] ?? '') ?>" required><label for="fullname"><i class="fas fa-id-card me-2"></i>Họ và tên</label></div>
+                        <div class="custom-floating mb-3"><input type="email" class="form-control modern-input" id="email" name="email" placeholder=" " value="<?= htmlspecialchars($_SESSION['auth_email'] ?? '') ?>" required><label for="email"><i class="fas fa-envelope me-2"></i>Email của bạn</label></div>
                         <div class="custom-floating mb-3"><input type="password" class="form-control modern-input" id="password" name="password" placeholder=" " required><label for="password"><i class="fas fa-lock me-2"></i>Mật khẩu</label></div>
                         <div class="custom-floating mb-4"><input type="password" class="form-control modern-input" id="confirm_pw" name="confirm_password" placeholder=" " required><label for="confirm_pw"><i class="fas fa-check-circle me-2"></i>Xác nhận mật khẩu</label></div>
                         <button type="submit" class="btn btn-glow btn-lg w-100 fw-bold rounded-pill text-white py-3">ĐĂNG KÝ NGAY</button>

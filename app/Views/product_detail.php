@@ -1457,8 +1457,19 @@ function addToCart(productId) {
     .then(data => {
         if (data.success) {
             // Thành công: Cập nhật badge giỏ hàng trên navbar
-            const cartBadge = document.getElementById('cart-count');
-            if (cartBadge) cartBadge.textContent = data.cart_count;
+            const badges = document.querySelectorAll('.cart-badge');
+            badges.forEach(b => {
+                b.textContent = data.cart_count;
+                b.style.display = data.cart_count > 0 ? 'inline-block' : 'none';
+                b.style.transform = 'translate(-50%, -50%) scale(1.5)';
+                setTimeout(() => b.style.transform = 'translate(-50%, -50%) scale(1)', 300);
+            });
+
+            // Hiệu ứng bay
+            if (typeof flyToCart === 'function') {
+                const imgUrl = document.getElementById('main-product-image').src;
+                flyToCart(btn, imgUrl);
+            }
 
             // Hiệu ứng thành công trên nút
             if (btn) {

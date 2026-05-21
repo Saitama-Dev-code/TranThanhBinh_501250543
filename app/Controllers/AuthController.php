@@ -43,9 +43,15 @@ class AuthController extends BaseController {
         $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
         
+        // Lưu tạm thông tin để điền lại vào form nếu có lỗi
+        $_SESSION['auth_fullname'] = $fullname;
+        $_SESSION['auth_email'] = $email;
+        
         // Kiểm tra validation cơ bản
         if (empty($fullname) || empty($email) || empty($password)) {
-            die("<h2 style='color:red; text-align:center; margin-top:50px;'>Vui lòng điền đầy đủ thông tin!</h2>");
+            $_SESSION['auth_error'] = "Vui lòng điền đầy đủ thông tin!";
+            header('Location: index.php?controller=auth&action=register');
+            exit;
         }
 
         $userModel = new User();
@@ -53,7 +59,9 @@ class AuthController extends BaseController {
         // Kiểm tra email đã tồn tại chưa
         $existingUser = $userModel->getByEmail($email);
         if ($existingUser) {
-            die("<h2 style='color:red; text-align:center; margin-top:50px;'>Email này đã được sử dụng! Vui lòng đăng nhập hoặc dùng email khác.</h2>");
+            $_SESSION['auth_error'] = "Email này đã được sử dụng! Vui lòng sử dụng email khác.";
+            header('Location: index.php?controller=auth&action=register');
+            exit;
         }
 
         // Bước 3: Mã hóa mật khẩu bằng thuật toán Bcrypt
@@ -68,10 +76,27 @@ class AuthController extends BaseController {
         ]);
         
         if ($success) {
-            // Chuyển hướng tới trang đăng nhập
-            echo "<script>alert('Đăng ký thành công! Vui lòng đăng nhập.'); window.location.href='index.php?controller=auth&action=register';</script>";
+            // Lấy lại user vừa tạo để tự động đăng nhập
+            $newUser = $userModel->getByEmail($email);
+            if ($newUser) {
+                $_SESSION['user'] = [
+                    'id' => $newUser['id'],
+                    'full_name' => $newUser['full_name'],
+                    'email' => $newUser['email'],
+                    'role' => $newUser['role']
+                ];
+            }
+            
+            // Xóa session tạm
+            unset($_SESSION['auth_fullname'], $_SESSION['auth_email'], $_SESSION['auth_error']);
+            
+            // Chuyển hướng thẳng tới trang chủ
+            header('Location: index.php');
+            exit;
         } else {
-            echo "<h2 style='color:red; text-align:center; margin-top:50px;'>Có lỗi xảy ra trong quá trình đăng ký. Vui lòng thử lại!</h2>";
+            $_SESSION['auth_error'] = "Có lỗi xảy ra trong quá trình đăng ký. Vui lòng thử lại!";
+            header('Location: index.php?controller=auth&action=register');
+            exit;
         }
     }
 
@@ -98,9 +123,14 @@ class AuthController extends BaseController {
         
         $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
+        
+        // Lưu lại email để người dùng không phải gõ lại nếu lỗi
+        $_SESSION['auth_email_login'] = $email;
 
         if (empty($email) || empty($password)) {
-            die("<h2 style='color:red; text-align:center; margin-top:50px;'>Vui lòng nhập Email và Mật khẩu!</h2>");
+            $_SESSION['login_error'] = "Vui lòng nhập Email và Mật khẩu!";
+            header('Location: index.php?controller=auth&action=login');
+            exit;
         }
 
         $userModel = new User();
@@ -108,9 +138,22 @@ class AuthController extends BaseController {
         // Tìm User theo Email
         $user = $userModel->getByEmail($email);
         
-        // Kiểm tra User tồn tại và khớp mật khẩu
-        if ($user && password_verify($password, $user['password'])) {
-            // Lưu session (chỉ lưu các thông tin an toàn, không lưu password)
+        // Kiểm tra mật khẩu (hỗ trợ cả hash bcrypt và mật khẩu nhập tay chưa mã hóa ở Database cũ)
+        $isPasswordValid = false;
+        
+        if ($user) {
+            if (password_verify($password, $user['password'])) {
+                $isPasswordValid = true;
+            } elseif ($user['password'] === $password) { // Fallback cho DB cũ
+                $isPasswordValid = true;
+                // Nâng cấp mật khẩu lên Bcrypt
+                $newHash = password_hash($password, PASSWORD_DEFAULT);
+                $userModel->updatePassword($user['id'], $newHash);
+            }
+        }
+        
+        if ($isPasswordValid) {
+            // Lưu session
             $_SESSION['user'] = [
                 'id' => $user['id'],
                 'full_name' => $user['full_name'],
@@ -118,11 +161,15 @@ class AuthController extends BaseController {
                 'role' => $user['role']
             ];
             
+            unset($_SESSION['login_error'], $_SESSION['auth_email_login']);
+            
             // Chuyển hướng về trang chủ
             header('Location: index.php');
             exit;
         } else { 
-            echo "<script>alert('Sai email hoặc mật khẩu!'); window.history.back();</script>";
+            $_SESSION['login_error'] = "Sai email hoặc mật khẩu!";
+            header('Location: index.php?controller=auth&action=login');
+            exit;
         }
     }
 

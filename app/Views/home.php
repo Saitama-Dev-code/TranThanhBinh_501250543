@@ -371,7 +371,7 @@ include __DIR__ . '/partials/header.php';
         opacity: 1;
     }
     
-    /* Nền của banner - Bỏ hiệu ứng kéo theo (Parallax) khi cuộn để hình ảnh ổn định */
+    /* Nền của banner - Hiệu ứng cuộn Parallax phóng to thu nhỏ động */
     .piano-banner-bg {
         position: absolute;
         top: 0;
@@ -381,8 +381,8 @@ include __DIR__ . '/partials/header.php';
         background-size: cover;
         background-position: center;
         z-index: 0;
-        transform: scale(1.05); /* Giữ phóng nhẹ để bao phủ */
-        transition: transform 0.5s ease;
+        transform: scale(calc(1.15 - 0.1 * var(--scroll-progress))) translate3d(0, calc(-20px * (1 - var(--scroll-progress))), 0);
+        transition: transform 0.1s ease-out;
     }
     
     .grand-piano-overlay {
@@ -411,11 +411,14 @@ include __DIR__ . '/partials/header.php';
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
     }
 
-    /* Hiệu ứng trượt ngang từ trái sang và hiện dần theo cuộn chuột */
+    /* Hiệu ứng trượt ngang từ trái sang, xoay nhẹ, và hiện dần theo cuộn chuột */
     .scroll-slide-left {
         opacity: var(--scroll-progress) !important;
-        transform: translateX(calc(-100px * (1 - var(--scroll-progress)))) !important;
-        transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+        transform: translateX(calc(-120px * (1 - var(--scroll-progress)))) rotate(calc(-3deg * (1 - var(--scroll-progress)))) scale(calc(0.92 + 0.08 * var(--scroll-progress))) !important;
+        border-color: rgba(59, 130, 246, calc(0.08 + 0.22 * var(--scroll-progress))) !important;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, calc(0.3 + 0.2 * var(--scroll-progress))), 
+                    0 0 30px rgba(59, 130, 246, calc(0.2 * var(--scroll-progress))) !important;
+        transition: transform 0.1s ease-out, opacity 0.1s ease-out, border-color 0.2s, box-shadow 0.2s;
     }
 
     @media (max-width: 768px) {

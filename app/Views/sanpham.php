@@ -1311,61 +1311,105 @@ class ProductCanvasAnimation {
         this.canvas = document.getElementById('product-canvas');
         if (!this.canvas) return;
         this.ctx = this.canvas.getContext('2d');
-        this.waves = [];
-        this.mouse = { x: null, y: null };
+        this.notes = [];
+        this.mouse = { x: null, y: null, radius: 150 };
+        this.symbols = ['♫', '♪', '♬', '♩', '𝄞', '𝄢'];
         this.resize();
+        this.initNotes();
         this.animate();
+        
         window.addEventListener('resize', () => this.resize());
         window.addEventListener('mousemove', (e) => { 
             this.mouse.x = e.clientX; 
             this.mouse.y = e.clientY;
-            // Tạo sóng mới khi di chuột
-            if (Math.random() > 0.8) {
-                this.createWave(this.mouse.x, this.mouse.y);
-            }
         });
-        // Tự động tạo sóng ngẫu nhiên
-        setInterval(() => {
-            this.createWave(Math.random() * this.canvas.width, Math.random() * this.canvas.height);
-        }, 1000);
+        window.addEventListener('mouseleave', () => { 
+            this.mouse.x = null; 
+            this.mouse.y = null;
+        });
     }
+    
     resize() { 
         this.canvas.width = window.innerWidth; 
         this.canvas.height = window.innerHeight; 
+        this.initNotes();
     }
-    createWave(x, y) {
-        this.waves.push({
-            x: x,
-            y: y,
-            radius: 1,
-            maxRadius: Math.random() * 150 + 100,
-            opacity: 0.3,
-            speed: Math.random() * 2 + 1
-        });
+    
+    initNotes() {
+        this.notes = [];
+        const density = Math.floor((this.canvas.width * this.canvas.height) / 18000);
+        const count = Math.min(Math.max(density, 40), 90);
+        
+        for (let i = 0; i < count; i++) {
+            this.notes.push({
+                x: Math.random() * this.canvas.width,
+                y: Math.random() * this.canvas.height,
+                vx: (Math.random() - 0.5) * 0.8,
+                vy: (Math.random() - 0.5) * 0.8,
+                size: Math.random() * 12 + 12,
+                opacity: Math.random() * 0.3 + 0.15,
+                symbol: this.symbols[Math.floor(Math.random() * this.symbols.length)],
+                color: Math.random() > 0.5 ? '56, 189, 248' : '139, 92, 246'
+            });
+        }
     }
+    
     animate() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.waves.forEach((w, i) => {
-            w.radius += w.speed;
-            w.opacity -= 0.002;
+        const count = this.notes.length;
+        
+        for (let i = 0; i < count; i++) {
+            const n = this.notes[i];
             
-            if (w.opacity <= 0 || w.radius >= w.maxRadius) {
-                this.waves.splice(i, 1);
-                return;
+            n.x += n.vx;
+            n.y += n.vy;
+            
+            if (n.x < 0 || n.x > this.canvas.width) n.vx *= -1;
+            if (n.y < 0 || n.y > this.canvas.height) n.vy *= -1;
+            
+            if (this.mouse.x !== null && this.mouse.y !== null) {
+                const dx = n.x - this.mouse.x;
+                const dy = n.y - this.mouse.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < this.mouse.radius) {
+                    const force = (this.mouse.radius - dist) / this.mouse.radius;
+                    const angle = Math.atan2(dy, dx);
+                    n.x += Math.cos(angle) * force * 3;
+                    n.y += Math.sin(angle) * force * 3;
+                }
             }
             
-            this.ctx.beginPath();
-            this.ctx.arc(w.x, w.y, w.radius, 0, Math.PI * 2);
-            this.ctx.strokeStyle = `rgba(59, 130, 246, ${w.opacity})`;
-            this.ctx.lineWidth = 2;
-            this.ctx.stroke();
+            this.ctx.save();
+            this.ctx.font = `${n.size}px Outfit, sans-serif`;
+            this.ctx.fillStyle = `rgba(${n.color}, ${n.opacity})`;
+            this.ctx.shadowBlur = 10;
+            this.ctx.shadowColor = `rgba(${n.color}, 0.8)`;
+            this.ctx.fillText(n.symbol, n.x, n.y);
+            this.ctx.restore();
             
-            // Vẽ thêm 1 vòng phụ nhỏ hơn
-            this.ctx.beginPath();
-            this.ctx.arc(w.x, w.y, w.radius * 0.7, 0, Math.PI * 2);
-            this.ctx.strokeStyle = `rgba(59, 130, 246, ${w.opacity * 0.5})`;
-            this.ctx.stroke();
-        });
+            for (let j = i + 1; j < count; j++) {
+                const n2 = this.notes[j];
+                const dx = n.x - n2.x;
+                const dy = n.y - n2.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < 130) {
+                    const alpha = (1 - dist / 130) * 0.15;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(n.x, n.y - 5);
+                    this.ctx.lineTo(n2.x, n2.y - 5);
+                    
+                    const grad = this.ctx.createLinearGradient(n.x, n.y, n2.x, n2.y);
+                    grad.addColorStop(0, `rgba(${n.color}, ${alpha})`);
+                    grad.addColorStop(1, `rgba(${n2.color}, ${alpha})`);
+                    
+                    this.ctx.strokeStyle = grad;
+                    this.ctx.lineWidth = 1;
+                    this.ctx.stroke();
+                }
+            }
+        }
+        
         requestAnimationFrame(() => this.animate());
     }
 }

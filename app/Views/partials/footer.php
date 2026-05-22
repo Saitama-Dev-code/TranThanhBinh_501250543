@@ -11,7 +11,7 @@
     <footer class="mt-5 pt-5" data-aos="fade-up" data-aos-offset="-100" data-aos-once="true" style="background-color: var(--card-bg); border-top: 1px solid var(--border-color); padding: 60px 0 20px 0; position: relative; z-index: 10;">
         <div class="container">
             <div class="row gy-4">
-                <div class="col-lg-4">
+                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
                     <h4 class="fw-bold mb-3"><i class="fas fa-music text-primary me-2"></i>TTB MUSIC</h4>
                     <p class="mb-4" style="color: var(--text-color); opacity: 0.8;">
                         Hệ thống cung cấp nhạc cụ hàng đầu, nơi khơi nguồn những giai điệu bất hủ và trải nghiệm âm nhạc đỉnh cao.
@@ -25,7 +25,7 @@
                     </div>
                 </div>
 
-                <div class="col-lg-2 offset-lg-1 col-md-4">
+                <div class="col-lg-2 offset-lg-1 col-md-4" data-aos="fade-up" data-aos-delay="200">
                     <h5 class="fw-bold mb-3" style="color: var(--text-color);">Cửa hàng</h5>
                     <ul class="list-unstyled footer-link-list">
                         <li><a href="index.php?controller=product&action=index&category=1">Guitar & Bass</a></li>
@@ -34,7 +34,7 @@
                     </ul>
                 </div>
 
-                <div class="col-lg-2 col-md-4">
+                <div class="col-lg-2 col-md-4" data-aos="fade-up" data-aos-delay="300">
                     <h5 class="fw-bold mb-3" style="color: var(--text-color);">Dịch vụ</h5>
                     <ul class="list-unstyled footer-link-list">
                         <li><a href="#" class="text-warning fw-bold">Cho Thuê Nhạc Cụ</a></li>
@@ -43,7 +43,7 @@
                     </ul>
                 </div>
 
-                <div class="col-lg-3 col-md-4">
+                <div class="col-lg-3 col-md-4" data-aos="fade-up" data-aos-delay="400">
                     <h5 class="fw-bold mb-3" style="color: var(--text-color);">Liên hệ</h5>
                     <ul class="list-unstyled" style="color: var(--text-color); opacity: 0.8;">
                         <li class="mb-2"><i class="fas fa-map-marker-alt me-2 text-primary"></i> Quận 1, TP.HCM</li>
@@ -147,6 +147,106 @@
             color: var(--text-color); transition: 0.3s; 
         }
         .social-btn:hover { background: rgba(128, 128, 128, 0.1); transform: translateY(-2px); }
+
+        /* 4. HOẠT ẢNH ĐÓNG GÓI SẢN PHẨM (PACKAGING FLY TO CART) */
+        .packaging-container {
+            position: fixed;
+            z-index: 999999;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.9s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.9s ease-out;
+        }
+        .packaging-box {
+            position: relative;
+            width: 75px;
+            height: 65px;
+            background: #cd7f32; /* Màu giấy các-tông */
+            border: 2px solid #b87333;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: scale(0);
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+        }
+        .packaging-box::before, .packaging-box::after {
+            content: '';
+            position: absolute;
+            top: -12px;
+            width: 50%;
+            height: 12px;
+            background: #d28c46;
+            border: 2px solid #b87333;
+            box-sizing: border-box;
+            transition: transform 0.4s ease;
+            transform-origin: bottom center;
+            z-index: 3;
+        }
+        .packaging-box::before {
+            left: 0;
+            border-top-left-radius: 4px;
+            transform: rotate(-75deg);
+        }
+        .packaging-box::after {
+            right: 0;
+            border-top-right-radius: 4px;
+            transform: rotate(75deg);
+        }
+        .packaging-box.closed::before {
+            transform: rotate(0deg);
+            background: #cd7f32;
+        }
+        .packaging-box.closed::after {
+            transform: rotate(0deg);
+            background: #cd7f32;
+        }
+        .packaging-tape {
+            position: absolute;
+            top: -2px;
+            left: 20%;
+            width: 60%;
+            height: 4px;
+            background: #8b5cf6;
+            opacity: 0;
+            z-index: 4;
+            transition: opacity 0.2s ease 0.3s;
+            box-shadow: 0 0 8px rgba(139, 92, 246, 0.8);
+        }
+        .packaging-box.closed .packaging-tape {
+            opacity: 1;
+        }
+        .packaging-img {
+            position: absolute;
+            width: 55px;
+            height: 55px;
+            object-fit: cover;
+            border-radius: 6px;
+            z-index: 2;
+            transition: transform 0.5s cubic-bezier(0.55, 0.085, 0.68, 0.53), opacity 0.4s;
+            transform: translateY(-20px) scale(1);
+            opacity: 1;
+        }
+        .packaging-img.packed {
+            transform: translateY(10px) scale(0.1);
+            opacity: 0;
+        }
+        .sparkle-particle {
+            position: fixed;
+            pointer-events: none;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            z-index: 999999;
+            animation: sparkleExplode 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+        @keyframes sparkleExplode {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
     </style>
 
     <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
@@ -388,47 +488,96 @@
         const startRect = imgEl ? imgEl.getBoundingClientRect() : startElement.getBoundingClientRect();
         const endRect = cartIcon.getBoundingClientRect();
 
-        // Tạo element ảnh bay
-        const flyingImg = document.createElement('img');
-        flyingImg.src = imgUrl;
-        flyingImg.style.position = 'fixed';
-        flyingImg.style.zIndex = '99999';
-        // Bắt đầu với kích thước và tọa độ chính xác của hình ảnh gốc để tạo hiệu ứng mượt mà
-        flyingImg.style.width = `${startRect.width}px`;
-        flyingImg.style.height = `${startRect.height}px`;
-        flyingImg.style.objectFit = 'cover';
-        flyingImg.style.borderRadius = imgEl ? window.getComputedStyle(imgEl).borderRadius : '8px';
-        flyingImg.style.boxShadow = '0 10px 25px rgba(0,0,0,0.3)';
-        flyingImg.style.left = `${startRect.left}px`;
-        flyingImg.style.top = `${startRect.top}px`;
+        // 1. Tạo container đóng gói ảo
+        const pContainer = document.createElement('div');
+        pContainer.className = 'packaging-container';
+        pContainer.style.width = `${startRect.width}px`;
+        pContainer.style.height = `${startRect.height}px`;
+        pContainer.style.left = `${startRect.left}px`;
+        pContainer.style.top = `${startRect.top}px`;
         
-        // CSS transition sử dụng GPU-accelerated transform và opacity
-        flyingImg.style.transition = 'transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease-out';
-
-        document.body.appendChild(flyingImg);
-
-        // Bắt buộc trình duyệt tính toán lại kích thước và cấu trúc (Reflow) trước khi đổi thuộc tính
-        void flyingImg.offsetWidth;
-
-        // Tính toán khoảng cách di chuyển
-        const dx = (endRect.left + endRect.width / 2) - (startRect.left + startRect.width / 2);
-        const dy = (endRect.top + endRect.height / 2) - (startRect.top + startRect.height / 2);
-
-        // Tiến hành dịch chuyển ảnh bay tới giỏ hàng đích bằng GPU-accelerated transform
-        flyingImg.style.transform = `translate(${dx}px, ${dy}px) scale(0.15)`;
-        flyingImg.style.opacity = '0.2';
-
-        // Xóa ảnh bay sau khi chạm đích và tạo hiệu ứng nhún cho biểu tượng giỏ
+        // 2. Tạo hình ảnh sản phẩm mini
+        const pImg = document.createElement('img');
+        pImg.src = imgUrl;
+        pImg.className = 'packaging-img';
+        
+        // 3. Tạo hộp các-tông
+        const pBox = document.createElement('div');
+        pBox.className = 'packaging-box';
+        
+        // Băng keo dán hộp
+        const pTape = document.createElement('div');
+        pTape.className = 'packaging-tape';
+        pBox.appendChild(pTape);
+        
+        pContainer.appendChild(pBox);
+        pContainer.appendChild(pImg);
+        document.body.appendChild(pContainer);
+        
+        // Kích hoạt hiển thị hộp (scale lên) và sản phẩm chuẩn bị chui vào
         setTimeout(() => {
-            flyingImg.remove();
+            pBox.style.transform = 'scale(1)';
+            pBox.style.opacity = '1';
+        }, 50);
+
+        // Bước 1: Sản phẩm rơi vào hộp
+        setTimeout(() => {
+            pImg.classList.add('packed');
+        }, 350);
+
+        // Bước 2: Đóng nắp hộp và niêm phong băng keo
+        setTimeout(() => {
+            pBox.classList.add('closed');
+            // Tạo hiệu ứng giật nhẹ khi niêm phong
+            pBox.style.transform = 'scale(1.15)';
+            setTimeout(() => {
+                pBox.style.transform = 'scale(1)';
+            }, 150);
+        }, 800);
+
+        // Bước 3: Bay đi tới giỏ hàng trên navbar
+        setTimeout(() => {
+            // Tính toán khoảng cách di chuyển
+            const currentBoxRect = pBox.getBoundingClientRect();
+            const dx = (endRect.left + endRect.width / 2) - (currentBoxRect.left + currentBoxRect.width / 2);
+            const dy = (endRect.top + endRect.height / 2) - (currentBoxRect.top + currentBoxRect.height / 2);
+            
+            pContainer.style.transform = `translate(${dx}px, ${dy}px) scale(0.25)`;
+            pContainer.style.opacity = '0.3';
+        }, 1300);
+
+        // Bước 4: Khi chạm đích, nổ hạt lấp lánh và xóa container
+        setTimeout(() => {
+            pContainer.remove();
+            
+            // Hiệu ứng nhún của biểu tượng giỏ hàng
             cartIcon.style.transition = 'transform 0.2s';
             cartIcon.style.transform = 'scale(1.4)';
-            cartIcon.style.color = '#3b82f6';
+            cartIcon.style.color = '#8b5cf6';
             setTimeout(() => {
                 cartIcon.style.transform = 'scale(1)';
                 cartIcon.style.color = '';
-            }, 200);
-        }, 800);
+            }, 250);
+
+            // Tạo các hạt lấp lánh (sparkles) nổ ra xung quanh giỏ hàng
+            const colors = ['#3b82f6', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b'];
+            for (let i = 0; i < 12; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle-particle';
+                sparkle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                sparkle.style.left = `${endRect.left + endRect.width / 2}px`;
+                sparkle.style.top = `${endRect.top + endRect.height / 2}px`;
+                
+                // Hướng nổ ngẫu nhiên
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 30 + Math.random() * 40;
+                sparkle.style.setProperty('--tx', `${Math.cos(angle) * distance}px`);
+                sparkle.style.setProperty('--ty', `${Math.sin(angle) * distance}px`);
+                
+                document.body.appendChild(sparkle);
+                setTimeout(() => sparkle.remove(), 600);
+            }
+        }, 2200);
     }
     </script>
 </body>

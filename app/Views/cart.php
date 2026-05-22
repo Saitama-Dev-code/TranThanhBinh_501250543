@@ -321,12 +321,27 @@ include __DIR__ . '/partials/header.php';
     .cart-summary-col { width: 100%; position: static; }
     .cart-item-total  { display: none; }
 }
+
+/* Hiệu ứng kéo trượt từ trên xuống khi tải trang giỏ hàng */
+@keyframes cartSlideDown {
+    0% {
+        transform: translateY(-80px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+.cart-entrance {
+    animation: cartSlideDown 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
 </style>
 
 <!-- Canvas Ripple sóng âm (giống product_detail nhưng màu xanh dương) -->
 <canvas id="cart-canvas"></canvas>
 
-<div class="container my-5 pt-3">
+<div class="container my-5 pt-3 cart-entrance">
 
     <!-- Tiêu đề trang -->
     <div class="mb-4">
@@ -850,14 +865,14 @@ function showEmptyCart() {
 }
 
 /* --------------------------------------------------------
-   CANVAS RIPPLE (nền sóng âm xanh dương - tím)
-   Giống product_detail nhưng dùng màu blue/purple
+   CANVAS BIOLUMINESCENT RIBBON FLOW (nền sóng cực quang neon)
    -------------------------------------------------------- */
 (function() {
     const canvas = document.getElementById('cart-canvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    let W, H, ripples = [];
+    let W, H;
+    let time = 0;
 
     function resize() {
         W = canvas.width  = window.innerWidth;
@@ -866,39 +881,97 @@ function showEmptyCart() {
     window.addEventListener('resize', resize);
     resize();
 
-    // Mỗi "ripple" là một vòng tròn lan rộng
-    function Ripple() {
-        this.x  = Math.random() * W;
-        this.y  = Math.random() * H;
-        this.r  = 0;                      // Bán kính bắt đầu = 0
-        this.max = 100 + Math.random() * 150; // Bán kính tối đa
-        this.speed  = 0.4 + Math.random() * 0.6;
-        this.opacity = 0.15 + Math.random() * 0.15;
-        // Màu ngẫu nhiên: xanh dương hoặc tím
-        this.color  = Math.random() > 0.5 ? '59,130,246' : '139,92,246';
+    // Định nghĩa các dải sóng ruy băng cực quang phát sáng
+    const ribbons = [
+        {
+            yPercent: 0.3,
+            amplitude: 45,
+            frequency: 0.0015,
+            speed: 0.015,
+            pointsCount: 300,
+            baseColor: '56, 189, 248' // màu cyan/sky-blue
+        },
+        {
+            yPercent: 0.5,
+            amplitude: 60,
+            frequency: 0.001,
+            speed: 0.01,
+            pointsCount: 350,
+            baseColor: '139, 92, 246' // màu tím purple
+        },
+        {
+            yPercent: 0.7,
+            amplitude: 50,
+            frequency: 0.002,
+            speed: 0.02,
+            pointsCount: 250,
+            baseColor: '236, 72, 153' // màu hồng neon
+        }
+    ];
+
+    let mouseX = -1000, mouseY = -1000;
+    window.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+
+    function drawRibbon(rb) {
+        const centerY = H * rb.yPercent;
+        
+        ctx.beginPath();
+        for (let i = 0; i <= rb.pointsCount; i++) {
+            const x = (W / rb.pointsCount) * i;
+            
+            let waveY = Math.sin(x * rb.frequency + time * rb.speed) * rb.amplitude;
+            waveY += Math.cos(x * (rb.frequency * 1.5) - time * (rb.speed * 0.8)) * (rb.amplitude * 0.4);
+            
+            const dx = x - mouseX;
+            const dy = (centerY + waveY) - mouseY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 150) {
+                const push = (150 - dist) * 0.25;
+                waveY += mouseY > centerY + waveY ? -push : push;
+            }
+            
+            const y = centerY + waveY;
+            
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+            
+            if (i % 3 === 0) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(x, y, Math.random() * 1.5 + 0.5, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${rb.baseColor}, ${Math.random() * 0.35 + 0.15})`;
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = `rgb(${rb.baseColor})`;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+        
+        ctx.save();
+        ctx.strokeStyle = `rgba(${rb.baseColor}, 0.08)`;
+        ctx.lineWidth = 4;
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = `rgb(${rb.baseColor})`;
+        ctx.stroke();
+        
+        ctx.strokeStyle = `rgba(${rb.baseColor}, 0.15)`;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.restore();
     }
 
     function loop() {
         ctx.clearRect(0, 0, W, H);
-
-        // Sinh thêm ripple theo xác suất
-        if (ripples.length < 8 && Math.random() < 0.015) {
-            ripples.push(new Ripple());
-        }
-
-        ripples = ripples.filter(rp => {
-            rp.r += rp.speed;
-            const fade = 1 - rp.r / rp.max; // Mờ dần khi lớn ra
-            if (fade <= 0) return false;     // Xóa khi đã mờ hoàn toàn
-
-            ctx.beginPath();
-            ctx.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
-            ctx.strokeStyle = `rgba(${rp.color},${rp.opacity * fade})`;
-            ctx.lineWidth   = 1.5;
-            ctx.stroke();
-            return true;
-        });
-
+        time += 0.8;
+        
+        ribbons.forEach(drawRibbon);
+        
         requestAnimationFrame(loop);
     }
     loop();

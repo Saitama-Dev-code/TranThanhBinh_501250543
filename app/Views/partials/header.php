@@ -17,10 +17,10 @@ $currentController = $_GET['controller'] ?? 'home';
 
 // =========================================================================
 // LOGIC HIỂN THỊ PRELOADER (MÀN HÌNH CHỜ)
-// - Tắt preloader cho toàn bộ phân trang/cửa hàng (khi đang ở controller 'product')
-//   để tránh việc người dùng click vào "Tất cả nhạc cụ" hoặc "Lọc" bị chớp màn hình.
+// - Tắt preloader cho cửa hàng (controller 'product') và giỏ hàng (controller 'cart')
+//   để tránh việc load màn hình chờ gây gián đoạn trải nghiệm người dùng.
 // =========================================================================
-$isFiltering = ($currentController == 'product');
+$isFiltering = ($currentController == 'product' || $currentController == 'cart');
 ?>
 <!DOCTYPE html>
 <html lang="vi" data-theme="dark">

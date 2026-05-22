@@ -24,6 +24,12 @@ class AuthController extends BaseController {
     // ĐIỀU HƯỚNG GIAO DIỆN
     // - Chỉ có tác dụng gọi ra các file giao diện (.php) trong thư mục Views
     // =========================================================================
+    public function login() {
+        $_SESSION['open_login_modal'] = true;
+        header('Location: index.php');
+        exit;
+    }
+
     public function register() {
         $this->render('register', ['pageTitle' => 'Đăng ký tài khoản - TTB Music']);
     }
@@ -42,14 +48,36 @@ class AuthController extends BaseController {
         $fullname = trim($_POST['fullname'] ?? '');
         $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
         
         // Lưu tạm thông tin để điền lại vào form nếu có lỗi
         $_SESSION['auth_fullname'] = $fullname;
         $_SESSION['auth_email'] = $email;
         
         // Kiểm tra validation cơ bản
-        if (empty($fullname) || empty($email) || empty($password)) {
+        if (empty($fullname) || empty($email) || empty($password) || empty($confirmPassword)) {
             $_SESSION['auth_error'] = "Vui lòng điền đầy đủ thông tin!";
+            header('Location: index.php?controller=auth&action=register');
+            exit;
+        }
+
+        // Kiểm tra định dạng email hợp lệ
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['auth_error'] = "Định dạng Email không hợp lệ!";
+            header('Location: index.php?controller=auth&action=register');
+            exit;
+        }
+
+        // Kiểm tra độ dài mật khẩu (tối thiểu 6 ký tự)
+        if (strlen($password) < 6) {
+            $_SESSION['auth_error'] = "Mật khẩu phải có độ dài tối thiểu 6 ký tự!";
+            header('Location: index.php?controller=auth&action=register');
+            exit;
+        }
+
+        // Kiểm tra mật khẩu khớp nhau
+        if ($password !== $confirmPassword) {
+            $_SESSION['auth_error'] = "Mật khẩu xác nhận không khớp!";
             header('Location: index.php?controller=auth&action=register');
             exit;
         }

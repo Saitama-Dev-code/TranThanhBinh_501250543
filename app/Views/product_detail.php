@@ -1456,13 +1456,14 @@ function addToCart(productId) {
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            // Thành công: Cập nhật badge giỏ hàng trên navbar
-            const badges = document.querySelectorAll('.cart-badge');
-            badges.forEach(b => {
-                b.textContent = data.cart_count;
-                b.style.display = data.cart_count > 0 ? 'inline-block' : 'none';
-                b.style.transform = 'translate(-50%, -50%) scale(1.5)';
-                setTimeout(() => b.style.transform = 'translate(-50%, -50%) scale(1)', 300);
+            // Thành công: Cập nhật số lượng giỏ hàng trên navbar
+            const cartCounts = document.querySelectorAll('.cart-count');
+            cartCounts.forEach(c => {
+                c.textContent = data.cart_count;
+                c.style.display = 'inline-block';
+                c.style.transition = 'transform 0.15s ease-out';
+                c.style.transform = 'scale(1.4)';
+                setTimeout(() => c.style.transform = 'scale(1)', 150);
             });
 
             // Hiệu ứng bay

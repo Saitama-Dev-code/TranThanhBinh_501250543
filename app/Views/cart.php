@@ -581,7 +581,7 @@ include __DIR__ . '/partials/header.php';
             <div class="modal-body text-center">
                 <i class="fas fa-exclamation-circle text-warning fa-3x mb-3 animate__animated animate__pulse animate__infinite"></i>
                 <h5 class="fw-bold mb-3" style="color: var(--text-color);">Xác nhận xóa</h5>
-                <p class="text-muted mb-4" id="delete-modal-msg">Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?</p>
+                <p class="mb-4" id="delete-modal-msg" style="color: var(--text-color); opacity: 0.8;">Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?</p>
                 <div class="d-flex justify-content-center gap-3">
                     <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
                     <button type="button" class="btn btn-danger rounded-pill px-4" id="btn-confirm-delete">Đồng ý xóa</button>

@@ -831,21 +831,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 progress = 0;
                 section.classList.remove('visible');
             } else if (rect.top <= enterStart && rect.top > enterEnd) {
-                // Đang cuộn lên (giai đoạn xuất hiện): Tỉ lệ tăng dần từ 0 lên 1
+                // Đang xuất hiện khi cuộn màn hình xuống: tăng dần từ 0 lên 1.
+                // Hoặc đang biến mất khi cuộn màn hình lên: giảm dần từ 1 về 0.
                 progress = (enterStart - rect.top) / (enterStart - enterEnd);
                 section.classList.add('visible');
-            } else if (rect.top <= enterEnd && rect.top > exitStart) {
-                // Nằm trọn vẹn trên màn hình: Giữ nguyên 100% (1)
+            } else {
+                // Đã xuất hiện đầy đủ hoặc trôi ra ngoài đỉnh màn hình: giữ nguyên 1 (không bị thu lại khi tiếp tục cuộn xuống)
                 progress = 1;
                 section.classList.add('visible');
-            } else if (rect.top <= exitStart && rect.top > exitEnd) {
-                // Đang cuộn qua đỉnh màn hình (giai đoạn biến mất): Tỉ lệ giảm dần từ 1 về 0
-                progress = (rect.top - exitEnd) / (exitStart - exitEnd);
-                section.classList.add('visible');
-            } else {
-                // Đã cuộn qua khỏi màn hình
-                progress = 0;
-                section.classList.remove('visible');
             }
             
             // Gán giá trị biến CSS cho element tương ứng

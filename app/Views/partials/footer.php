@@ -8,7 +8,7 @@
 ?>
     </div> 
 
-    <footer class="mt-5 pt-5" style="background-color: var(--card-bg); border-top: 1px solid var(--border-color); padding: 60px 0 20px 0; position: relative; z-index: 10;">
+    <footer class="mt-5 pt-5" data-aos="fade-up" data-aos-offset="-100" data-aos-once="true" style="background-color: var(--card-bg); border-top: 1px solid var(--border-color); padding: 60px 0 20px 0; position: relative; z-index: 10;">
         <div class="container">
             <div class="row gy-4">
                 <div class="col-lg-4">
@@ -97,6 +97,10 @@
         .footer-link-list a:hover::before { opacity: 1; left: 0px; }
 
         /* 3. MODAL GLASSMORPHISM & FULL CONTENT */
+        body.modal-open {
+            overflow: auto !important;
+            padding-right: 0 !important;
+        }
         .animated-border-wrapper { position: relative; border-radius: 1.6rem; z-index: 1; padding: 2px; }
         .animated-border-wrapper::before { 
             content: ""; position: absolute; inset: 0; border-radius: 1.6rem; 

@@ -170,6 +170,65 @@ include __DIR__ . '/partials/header.php';
     margin: 0;
 }
 
+.price-slider {
+    position: relative;
+    width: 100%;
+    height: 6px;
+    background: rgba(59, 130, 246, 0.15);
+    border-radius: 3px;
+    margin-bottom: 15px;
+    margin-top: 15px;
+}
+
+.price-slider-fill {
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    border-radius: 3px;
+    pointer-events: none;
+}
+
+.price-slider input[type="range"] {
+    position: absolute;
+    top: -6px; left: 0;
+    width: 100%;
+    height: 18px;
+    -webkit-appearance: none;
+    background: transparent;
+    cursor: pointer;
+    margin: 0;
+}
+
+.price-slider input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #3b82f6;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    cursor: pointer;
+}
+
+.price-slider input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #3b82f6;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    cursor: pointer;
+}
+
+.price-display {
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #3b82f6;
+    padding: 8px 0;
+}
+
 .btn-apply-filter {
     width: 100%;
     padding: 14px;
@@ -210,6 +269,8 @@ include __DIR__ . '/partials/header.php';
 
 .search-input-sidebar {
     flex: 1;
+    width: 100%;
+    box-sizing: border-box;
     padding: 10px 14px;
     background: var(--bg-color);
     border: 1px solid var(--border-color);
@@ -731,7 +792,7 @@ include __DIR__ . '/partials/header.php';
                             <div class="price-slider-fill" id="price-slider-fill"></div>
                             <input type="range" id="price-range-max"
                                    min="0" max="100000000" step="500000"
-                                   value="<?= htmlspecialchars($currentPriceMax ?? '100000000') ?>">
+                                   value="<?= htmlspecialchars((isset($currentPriceMax) && $currentPriceMax !== '') ? $currentPriceMax : '100000000') ?>">
                         </div>
                         <div class="price-display" id="price-display">
                             <?php
@@ -740,7 +801,7 @@ include __DIR__ . '/partials/header.php';
                                 : '0 ₫';
                             $pMax = (isset($currentPriceMax) && $currentPriceMax !== '')
                                 ? number_format((float)$currentPriceMax, 0, ',', '.') . ' ₫'
-                                : '100M+';
+                                : '100.000.000 ₫';
                             echo $pMin . ' — ' . $pMax;
                             ?>
                         </div>

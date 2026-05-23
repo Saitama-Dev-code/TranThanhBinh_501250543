@@ -598,7 +598,7 @@ include __DIR__ . '/partials/header.php';
 </div>
 
 <!-- Custom Confirmation Modal (Khung câu hỏi xóa sản phẩm) -->
-<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true" style="backdrop-filter: blur(8px); z-index: 1060;">
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false" style="background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px); z-index: 1060;">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content glass-panel p-4" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 1.5rem; box-shadow: 0 15px 35px rgba(0,0,0,0.4); color: var(--text-color) !important;">
             <div class="modal-body text-center">

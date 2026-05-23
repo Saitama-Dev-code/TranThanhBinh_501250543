@@ -616,9 +616,9 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
             transform: rotate(90deg);
         }
 
-        /* Tối ưu màu sắc cho giỏ hàng ở Light Theme */
+        /* Tối ưu màu sắc cho giỏ hàng ở Light Theme (tím khói dịu mát để nổi bật khung trắng bên trong) */
         :root[data-theme="light"] .spa-page#page-cart {
-            background: rgba(255, 255, 255, 0.98) !important;
+            background: #f5f3ff !important;
         }
         :root[data-theme="light"] .btn-cart-close {
             background: rgba(15, 23, 42, 0.05) !important;

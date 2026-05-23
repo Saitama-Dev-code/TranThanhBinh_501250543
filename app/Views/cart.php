@@ -34,7 +34,7 @@ include __DIR__ . '/partials/header.php';
 .cart-title {
     font-size: 2rem;
     font-weight: 800;
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    background: linear-gradient(135deg, #7c3aed, #8b5cf6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -92,7 +92,7 @@ include __DIR__ . '/partials/header.php';
     height: 90px;
     border-radius: 12px;
     flex-shrink: 0;
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    background: linear-gradient(135deg, #7c3aed, #8b5cf6);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -119,7 +119,7 @@ include __DIR__ . '/partials/header.php';
 .cart-item-price {
     font-size: 1rem;
     font-weight: 700;
-    color: #3b82f6;
+    color: #7c3aed;
 }
 
 /* Điều khiển số lượng */
@@ -144,9 +144,9 @@ include __DIR__ . '/partials/header.php';
     transition: all 0.2s;
 }
 .qty-btn:hover {
-    background: #3b82f6;
+    background: #7c3aed;
     color: white;
-    border-color: #3b82f6;
+    border-color: #7c3aed;
 }
 .qty-display {
     min-width: 32px;
@@ -216,7 +216,7 @@ include __DIR__ . '/partials/header.php';
 }
 .summary-total-price {
     font-size: 1.3rem;
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    background: linear-gradient(135deg, #7c3aed, #8b5cf6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -225,7 +225,7 @@ include __DIR__ . '/partials/header.php';
 .btn-checkout {
     width: 100%;
     padding: 14px;
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    background: linear-gradient(135deg, #7c3aed, #6366f1);
     border: none;
     border-radius: 12px;
     color: white;
@@ -242,7 +242,7 @@ include __DIR__ . '/partials/header.php';
 }
 .btn-checkout:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(59,130,246,0.4);
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.35);
     color: white;
 }
 
@@ -266,8 +266,8 @@ include __DIR__ . '/partials/header.php';
     text-decoration: none;
 }
 .btn-continue:hover {
-    border-color: #3b82f6;
-    color: #3b82f6;
+    border-color: #7c3aed;
+    color: #7c3aed;
 }
 
 /* ---- Giỏ trống ---- */

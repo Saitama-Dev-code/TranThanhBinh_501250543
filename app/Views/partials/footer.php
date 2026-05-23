@@ -5,10 +5,15 @@
  * MÔ TẢ: Fix hiệu ứng Hover Social Icons, Link trượt và khôi phục nội dung Modal.
  * =========================================================================
  */
+if (isset($_GET['spa']) && $_GET['spa'] == '1') {
+    return;
+}
 ?>
-    </div> 
+            </div> <!-- Close active page container -->
+        </div> <!-- Close spa-viewport -->
+    </div> <!-- Close main-content-wrapper -->
 
-    <footer class="mt-5 pt-5" data-aos="fade-up" data-aos-offset="-100" data-aos-once="true" style="background-color: var(--card-bg); border-top: 1px solid var(--border-color); padding: 60px 0 20px 0; position: relative; z-index: 10;">
+    <footer class="mt-5 pt-5" data-aos="fade-up" data-aos-offset="50" data-aos-once="true" style="background-color: var(--card-bg); border-top: 1px solid var(--border-color); padding: 60px 0 20px 0; position: relative; z-index: 10;">
         <div class="container">
             <div class="row gy-4">
                 <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
@@ -334,9 +339,10 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     
     <script>
+        const isHomePageInitial = document.querySelector('.spa-page.active')?.id === 'page-home';
         AOS.init({ 
-            once: false, /* Cho phép lặp lại hiệu ứng nhiều lần */
-            mirror: true, /* Hiệu ứng biến mất khi cuộn qua, xuất hiện lại khi cuộn về */
+            once: !isHomePageInitial, /* Nếu không phải home thì chỉ chạy 1 lần, tránh lặp lại kỳ cục */
+            mirror: isHomePageInitial, /* Chỉ bật mirror cho trang chủ */
             offset: 100 
         });
 
@@ -579,6 +585,756 @@
             }
         }, 2200);
     }
+    </script>
+    
+    <!-- =========================================================================
+         PHẦN 12: SPA ROUTER & TRANSITION ENGINE (ZERO-RELOAD SPA)
+         ========================================================================= -->
+    <script>
+    (function() {
+        // 1. Ghi đè addEventListener và onload để thực thi script tải động qua AJAX
+        const originalAddEventListener = EventTarget.prototype.addEventListener;
+        EventTarget.prototype.addEventListener = function(type, listener, options) {
+            if ((this === document || this === window) && (type === 'DOMContentLoaded' || type === 'load')) {
+                if (document.readyState !== 'loading') {
+                    setTimeout(() => {
+                        try {
+                            listener.call(this, new Event(type));
+                        } catch (e) {
+                            console.error("SPA: Lỗi thực thi listener trì hoãn:", e);
+                        }
+                    }, 10);
+                    return;
+                }
+            }
+            return originalAddEventListener.call(this, type, listener, options);
+        };
+
+        Object.defineProperty(window, 'onload', {
+            set: function(listener) {
+                if (typeof listener === 'function') {
+                    setTimeout(() => {
+                        try {
+                            listener.call(window, new Event('load'));
+                        } catch (e) {
+                            console.error("SPA: Lỗi thực thi window.onload:", e);
+                        }
+                    }, 10);
+                }
+            },
+            configurable: true
+        });
+
+        // 2. Chuyển tiếp cuộn chuột khi bật Login Modal
+        const loginModalEl = document.getElementById('loginModal');
+        if (loginModalEl) {
+            loginModalEl.addEventListener('wheel', function(e) {
+                window.scrollBy(0, e.deltaY);
+            }, { passive: true });
+        }
+
+        // 3. Khởi tạo đối tượng định tuyến SPA
+        const SPARouter = {
+            isTransitioning: false,
+            scrollPositions: {},
+            backgroundPageUrl: null,
+            lastClickedProductId: null,
+            lastClickedProductImage: null,
+            currentUrl: window.location.href,
+
+            getPageIndex(url) {
+                try {
+                    const urlObj = new URL(url, window.location.origin);
+                    const controller = urlObj.searchParams.get('controller') || 'home';
+                    const action = urlObj.searchParams.get('action') || 'index';
+                    
+                    if (controller === 'home') return 0;
+                    if (controller === 'product') {
+                        if (action === 'detail') return 2;
+                        return 1;
+                    }
+                    if (controller === 'cart') return 3;
+                    return 0;
+                } catch (e) {
+                    return 0;
+                }
+            },
+
+            getPageContainerId(url) {
+                try {
+                    const urlObj = new URL(url, window.location.origin);
+                    const controller = urlObj.searchParams.get('controller') || 'home';
+                    const action = urlObj.searchParams.get('action') || 'index';
+                    
+                    if (controller === 'home') return 'page-home';
+                    if (controller === 'product') {
+                        if (action === 'detail') return 'page-detail';
+                        return 'page-shop';
+                    }
+                    if (controller === 'cart') return 'page-cart';
+                    return 'page-home';
+                } catch (e) {
+                    return 'page-home';
+                }
+            },
+
+            cleanUrl(url) {
+                try {
+                    const urlObj = new URL(url, window.location.origin);
+                    return urlObj.pathname + urlObj.search;
+                } catch (e) {
+                    return url;
+                }
+            },
+
+            updateNavbar(url) {
+                try {
+                    const urlObj = new URL(url, window.location.origin);
+                    const controller = urlObj.searchParams.get('controller') || 'home';
+                    
+                    document.querySelectorAll('.nav-link').forEach(link => {
+                        const href = link.getAttribute('href');
+                        if (!href) return;
+                        const linkUrl = new URL(href, window.location.origin);
+                        const linkController = linkUrl.searchParams.get('controller') || 'home';
+                        
+                        if (linkController === controller) {
+                            link.classList.add('active');
+                        } else {
+                            link.classList.remove('active');
+                        }
+                    });
+                } catch (e) {}
+            },
+
+            executeScripts(container) {
+                const scripts = container.querySelectorAll('script');
+                scripts.forEach(oldScript => {
+                    if (oldScript.src && (oldScript.src.includes('bootstrap') || oldScript.src.includes('aos.js'))) {
+                        return;
+                    }
+                    const newScript = document.createElement('script');
+                    Array.from(oldScript.attributes).forEach(attr => {
+                        newScript.setAttribute(attr.name, attr.value);
+                    });
+                    newScript.textContent = oldScript.textContent;
+                    document.body.appendChild(newScript);
+                    newScript.remove();
+                });
+            },
+
+            // Xử lý giỏ hàng overlay trượt xuống
+            showCartOverlay(url, htmlContent) {
+                let cartContainer = document.getElementById('page-cart');
+                if (!cartContainer) {
+                    cartContainer = document.createElement('div');
+                    cartContainer.id = 'page-cart';
+                    cartContainer.className = 'spa-page';
+                    document.getElementById('spa-viewport').appendChild(cartContainer);
+                }
+
+                // Tiêm nội dung mới
+                cartContainer.innerHTML = htmlContent;
+                this.executeScripts(cartContainer);
+
+                // Khởi chạy modal và các logic giỏ hàng
+                if (typeof initCartPage === 'function') {
+                    initCartPage();
+                }
+
+                // Hiển thị overlay trượt xuống
+                cartContainer.style.display = 'block';
+                // Đọc offsetWidth để buộc reflow trước khi bật animation
+                cartContainer.offsetWidth;
+                cartContainer.classList.add('active-overlay');
+                document.body.style.overflow = 'hidden'; // ✅ Khóa cuộn trang nền dưới giỏ hàng
+
+                this.isTransitioning = false;
+            },
+
+            hideCartOverlay() {
+                const cartContainer = document.getElementById('page-cart');
+                if (cartContainer && cartContainer.classList.contains('active-overlay')) {
+                    cartContainer.classList.remove('active-overlay');
+                    
+                    // Chỉ mở khóa cuộn body nếu không có page-detail active bên dưới
+                    const detailContainer = document.getElementById('page-detail');
+                    const isDetailActive = detailContainer && detailContainer.classList.contains('active-sheet');
+                    if (!isDetailActive) {
+                        document.body.style.overflow = '';
+                    }
+
+                    setTimeout(() => {
+                        cartContainer.style.display = 'none';
+                    }, 700);
+                }
+            },
+
+            // Xử lý trang chi tiết sản phẩm sheet trượt lên
+            showDetailSheet(url, htmlContent) {
+                let detailContainer = document.getElementById('page-detail');
+                if (!detailContainer) {
+                    detailContainer = document.createElement('div');
+                    detailContainer.id = 'page-detail';
+                    detailContainer.className = 'spa-page';
+                    document.getElementById('spa-viewport').appendChild(detailContainer);
+                }
+
+                // Tiêm nội dung mới
+                detailContainer.innerHTML = htmlContent;
+                this.executeScripts(detailContainer);
+
+                // Cuộn trang chi tiết về đầu
+                detailContainer.scrollTo({ top: 0 });
+
+                // Khởi chạy các logic và canvas chi tiết sản phẩm
+                if (typeof initDetailPage === 'function') {
+                    initDetailPage();
+                }
+
+                // Hiển thị sheet trượt lên
+                detailContainer.style.display = 'block';
+                detailContainer.offsetWidth; // Reflow
+                detailContainer.classList.add('active-sheet');
+                document.body.style.overflow = 'hidden'; // Khóa cuộn trang nền
+
+                // Khởi tạo lại và làm tươi AOS cho các phần tử động mới chèn vào DOM
+                if (typeof AOS !== 'undefined') {
+                    try {
+                        AOS.init({ 
+                            once: true,
+                            mirror: false,
+                            offset: 100 
+                        });
+                        AOS.refresh();
+                    } catch(aosErr) {}
+                }
+
+                this.isTransitioning = false;
+            },
+
+            hideDetailSheet() {
+                const detailContainer = document.getElementById('page-detail');
+                if (detailContainer && detailContainer.classList.contains('active-sheet')) {
+                    detailContainer.classList.remove('active-sheet');
+                    
+                    // Chỉ mở khóa cuộn body nếu không có page-cart active bên dưới
+                    const cartContainer = document.getElementById('page-cart');
+                    const isCartActive = cartContainer && cartContainer.classList.contains('active-overlay');
+                    if (!isCartActive) {
+                        document.body.style.overflow = '';
+                    }
+                    
+                    // Dọn dẹp canvas và sự kiện
+                    if (typeof window.detailCanvasCleanup === 'function') {
+                        try { window.detailCanvasCleanup(); window.detailCanvasCleanup = null; } catch(e) { console.error(e); }
+                    }
+
+                    setTimeout(() => {
+                        detailContainer.style.display = 'none';
+                        detailContainer.remove(); // Xoá để giải phóng bộ nhớ và sự kiện
+                    }, 700);
+                }
+            },
+
+            async navigateTo(url, isBack = false) {
+                if (this.isTransitioning) return;
+                
+                const fromUrl = this.currentUrl || window.location.href;
+                const toUrl = url;
+                
+                const fromContainerId = this.getPageContainerId(fromUrl);
+                const toContainerId = this.getPageContainerId(toUrl);
+
+                // 🚀 Khắc phục tự lặp: Nếu click vào chính URL hiện tại (hoặc cùng trang)
+                if (this.cleanUrl(toUrl) === this.cleanUrl(fromUrl)) {
+                    const toParams = new URL(toUrl, window.location.origin).searchParams;
+                    const fromParams = new URL(fromUrl, window.location.origin).searchParams;
+                    if (toParams.toString() === fromParams.toString()) {
+                        // Cùng tham số query -> cuộn lên đầu
+                        if (toContainerId === 'page-detail') {
+                            const detailSheet = document.getElementById('page-detail');
+                            if (detailSheet) detailSheet.scrollTo({ top: 0, behavior: 'smooth' });
+                        } else {
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                        this.isTransitioning = false;
+                        return;
+                    }
+                }
+                
+                // Luôn cập nhật currentUrl ngay từ đầu
+                this.currentUrl = toUrl;
+                
+                const fromIndex = this.getPageIndex(fromUrl);
+                const toIndex = this.getPageIndex(toUrl);
+
+                // Nếu đích đến là Detail, tự động cập nhật productId phục vụ Morph Zoom
+                if (toContainerId === 'page-detail') {
+                    try {
+                        const urlObj = new URL(toUrl, window.location.origin);
+                        const pid = urlObj.searchParams.get('id');
+                        if (pid) {
+                            this.lastClickedProductId = pid;
+                        }
+                    } catch (e) {}
+                }
+
+                // Lưu trạng thái cuộn của trang hiện tại trước khi chuyển đi
+                if (fromContainerId !== 'page-cart') {
+                    this.scrollPositions[this.cleanUrl(fromUrl)] = window.scrollY;
+                }
+
+                // Cập nhật lịch sử duyệt web
+                if (!isBack) {
+                    history.pushState(null, '', toUrl);
+                }
+
+                this.isTransitioning = true;
+
+                // Xử lý riêng nếu đích đến là Giỏ hàng (Overlay trượt xuống)
+                if (toContainerId === 'page-cart') {
+                    // Lưu URL trang nền hiện tại
+                    if (fromContainerId !== 'page-cart') {
+                        this.backgroundPageUrl = fromUrl;
+                    }
+                    try {
+                        const spaUrl = toUrl + (toUrl.includes('?') ? '&' : '?') + 'spa=1';
+                        const res = await fetch(spaUrl);
+                        const htmlText = await res.text();
+                        
+                        const doc = new DOMParser().parseFromString(htmlText, 'text/html');
+                        const titleMeta = doc.querySelector('title-meta');
+                        if (titleMeta) {
+                            document.title = titleMeta.getAttribute('data-title') || document.title;
+                        }
+                        
+                        this.showCartOverlay(toUrl, htmlText);
+                    } catch (e) {
+                        console.error("Lỗi AJAX tải giỏ hàng:", e);
+                        this.isTransitioning = false;
+                        window.location.href = toUrl; // fallback
+                    }
+                    return;
+                }
+
+                // Nếu đang ở Giỏ hàng và đi tới trang khác
+                if (fromContainerId === 'page-cart') {
+                    // Xem trang đích đã có trong DOM chưa
+                    let toContainer = document.getElementById(toContainerId);
+                    const isCached = (toContainer !== null);
+
+                    if (isCached) {
+                        this.hideCartOverlay();
+                        this.updateNavbar(toUrl);
+                        this.isTransitioning = false;
+                        return;
+                    } else {
+                        // Tải trang đích chèn xuống dưới overlay
+                        try {
+                            const spaUrl = toUrl + (toUrl.includes('?') ? '&' : '?') + 'spa=1';
+                            const res = await fetch(spaUrl);
+                            const htmlText = await res.text();
+
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(htmlText, 'text/html');
+                            
+                            toContainer = document.createElement('div');
+                            toContainer.id = toContainerId;
+                            toContainer.className = 'spa-page active';
+                            
+                            const titleMeta = doc.querySelector('title-meta');
+                            if (titleMeta) {
+                                const pageTitle = titleMeta.getAttribute('data-title') || document.title;
+                                document.title = pageTitle;
+                                toContainer.setAttribute('data-page-title', pageTitle);
+                            }
+                            
+                            toContainer.innerHTML = htmlText;
+                            
+                            // Chèn trước page-cart để nằm ở dưới
+                            const viewport = document.getElementById('spa-viewport');
+                            const cartOverlay = document.getElementById('page-cart');
+                            if (cartOverlay) {
+                                viewport.insertBefore(toContainer, cartOverlay);
+                            } else {
+                                viewport.appendChild(toContainer);
+                            }
+                            
+                            this.executeScripts(toContainer);
+                            
+                            if (toContainerId === 'page-shop' && typeof window.initShopPage === 'function') {
+                                window.initShopPage();
+                            } else if (toContainerId === 'page-home' && typeof window.initHomePage === 'function') {
+                                window.initHomePage();
+                            }
+
+                            this.hideCartOverlay();
+                            this.updateNavbar(toUrl);
+                            this.isTransitioning = false;
+                        } catch (e) {
+                            console.error("Lỗi AJAX tải trang nền khi đóng giỏ hàng:", e);
+                            this.isTransitioning = false;
+                            window.location.href = toUrl;
+                        }
+                        return;
+                    }
+                }
+
+                // Xử lý riêng nếu đích đến là Chi tiết sản phẩm (Sheet trượt từ dưới lên)
+                if (toContainerId === 'page-detail') {
+                    // Lưu URL trang nền hiện tại
+                    if (fromContainerId !== 'page-detail' && fromContainerId !== 'page-cart') {
+                        this.backgroundPageUrl = fromUrl;
+                    }
+                    try {
+                        const spaUrl = toUrl + (toUrl.includes('?') ? '&' : '?') + 'spa=1';
+                        const res = await fetch(spaUrl);
+                        const htmlText = await res.text();
+                        
+                        const doc = new DOMParser().parseFromString(htmlText, 'text/html');
+                        const titleMeta = doc.querySelector('title-meta');
+                        if (titleMeta) {
+                            document.title = titleMeta.getAttribute('data-title') || document.title;
+                        }
+                        
+                        this.showDetailSheet(toUrl, htmlText);
+                    } catch (e) {
+                        console.error("Lỗi AJAX tải chi tiết sản phẩm:", e);
+                        this.isTransitioning = false;
+                        window.location.href = toUrl; // fallback
+                    }
+                    return;
+                }
+
+                // Nếu đang ở Chi tiết sản phẩm và đi tới trang khác
+                if (fromContainerId === 'page-detail') {
+                    // Xem trang đích đã có trong DOM chưa
+                    let toContainer = document.getElementById(toContainerId);
+                    const isCached = (toContainer !== null);
+
+                    if (isCached) {
+                        // Kịch bản mượt nhất: Trang nền đã có sẵn bên dưới sheet
+                        this.hideDetailSheet();
+                        this.updateNavbar(toUrl);
+                        this.isTransitioning = false;
+                        return;
+                    } else {
+                        // Kịch bản truy cập trực tiếp: Phải tải trang nền chèn xuống dưới sheet
+                        try {
+                            const spaUrl = toUrl + (toUrl.includes('?') ? '&' : '?') + 'spa=1';
+                            const res = await fetch(spaUrl);
+                            const htmlText = await res.text();
+
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(htmlText, 'text/html');
+                            
+                            toContainer = document.createElement('div');
+                            toContainer.id = toContainerId;
+                            toContainer.className = 'spa-page active'; // Bật active ngay lập tức dưới nền
+                            
+                            const titleMeta = doc.querySelector('title-meta');
+                            if (titleMeta) {
+                                const pageTitle = titleMeta.getAttribute('data-title') || document.title;
+                                document.title = pageTitle;
+                                toContainer.setAttribute('data-page-title', pageTitle);
+                            }
+                            
+                            toContainer.innerHTML = htmlText;
+                            
+                            // Chèn trước page-detail để nó nằm bên dưới sheet
+                            const viewport = document.getElementById('spa-viewport');
+                            const detailSheet = document.getElementById('page-detail');
+                            if (detailSheet) {
+                                viewport.insertBefore(toContainer, detailSheet);
+                            } else {
+                                viewport.appendChild(toContainer);
+                            }
+                            
+                            // Thực thi scripts của trang đích
+                            this.executeScripts(toContainer);
+                            
+                            if (toContainerId === 'page-shop' && typeof window.initShopPage === 'function') {
+                                window.initShopPage();
+                            } else if (toContainerId === 'page-home' && typeof window.initHomePage === 'function') {
+                                window.initHomePage();
+                            }
+
+                            // Giờ trượt sheet detail xuống để lộ trang nền vừa chèn
+                            this.hideDetailSheet();
+                            this.updateNavbar(toUrl);
+                            this.isTransitioning = false;
+                        } catch (e) {
+                            console.error("Lỗi AJAX tải trang nền khi đóng sheet:", e);
+                            this.isTransitioning = false;
+                            window.location.href = toUrl; // fallback
+                        }
+                        return;
+                    }
+                }
+
+                try {
+                    // Lấy hoặc tạo container trang đích
+                    let toContainer = document.getElementById(toContainerId);
+                    const isCached = (toContainer !== null);
+
+                    // Tải trang AJAX nếu chưa có trong DOM
+                    if (!isCached) {
+                        const spaUrl = toUrl + (toUrl.includes('?') ? '&' : '?') + 'spa=1';
+                        const res = await fetch(spaUrl);
+                        const htmlText = await res.text();
+
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(htmlText, 'text/html');
+                        
+                        // Cập nhật tiêu đề trang
+                        const titleMeta = doc.querySelector('title-meta');
+                        if (titleMeta) {
+                            const pageTitle = titleMeta.getAttribute('data-title') || document.title;
+                            document.title = pageTitle;
+                            toContainer = document.createElement('div');
+                            toContainer.setAttribute('data-page-title', pageTitle);
+                        } else {
+                            toContainer = document.createElement('div');
+                        }
+
+                        toContainer.id = toContainerId;
+                        toContainer.className = 'spa-page';
+                        toContainer.innerHTML = htmlText;
+                        document.getElementById('spa-viewport').appendChild(toContainer);
+
+                        // Thực thi inline scripts trong trang mới an toàn
+                        try {
+                            this.executeScripts(toContainer);
+                        } catch (scriptErr) {
+                            console.error("SPA: Lỗi thực thi script trang mới:", scriptErr);
+                        }
+                    } else {
+                        // Nếu đã có sẵn trong DOM (cached), chúng ta chỉ cần hiển thị nó lên
+                        toContainer.style.display = 'block';
+                        const cachedTitle = toContainer.getAttribute('data-page-title');
+                        if (cachedTitle) {
+                            document.title = cachedTitle;
+                        }
+                    }
+
+                    const fromContainer = document.getElementById(fromContainerId);
+                    
+                    // Xác định hướng hoạt ảnh chuyển trang
+                    let isRight = toIndex < fromIndex;
+                    const isVerticalTransition = (fromContainerId === 'page-shop' && toContainerId === 'page-detail') ||
+                                                 (fromContainerId === 'page-detail' && toContainerId === 'page-shop');
+                    const isUp = (fromContainerId === 'page-shop' && toContainerId === 'page-detail');
+
+                    // Lấy vị trí cuộn trang hiện tại và đích đến
+                    const currentScroll = window.scrollY;
+                    const savedScroll = this.scrollPositions[this.cleanUrl(toUrl)] || 0;
+
+                    // Chuẩn bị chuyển trang
+                    const viewport = document.getElementById('spa-viewport');
+                    viewport.classList.add('spa-viewport-transitioning');
+
+                    // Đóng băng trang cũ ở vị trí cuộn hiện tại để không bị nhảy giật
+                    if (fromContainer) {
+                        fromContainer.style.position = 'fixed';
+                        fromContainer.style.top = `-${currentScroll}px`;
+                        fromContainer.style.left = '0';
+                        fromContainer.style.width = '100%';
+                        fromContainer.style.height = '100vh';
+                        fromContainer.style.overflow = 'hidden';
+                        
+                        fromContainer.classList.add('spa-leaving');
+                        if (isVerticalTransition) {
+                            fromContainer.classList.add(isUp ? 'slide-up-leaving' : 'slide-down-leaving');
+                        } else {
+                            fromContainer.classList.add(isRight ? 'slide-right-leaving' : 'slide-left-leaving');
+                        }
+                    }
+
+                    // Cuộn trang mới đến vị trí đích
+                    // Bù chiều cao tạm thời cho trang shop để tránh cuộn hụt khi trang chưa vẽ đủ chiều cao
+                    if (toContainerId === 'page-shop') {
+                        toContainer.style.minHeight = '3000px';
+                    }
+                    window.scrollTo(0, savedScroll);
+
+                    // Thêm class bắt đầu transition cho toContainer
+                    toContainer.classList.add('spa-entering');
+                    if (isVerticalTransition) {
+                        toContainer.classList.add(isUp ? 'slide-up-entering-start' : 'slide-down-entering-start');
+                    } else {
+                        toContainer.classList.add(isRight ? 'slide-right-entering-start' : 'slide-left-entering-start');
+                    }
+                    
+                    // Buộc reflow
+                    toContainer.offsetWidth;
+
+                    // Chạy hoạt ảnh
+                    if (isVerticalTransition) {
+                        toContainer.classList.remove(isUp ? 'slide-up-entering-start' : 'slide-down-entering-start');
+                        toContainer.classList.add(isUp ? 'slide-up-entering-end' : 'slide-down-entering-end');
+                    } else {
+                        toContainer.classList.remove(isRight ? 'slide-right-entering-start' : 'slide-left-entering-start');
+                        toContainer.classList.add(isRight ? 'slide-right-entering-end' : 'slide-left-entering-end');
+                    }
+
+                    // Cập nhật trạng thái navbar
+                    this.updateNavbar(toUrl);
+
+                    // Chờ hoạt ảnh chuyển trang hoàn thành (600ms)
+                    setTimeout(() => {
+                        try {
+                            // Dọn dẹp trang cũ bằng cách xóa hoàn toàn khỏi DOM
+                            if (fromContainer) {
+                                // Thực hiện dọn dẹp các sự kiện để tránh lỗi rò rỉ listener gây giật lag
+                                if (fromContainerId === 'page-home' && typeof window.homePageCleanup === 'function') {
+                                    try { window.homePageCleanup(); window.homePageCleanup = null; } catch(e) { console.error(e); }
+                                } else if (fromContainerId === 'page-shop' && typeof window.shopPageCleanup === 'function') {
+                                    try { window.shopPageCleanup(); window.shopPageCleanup = null; } catch(e) { console.error(e); }
+                                } else if (fromContainerId === 'page-detail' && typeof window.detailCanvasCleanup === 'function') {
+                                    try { window.detailCanvasCleanup(); window.detailCanvasCleanup = null; } catch(e) { console.error(e); }
+                                }
+                                fromContainer.remove();
+                            }
+
+                            toContainer.classList.remove(
+                                'spa-entering', 'slide-left-entering-end', 'slide-right-entering-end',
+                                'slide-up-entering-end', 'slide-down-entering-end'
+                            );
+                            toContainer.classList.add('active');
+                            toContainer.style.display = 'block';
+
+                            // Khôi phục lại chiều cao mặc định sau khi đã hoàn tất transition
+                            if (toContainerId === 'page-shop') {
+                                toContainer.style.minHeight = '';
+                            }
+
+                            // Xóa sạch tất cả các page container thừa thãi khác để tránh ô nhiễm CSS cục bộ
+                            const pages = viewport.querySelectorAll('.spa-page');
+                            pages.forEach(p => {
+                                if (p.id !== toContainerId && p.id !== 'page-cart') {
+                                    p.remove();
+                                }
+                            });
+
+                            viewport.classList.remove('spa-viewport-transitioning');
+
+                            // Phục hồi vị trí cuộn trang
+                            window.scrollTo(0, savedScroll);
+
+                            // Khởi chạy lại script khởi tạo của từng trang an toàn
+                            try {
+                                if (toContainerId === 'page-shop' && typeof window.initShopPage === 'function') {
+                                    window.initShopPage();
+                                } else if (toContainerId === 'page-detail' && typeof window.initDetailPage === 'function') {
+                                    window.initDetailPage();
+                                } else if (toContainerId === 'page-home' && typeof window.initHomePage === 'function') {
+                                    window.initHomePage();
+                                }
+                            } catch (initErr) {
+                                console.error("SPA: Lỗi khởi chạy script khởi tạo trang mới:", initErr);
+                            }
+
+                            // Khởi tạo lại và làm tươi AOS cho các phần tử động mới chèn vào DOM
+                            if (typeof AOS !== 'undefined') {
+                                try {
+                                    AOS.init({ 
+                                        once: (toContainerId !== 'page-home'), // 🚀 Chỉ chạy 1 lần ở các trang khác để tránh lặp lại kỳ cục
+                                        mirror: (toContainerId === 'page-home'), // 🚀 Chỉ bật mirror cho trang chủ
+                                        offset: 100 
+                                    });
+                                    AOS.refresh();
+                                } catch(aosErr) {}
+                            }
+                        } catch (transitionErr) {
+                            console.error("SPA: Lỗi trong quá trình hoàn thành transition:", transitionErr);
+                        } finally {
+                            this.isTransitioning = false; // 🔓 Luôn giải phóng khóa điều hướng
+                        }
+                    }, 650);
+
+                } catch (e) {
+                    console.error("Lỗi AJAX tải trang:", e);
+                    this.isTransitioning = false;
+                    window.location.href = toUrl; // fallback
+                }
+            }
+        };
+
+        // Lắng nghe click để lưu Product ID phục vụ Morph Zoom
+        document.addEventListener('mousedown', function(e) {
+            const cardLink = e.target.closest('.product-card a[href*="id="]') || e.target.closest('.product-card-clean a[href*="id="]') || e.target.closest('.product-card-layout2 a[href*="id="]');
+            if (cardLink) {
+                try {
+                    const url = new URL(cardLink.href);
+                    const pid = url.searchParams.get('id');
+                    if (pid) {
+                        SPARouter.lastClickedProductId = pid;
+                    }
+                } catch (err) {}
+            }
+        });
+
+        // Lắng nghe sự kiện đi lùi/tiến lịch sử trình duyệt
+        window.addEventListener('popstate', function() {
+            SPARouter.navigateTo(window.location.href, true);
+        });
+
+        // Hỗ trợ sự kiện click trên các anchor tags local
+        document.addEventListener('click', function(e) {
+            const link = e.target.closest('a');
+            if (!link) return;
+            
+            if (link.target === '_blank' || link.hasAttribute('data-no-spa') || link.closest('[data-no-spa]')) return;
+            
+            const href = link.getAttribute('href');
+            if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+            
+            try {
+                const url = new URL(href, window.location.origin);
+                if (url.origin !== window.location.origin) return;
+                
+                e.preventDefault();
+                SPARouter.navigateTo(href);
+            } catch (err) {}
+        });
+
+        // Can thiệp submit GET Form (Tìm kiếm, bộ lọc)
+        document.addEventListener('submit', function(e) {
+            if (e.defaultPrevented) return;
+            const form = e.target;
+            if (form.method.toLowerCase() === 'get' && !form.hasAttribute('data-no-spa')) {
+                const action = form.getAttribute('action') || 'index.php';
+                try {
+                    const url = new URL(action, window.location.origin);
+                    if (url.origin === window.location.origin) {
+                        e.preventDefault();
+                        const formData = new FormData(form);
+                        const params = new URLSearchParams(formData);
+                        const targetUrl = action + (action.includes('?') ? '&' : '?') + params.toString();
+                        SPARouter.navigateTo(targetUrl);
+                    }
+                } catch (err) {}
+            }
+        });
+
+        // Tự động kích hoạt overlay giỏ hàng hoặc sheet chi tiết trên trang load đầu tiên
+        document.addEventListener('DOMContentLoaded', function() {
+            const activePage = document.querySelector('.spa-page.active');
+            if (activePage) {
+                if (activePage.id === 'page-cart') {
+                    activePage.classList.add('active-overlay');
+                } else if (activePage.id === 'page-detail') {
+                    activePage.classList.add('active-sheet');
+                    document.body.style.overflow = 'hidden'; // ✅ Khóa cuộn trang nền dưới sheet
+                }
+            }
+        });
+
+        // Xuất ra phạm vi toàn cục để tiện sử dụng ở các trang con
+        window.navigateToSPA = (url) => SPARouter.navigateTo(url);
+        window.hideCartOverlaySPA = () => SPARouter.hideCartOverlay();
+    })();
     </script>
 </body>
 </html>

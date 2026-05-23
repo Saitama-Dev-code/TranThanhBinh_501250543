@@ -295,8 +295,9 @@ include __DIR__ . '/partials/header.php';
     position: fixed;
     bottom: 30px;
     right: 30px;
-    background: #1e293b;
-    color: white;
+    background: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
     padding: 14px 20px;
     border-radius: 14px;
     display: flex;
@@ -337,6 +338,13 @@ include __DIR__ . '/partials/header.php';
     animation: cartSlideDown 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 </style>
+
+<!-- Nút Đóng giỏ hàng SPA Overlay -->
+<div class="cart-close-btn-wrapper">
+    <button type="button" class="btn-cart-close" id="btn-close-cart-overlay" title="Quay lại">
+        <i class="fas fa-times"></i>
+    </button>
+</div>
 
 <!-- Canvas Ripple sóng âm (giống product_detail nhưng màu xanh dương) -->
 <canvas id="cart-canvas"></canvas>
@@ -592,13 +600,13 @@ include __DIR__ . '/partials/header.php';
 <!-- Custom Confirmation Modal (Khung câu hỏi xóa sản phẩm) -->
 <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true" style="backdrop-filter: blur(8px); z-index: 1060;">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content glass-panel p-4" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 1.5rem; box-shadow: 0 15px 35px rgba(0,0,0,0.4);">
+        <div class="modal-content glass-panel p-4" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 1.5rem; box-shadow: 0 15px 35px rgba(0,0,0,0.4); color: var(--text-color) !important;">
             <div class="modal-body text-center">
                 <i class="fas fa-exclamation-circle text-warning fa-3x mb-3 animate__animated animate__pulse animate__infinite"></i>
                 <h5 class="fw-bold mb-3" style="color: var(--text-color);">Xác nhận xóa</h5>
                 <p class="mb-4" id="delete-modal-msg" style="color: var(--text-color); opacity: 0.8;">Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?</p>
                 <div class="d-flex justify-content-center gap-3">
-                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn rounded-pill px-4" data-bs-dismiss="modal" style="color: var(--text-color); border: 1px solid var(--border-color); background: transparent; transition: all 0.2s;">Hủy</button>
                     <button type="button" class="btn btn-danger rounded-pill px-4" id="btn-confirm-delete">Đồng ý xóa</button>
                 </div>
             </div>
@@ -666,7 +674,7 @@ function updateNavBadge(count) {
 let deleteAction = null;
 let deleteModal = null;
 
-document.addEventListener('DOMContentLoaded', () => {
+window.initCartPage = function() {
     const modalEl = document.getElementById('deleteConfirmModal');
     if (modalEl) {
         deleteModal = new bootstrap.Modal(modalEl);
@@ -683,7 +691,32 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-});
+
+    // Xử lý nút đóng giỏ hàng
+    const closeCartBtn = document.getElementById('btn-close-cart-overlay');
+    if (closeCartBtn) {
+        closeCartBtn.addEventListener('click', () => {
+            if (typeof window.hideCartOverlaySPA === 'function') {
+                window.hideCartOverlaySPA();
+                if (history.length > 1) {
+                    history.back();
+                } else {
+                    window.navigateToSPA('index.php?controller=product&action=index');
+                }
+            } else {
+                const cartPage = document.getElementById('page-cart');
+                if (cartPage && cartPage.classList.contains('active-overlay')) {
+                    cartPage.classList.remove('active-overlay');
+                    document.body.style.overflow = '';
+                    setTimeout(() => {
+                        cartPage.style.display = 'none';
+                    }, 700);
+                }
+                window.location.href = 'index.php?controller=product&action=index';
+            }
+        });
+    }
+};
 
 /**
  * Hiển thị khung câu hỏi xác nhận xóa sản phẩm
@@ -693,7 +726,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function showDeleteConfirm(itemName, onConfirm) {
     const msgEl = document.getElementById('delete-modal-msg');
     if (msgEl) {
-        msgEl.innerHTML = `Bạn có chắc chắn muốn xóa sản phẩm <strong class="text-primary">${itemName}</strong> khỏi giỏ hàng?`;
+        msgEl.innerHTML = `Bạn có chắc chắn muốn xóa sản phẩm <strong style="color: #60a5fa !important;">${itemName}</strong> khỏi giỏ hàng?`;
     }
     deleteAction = onConfirm;
     if (deleteModal) {
@@ -874,11 +907,28 @@ function showEmptyCart() {
     let W, H;
     let time = 0;
 
+    // Hủy các listener cũ của Cart nếu có
+    if (window.cartCanvasCleanup) {
+        window.cartCanvasCleanup();
+    }
+
     function resize() {
         W = canvas.width  = window.innerWidth;
         H = canvas.height = window.innerHeight;
     }
+    const onMouseMove = (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    };
+
     window.addEventListener('resize', resize);
+    window.addEventListener('mousemove', onMouseMove);
+
+    window.cartCanvasCleanup = function() {
+        window.removeEventListener('resize', resize);
+        window.removeEventListener('mousemove', onMouseMove);
+    };
+
     resize();
 
     // Định nghĩa các dải sóng ruy băng cực quang phát sáng
@@ -910,10 +960,6 @@ function showEmptyCart() {
     ];
 
     let mouseX = -1000, mouseY = -1000;
-    window.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-    });
 
     function drawRibbon(rb) {
         const centerY = H * rb.yPercent;
@@ -967,6 +1013,13 @@ function showEmptyCart() {
     }
 
     function loop() {
+        if (!canvas || !document.body.contains(canvas)) {
+            if (window.cartCanvasCleanup) {
+                window.cartCanvasCleanup();
+                window.cartCanvasCleanup = null;
+            }
+            return;
+        }
         ctx.clearRect(0, 0, W, H);
         time += 0.8;
         

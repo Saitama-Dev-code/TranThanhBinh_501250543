@@ -21,6 +21,11 @@ $currentController = $_GET['controller'] ?? 'home';
 //   để tránh việc load màn hình chờ gây gián đoạn trải nghiệm người dùng.
 // =========================================================================
 $isFiltering = ($currentController == 'product' || $currentController == 'cart');
+
+if (isset($_GET['spa']) && $_GET['spa'] == '1') {
+    echo '<title-meta data-title="' . htmlspecialchars($pageTitle ?? 'TTB - Giai Điệu Của Riêng Bạn') . '"></title-meta>';
+    return;
+}
 ?>
 <!DOCTYPE html>
 <html lang="vi" data-theme="dark">
@@ -433,6 +438,217 @@ $isFiltering = ($currentController == 'product' || $currentController == 'cart')
             transform: scale(1.15);
             color: #3b82f6 !important;
         }
+
+        /* ================= SPA CORE LAYOUT & TRANSITIONS ================= */
+        #spa-viewport {
+            position: relative;
+            width: 100%;
+            min-height: 75vh;
+        }
+        .spa-page {
+            display: none;
+            width: 100%;
+        }
+        .spa-page.active {
+            display: block;
+        }
+
+        /* Lớp bọc tạm thời khi đang slide transition */
+        .spa-viewport-transitioning {
+            overflow: hidden;
+            height: 100vh;
+            position: fixed;
+            width: 100%;
+        }
+
+        .spa-page.spa-leaving {
+            display: block !important;
+            position: fixed;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            z-index: 10;
+            pointer-events: none;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s ease;
+        }
+
+        .spa-page.spa-entering {
+            display: block !important;
+            position: fixed;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            z-index: 20;
+            pointer-events: none;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s ease;
+        }
+
+        /* Slide Trái (Đi tới) */
+        .spa-page.slide-left-leaving {
+            transform: translateX(-100%);
+            opacity: 0.7;
+        }
+        .spa-page.slide-left-entering-start {
+            transform: translateX(100%);
+        }
+        .spa-page.slide-left-entering-end {
+            transform: translateX(0);
+        }
+
+        /* Slide Phải (Quay lại) */
+        .spa-page.slide-right-leaving {
+            transform: translateX(100%);
+            opacity: 0.7;
+        }
+        .spa-page.slide-right-entering-start {
+            transform: translateX(-100%);
+        }
+        .spa-page.slide-right-entering-end {
+            transform: translateX(0);
+        }
+
+        /* Slide Lên (Shop -> Detail) */
+        .spa-page.slide-up-leaving {
+            transform: translateY(-50px);
+            opacity: 0.5;
+        }
+        .spa-page.slide-up-entering-start {
+            transform: translateY(100vh);
+        }
+        .spa-page.slide-up-entering-end {
+            transform: translateY(0);
+        }
+
+        /* Slide Xuống (Detail -> Shop) */
+        .spa-page.slide-down-leaving {
+            transform: translateY(100vh) !important;
+            opacity: 1 !important; /* ✅ Không ẩn dần, trượt hẳn xuống dưới */
+            z-index: 25; /* Đè lên trang shop bên dưới */
+        }
+        .spa-page.slide-down-entering-start {
+            transform: translateY(-50px);
+            opacity: 0.5;
+        }
+        .spa-page.slide-down-entering-end {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* ================= CART SLIDE OVERLAY ================= */
+        .spa-page#page-cart {
+            display: block !important;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 1050; /* Đè lên navbar (1030) */
+            background: rgba(15, 23, 42, 0.95); /* ✅ Thay đổi thành 0.95 tối vững để triệt tiêu lag của blur */
+            transform: translateY(-100%);
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            overflow-y: auto;
+            pointer-events: none;
+            scrollbar-width: none; /* ✅ Ẩn thanh cuộn trên Firefox */
+            -ms-overflow-style: none; /* ✅ Ẩn thanh cuộn trên IE/Edge */
+        }
+        .spa-page#page-cart::-webkit-scrollbar {
+            display: none; /* ✅ Ẩn thanh cuộn trên Chrome/Safari/Opera */
+        }
+        .spa-page#page-cart.active-overlay {
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* ================= DETAIL SLIDE SHEET OVERLAY ================= */
+        .spa-page#page-detail {
+            display: block !important;
+            position: fixed;
+            top: 76px; /* Bắt đầu ngay dưới navbar */
+            left: 0;
+            width: 100%;
+            height: calc(100vh - 76px); /* Chiều cao phần còn lại */
+            z-index: 1020; /* Nằm dưới navbar (1030) */
+            background: var(--bg-color);
+            transform: translateY(100vh);
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
+            pointer-events: none;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .spa-page#page-detail::-webkit-scrollbar {
+            display: none;
+        }
+        .spa-page#page-detail.active-sheet {
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* Thêm nút Đóng giỏ hàng ở vị trí nổi bật */
+        .cart-close-btn-wrapper {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            z-index: 10;
+        }
+        .btn-cart-close {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-cart-close:hover {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+            transform: rotate(90deg);
+        }
+
+        /* Ảnh ảo dùng cho Morph Zoom */
+        .morph-temp-image {
+            position: fixed;
+            pointer-events: none;
+            z-index: 99999;
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.65s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* Morph transition classes */
+        .spa-page.morph-leaving {
+            display: block !important;
+            position: fixed;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            z-index: 10;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            opacity: 0;
+        }
+        .spa-page.morph-entering {
+            display: block !important;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 20;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            opacity: 0;
+        }
+        .spa-page.morph-entering-active {
+            opacity: 1;
+        }
     </style>
 </head>
 
@@ -600,7 +816,7 @@ $isFiltering = ($currentController == 'product' || $currentController == 'cart')
 
     <nav class="navbar navbar-expand-lg" id="smartNavbar">
         <div class="container">
-            <a class="navbar-brand-modern" href="index.php?controller=home">
+            <a class="navbar-brand-modern" href="index.php?controller=home" data-no-spa>
                 <i class="fas fa-music text-primary me-2 logo-icon-spin"></i>
                 <span class="char-t1">
                     <span class="bar-top"></span>
@@ -619,8 +835,7 @@ $isFiltering = ($currentController == 'product' || $currentController == 'cart')
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
                         <a class="nav-link <?= ($currentController == 'home') ? 'active' : '' ?>"
-                            href="<?= ($currentController == 'home') ? '#top' : 'index.php?controller=home' ?>"
-                            onclick="<?= ($currentController == 'home') ? 'window.scrollTo({top: 0, behavior: \'smooth\'}); return false;' : '' ?>">
+                            href="index.php?controller=home">
                             Trang chủ
                         </a>
                     </li>
@@ -665,3 +880,17 @@ $isFiltering = ($currentController == 'product' || $currentController == 'cart')
         </div>
     </nav>
     <div class="main-content-wrapper" style="min-height: 75vh;">
+        <div id="spa-viewport">
+            <?php
+            $activePageId = 'page-home';
+            if ($currentController === 'product') {
+                if (isset($_GET['action']) && $_GET['action'] === 'detail') {
+                    $activePageId = 'page-detail';
+                } else {
+                    $activePageId = 'page-shop';
+                }
+            } else if ($currentController === 'cart') {
+                $activePageId = 'page-cart';
+            }
+            ?>
+            <div id="<?= $activePageId ?>" class="spa-page active">

@@ -255,5 +255,25 @@ class Product extends BaseModel {
 
         return $result;
     }
+
+    /**
+     * HÀM: Lấy danh sách sản phẩm ngẫu nhiên (nổi bật)
+     * - @param int $limit Số lượng sản phẩm cần lấy (mặc định 6)
+     * - @param int|null $excludeId ID sản phẩm cần loại trừ
+     */
+    public function getRandomProducts($limit = 6, $excludeId = null) {
+        $sql = "SELECT * FROM {$this->table} WHERE 1=1";
+        if ($excludeId !== null) {
+            $sql .= " AND id != :exclude_id";
+        }
+        $sql .= " ORDER BY RAND() LIMIT " . (int)$limit;
+        
+        $stmt = $this->db->prepare($sql);
+        if ($excludeId !== null) {
+            $stmt->bindValue(':exclude_id', (int)$excludeId, PDO::PARAM_INT);
+        }
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 }
 ?>

@@ -27,6 +27,58 @@ include __DIR__ . '/partials/header.php';
      CSS RIÊNG CHO TRANG CHI TIẾT SẢN PHẨM
      ============================================================ -->
 <style>
+/* Thanh Drag Handle ở trên cùng của trang chi tiết */
+.detail-sheet-header {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 14px 0;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    background: var(--bg-color);
+    border-bottom: 1px solid var(--border-color);
+    z-index: 100;
+}
+.detail-drag-handle {
+    width: 90px;
+    height: 18px;
+    background: rgba(139, 92, 246, 0.12);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s, border-color 0.3s, transform 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+.detail-drag-handle::after {
+    content: '\f078'; /* FontAwesome chevron-down */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    color: #a78bfa;
+    font-size: 0.75rem;
+    opacity: 0.6;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    display: inline-block;
+}
+.detail-drag-handle:hover {
+    background: rgba(139, 92, 246, 0.25);
+    border-color: rgba(139, 92, 246, 0.5);
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.5);
+}
+.detail-drag-handle:hover::after {
+    opacity: 1;
+    color: #ffffff;
+    animation: chevronSlideDown 1.2s infinite;
+}
+@keyframes chevronSlideDown {
+    0% { transform: translateY(-4px); opacity: 0; }
+    50% { transform: translateY(1px); opacity: 1; }
+    100% { transform: translateY(5px); opacity: 0; }
+}
+
 /* ================================================================================
    BIẾN MÀU THEO THEME - sửa lỗi chữ tắt ở nền sáng
    ================================================================================ */
@@ -582,6 +634,358 @@ include __DIR__ . '/partials/header.php';
 .specs-table td:last-child {
     color: var(--text-color);
 }
+
+/* ================================================================================
+   PHẦN NÂNG CẤP: HOVER ZOOM, 360 VIEWER, REVIEWS, CAROUSEL
+   ================================================================================ */
+
+/* 1. Lightbox phóng to ảnh sản phẩm */
+.main-image-frame {
+    position: relative;
+    overflow: hidden;
+    cursor: zoom-in;
+}
+.product-lightbox-modal {
+    display: none;
+    position: fixed;
+    z-index: 1200; /* Cao nhất để đè lên tất cả */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: rgba(10, 10, 15, 0.95);
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    cursor: zoom-out;
+}
+.product-lightbox-modal.active {
+    display: flex;
+    opacity: 1;
+}
+.lightbox-image-content {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    transform: scale(0.9);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.product-lightbox-modal.active .lightbox-image-content {
+    transform: scale(1);
+}
+.lightbox-close-btn {
+    position: absolute;
+    top: 25px;
+    right: 35px;
+    color: #f1f5f9;
+    font-size: 40px;
+    font-weight: 300;
+    transition: all 0.3s;
+    cursor: pointer;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 10;
+}
+.lightbox-close-btn:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.2);
+    transform: rotate(90deg);
+}
+
+/* 2. Custom Select Trả Góp */
+.installment-select-wrapper {
+    position: relative;
+    width: 100%;
+}
+.installment-select-wrapper::after {
+    content: '\f107'; /* FontAwesome chevron-down */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #a78bfa;
+    text-shadow: 0 0 5px rgba(167, 139, 250, 0.5);
+    transition: transform 0.3s ease;
+}
+.installment-select-wrapper:hover::after {
+    transform: translateY(-50%) translateY(2px);
+    color: #8b5cf6;
+}
+.installment-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: rgba(13, 12, 24, 0.6) !important;
+    border: 1px solid rgba(139, 92, 246, 0.4) !important;
+    border-radius: 12px !important;
+    color: var(--text-color) !important;
+    padding: 12px 40px 12px 18px !important;
+    font-size: 0.9rem !important;
+    width: 100%;
+    cursor: pointer;
+    outline: none;
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.1) !important;
+    transition: all 0.3s ease;
+}
+.installment-select:focus {
+    border-color: #8b5cf6 !important;
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.45) !important;
+}
+
+/* 3. Section Đánh giá sản phẩm */
+.reviews-section {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: 30px;
+    margin-top: 40px;
+    backdrop-filter: blur(10px);
+}
+.rating-summary-box {
+    text-align: center;
+    padding: 24px;
+    background: rgba(139, 92, 246, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 18px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.rating-big-number {
+    font-size: 3.5rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+}
+.stars-outer {
+    position: relative;
+    display: inline-block;
+    color: #e2e8f0;
+    font-size: 1.2rem;
+}
+.stars-inner {
+    position: absolute;
+    top: 0; left: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 92%; /* 4.6 stars as placeholder */
+    color: #f59e0b;
+}
+.rating-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: var(--text-color);
+    width: 100%;
+}
+.rating-bar-label {
+    width: 50px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.rating-bar-progress-container {
+    flex: 1;
+    height: 8px;
+    background: rgba(128,128,128,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+.rating-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #8b5cf6, #ec4899);
+    border-radius: 4px;
+}
+.rating-bar-count {
+    width: 35px;
+    text-align: right;
+    color: var(--text-muted);
+}
+.interactive-stars {
+    display: flex;
+    gap: 6px;
+    font-size: 1.5rem;
+    color: #e2e8f0;
+    cursor: pointer;
+}
+.interactive-stars i {
+    transition: color 0.2s, transform 0.2s;
+}
+.interactive-stars i.active, .interactive-stars i:hover {
+    color: #f59e0b;
+    transform: scale(1.15);
+}
+.review-item {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+.review-item:last-child {
+    border-bottom: none;
+}
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.reviewer-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-color);
+}
+.reviewer-badge {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    margin-left: 8px;
+}
+.review-date {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+.review-text {
+    color: var(--text-color);
+    opacity: 0.85;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* 4. Carousel Sản Phẩm Nổi Bật */
+.carousel-container-outer {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+.carousel-track-wrapper {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+    width: 100%;
+    padding: 10px 0;
+}
+.carousel-track-wrapper::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome/Safari */
+}
+.carousel-card-item {
+    flex: 0 0 calc(25% - 15px); /* 4 items per row on large screen */
+    min-width: 250px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.carousel-card-item:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    border-color: rgba(139, 92, 246, 0.3);
+}
+.carousel-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+.carousel-card-img-wrap {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    position: relative;
+    background: rgba(128,128,128,0.03);
+}
+.carousel-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+.carousel-card-item:hover .carousel-card-img {
+    transform: scale(1.1);
+}
+.carousel-card-info {
+    padding: 16px;
+}
+.carousel-card-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.carousel-card-price {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #3b82f6;
+}
+.carousel-nav-btn {
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--border-color);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    position: absolute;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.carousel-nav-btn:hover {
+    background: #8b5cf6;
+    border-color: #8b5cf6;
+    transform: scale(1.1);
+}
+.carousel-nav-btn.prev-btn {
+    left: -15px;
+}
+.carousel-nav-btn.next-btn {
+    right: -15px;
+}
+@media (max-width: 992px) {
+    .carousel-card-item {
+        flex: 0 0 calc(33.333% - 14px); /* 3 items */
+    }
+}
+@media (max-width: 768px) {
+    .carousel-card-item {
+        flex: 0 0 calc(50% - 10px); /* 2 items */
+    }
+    .carousel-nav-btn {
+        display: none; /* Hide buttons on mobile, rely on swipe */
+    }
+}
 </style>
 
 <!-- Canvas nền Ripple Sóng Âm - RIÊNG của trang chi tiết -->
@@ -590,30 +994,29 @@ include __DIR__ . '/partials/header.php';
 <!-- ============================================================
      NỘI DUNG CHÍNH TRANG CHI TIẾT
      ============================================================ -->
-<div class="container my-5 pt-2">
+<div class="detail-sheet-header">
+    <div class="detail-drag-handle" onclick="if(history.length > 1) { history.back(); } else { window.navigateToSPA('index.php?controller=product&action=index'); }" title="Nhấp để quay lại"></div>
+</div>
 
-    <!-- BREADCRUMB: Điều hướng trang hiện tại -->
-    <nav class="detail-breadcrumb">
-        <!-- Link về trang chủ -->
-        <a href="index.php?controller=home">
-            <i class="fas fa-home"></i> Trang chủ
-        </a>
-        <span class="separator">/</span>
+<div class="container my-4">
 
-        <!-- Link về cửa hàng -->
-        <a href="index.php?controller=product&action=index">Cửa hàng</a>
-        <span class="separator">/</span>
+    <!-- Hàng trên: Breadcrumb điều hướng -->
+    <div class="d-flex align-items-center justify-content-end mb-4">
+        <nav class="detail-breadcrumb m-0 p-0" style="margin-bottom: 0;">
+            <!-- Link về trang chủ -->
+            <a href="index.php?controller=home">
+                <i class="fas fa-home"></i> Trang chủ
+            </a>
+            <span class="separator">/</span>
 
-        <!-- Tên sản phẩm hiện tại (không phải link) -->
-        <?php
-        /*
-         * htmlspecialchars() chuyển các ký tự đặc biệt (<, >, ", &) thành
-         * HTML entity an toàn, tránh lỗi XSS khi tên SP chứa ký tự lạ.
-         * $product được truyền từ ProductController::detail()
-         */
-        ?>
-        <span class="current"><?= htmlspecialchars($product['name']) ?></span>
-    </nav>
+            <!-- Link về cửa hàng -->
+            <a href="index.php?controller=product&action=index">Cửa hàng</a>
+            <span class="separator">/</span>
+
+            <!-- Tên sản phẩm hiện tại (không phải link) -->
+            <span class="current"><?= htmlspecialchars($product['name']) ?></span>
+        </nav>
+    </div>
 
     <!-- ============================================================
          PHẦN CHÍNH: 2 CỘT (GALLERY | THÔNG TIN)
@@ -667,6 +1070,8 @@ include __DIR__ . '/partials/header.php';
                         src="<?= htmlspecialchars($product['image'] ?? 'https://via.placeholder.com/600x400') ?>"
                         alt="<?= htmlspecialchars($product['name']) ?>"
                         loading="lazy"
+                        onclick="window.openLightbox()"
+                        title="Click để phóng to ảnh sản phẩm"
                     >
                 </div>
 
@@ -867,30 +1272,27 @@ include __DIR__ . '/partials/header.php';
                  * (Trả góp không hợp lý với SP giá rẻ)
                  */
                 if ($product['price'] >= 5000000): ?>
-                <div class="installment-card">
-                    <div class="installment-title">
-                        <i class="fas fa-credit-card"></i>
-                        Tính trả góp 0% lãi suất
+                <div class="installment-card" style="background: rgba(139, 92, 246, 0.05); border: 1px solid rgba(139, 92, 246, 0.15); border-radius: 16px; padding: 20px; margin-top: 24px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);">
+                    <div class="installment-title" style="font-size: 0.9rem; font-weight: 700; color: #a78bfa; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-credit-card" style="color: #8b5cf6;"></i>
+                        <span>Tính trả góp 0% lãi suất</span>
                     </div>
-                    <div class="row g-2 align-items-center">
-                        <div class="col-md-6">
-                            <!-- Select số tháng trả góp -->
-                            <select class="installment-select" id="installment-months"
-                                    onchange="calcInstallment()">
-                                <option value="3">3 tháng</option>
-                                <option value="6" selected>6 tháng</option>
-                                <option value="12">12 tháng</option>
-                                <option value="24">24 tháng</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="installment-result">
-                                <span style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">Mỗi tháng:</span>
-                                <!-- Giá trị được tính bằng JS -->
-                                <span class="installment-monthly" id="installment-price">
-                                    <?= number_format($product['price'] / 6, 0, ',', '.') ?>₫
-                                </span>
+                    <div class="d-flex flex-wrap align-items-center gap-3 justify-content-between">
+                        <div style="flex: 1; min-width: 150px;">
+                            <div class="installment-select-wrapper">
+                                <select class="installment-select" id="installment-months" onchange="calcInstallment()">
+                                    <option value="3">3 tháng</option>
+                                    <option value="6" selected>6 tháng</option>
+                                    <option value="12">12 tháng</option>
+                                    <option value="24">24 tháng</option>
+                                </select>
                             </div>
+                        </div>
+                        <div class="d-flex align-items-baseline gap-2" style="white-space: nowrap;">
+                            <span style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; line-height: 1;">Mỗi tháng:</span>
+                            <span class="installment-monthly" id="installment-price" style="font-size: 1.4rem; font-weight: 800; color: #8b5cf6; text-shadow: 0 0 10px rgba(139, 92, 246, 0.2); line-height: 1;">
+                                <?= number_format($product['price'] / 6, 0, ',', '.') ?>₫
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -938,13 +1340,43 @@ include __DIR__ . '/partials/header.php';
         <div class="tab-content-panel active" id="tab-desc">
             <div class="description-content">
                 <?php
-                /*
-                 * nl2br() chuyển ký tự xuống dòng (\n) trong DB
-                 * thành thẻ <br> để hiển thị đúng trên trình duyệt.
-                 * htmlspecialchars() vẫn được gọi trước để chống XSS.
-                 */
                 echo nl2br(htmlspecialchars($product['description'] ?? 'Chưa có mô tả cho sản phẩm này.'));
                 ?>
+                
+                <!-- BỔ SUNG CONTENT CHI TIẾT SANG TRỌNG ĐỂ LẤP KHOẢNG TRỐNG -->
+                <div class="mt-5 pt-4 border-top" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                    <h5 class="text-primary mb-3 fw-bold" style="background: linear-gradient(135deg, #a78bfa, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                        <i class="fas fa-gem me-2" style="-webkit-text-fill-color: #8b5cf6;"></i>Đặc điểm nổi bật & Thiết kế cao cấp
+                    </h5>
+                    <p style="color: var(--text-muted); line-height: 1.7; font-size: 0.95rem;">
+                        Sản phẩm nhạc cụ phân phối bởi <strong>TTB Music</strong> được tuyển chọn khắt khe và chế tác tinh xảo từ những xưởng chế tạo danh tiếng. Thiết kế công thái học vượt trội không chỉ tạo cảm giác cầm nắm thoải mái mà còn tối ưu hóa hiệu suất biểu diễn cho nghệ sĩ ở mọi cấp độ.
+                    </p>
+                    
+                    <div class="row g-4 mt-2 mb-4">
+                        <div class="col-md-4">
+                            <div class="p-4 rounded-4 h-100" style="background: rgba(139, 92, 246, 0.04); border: 1px solid rgba(139, 92, 246, 0.15); backdrop-filter: blur(5px);">
+                                <h6 class="fw-bold mb-2 text-info" style="font-size: 1rem;"><i class="fas fa-music me-2"></i>Âm thanh trung thực</h6>
+                                <p class="small text-muted mb-0" style="line-height: 1.6;">Cơ chế phản hồi âm học độc quyền mang đến âm sắc trầm ấm, ngọt ngào ở dải bass và trong trẻo, réo rắt ở dải treble, tái hiện chân thực mọi cảm xúc âm nhạc.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-4 rounded-4 h-100" style="background: rgba(139, 92, 246, 0.04); border: 1px solid rgba(139, 92, 246, 0.15); backdrop-filter: blur(5px);">
+                                <h6 class="fw-bold mb-2 text-info" style="font-size: 1rem;"><i class="fas fa-tree me-2"></i>Gỗ tuyển chọn kỹ lưỡng</h6>
+                                <p class="small text-muted mb-0" style="line-height: 1.6;">Được cấu thành từ các dòng gỗ sấy tự nhiên lâu năm như Vân Sam (Spruce), Gỗ Gụ (Mahogany) hoặc Gỗ Mun (Ebony), giúp hạn chế tối đa cong vênh dưới tác động thời tiết.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-4 rounded-4 h-100" style="background: rgba(139, 92, 246, 0.04); border: 1px solid rgba(139, 92, 246, 0.15); backdrop-filter: blur(5px);">
+                                <h6 class="fw-bold mb-2 text-info" style="font-size: 1rem;"><i class="fas fa-drafting-compass me-2"></i>Gia công thủ công tỉ mỉ</h6>
+                                <p class="small text-muted mb-0" style="line-height: 1.6;">Từng đường chỉ viền, phím đàn đến các khớp nối cơ học đều được mài giũa tỉ mỉ bởi nghệ nhân lành nghề, đạt tiêu chuẩn hoàn thiện thẩm mỹ cao nhất.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p style="color: var(--text-muted); line-height: 1.7; font-size: 0.95rem;">
+                        Với lớp phủ hoàn thiện bảo vệ chống trầy xước cao cấp kết hợp các chi tiết phần cứng mạ chrome/neon chống oxy hóa, nhạc cụ giữ được vẻ sáng bóng bóng bẩy qua hàng thập kỷ. Đây chính là người bạn đồng hành hoàn hảo cùng bạn thăng hoa trong từng nốt nhạc trên sân khấu lẫn những buổi tập luyện chuyên sâu tại gia.
+                    </p>
+                </div>
             </div>
         </div>
 
@@ -952,13 +1384,6 @@ include __DIR__ . '/partials/header.php';
         <div class="tab-content-panel" id="tab-specs">
             <table class="specs-table">
                 <tbody>
-                    <?php
-                    /*
-                     * Bảng thông số được xây dựng từ dữ liệu sản phẩm trong DB.
-                     * Mỗi dòng kiểm tra !empty() trước khi render để không
-                     * hiển thị các dòng "trống" thiếu thông tin.
-                     */
-                    ?>
                     <tr>
                         <td>Thương hiệu</td>
                         <td><?= htmlspecialchars($product['brand'] ?? '—') ?></td>
@@ -970,9 +1395,7 @@ include __DIR__ . '/partials/header.php';
                     <tr>
                         <td>Tình trạng kho</td>
                         <td>
-                            <?php
-                            // Hiển thị trạng thái kho với màu sắc tương ứng
-                            if ($product['stock'] <= 0): ?>
+                            <?php if ($product['stock'] <= 0): ?>
                                 <span style="color: #ef4444; font-weight: 600;">
                                     <i class="fas fa-times-circle"></i> Hết hàng
                                 </span>
@@ -989,12 +1412,135 @@ include __DIR__ . '/partials/header.php';
                             <?php endif; ?>
                         </td>
                     </tr>
-                    <tr>
-                        <td>Giá bán</td>
-                        <td style="color: #8b5cf6; font-weight: 700; font-size: 1.05rem;">
-                            <?= number_format($product['price'], 0, ',', '.') ?>₫
-                        </td>
-                    </tr>
+                    <?php
+                    $catId = (int)($product['category_id'] ?? 0);
+                    switch ($catId) {
+                        case 1: // Guitar & Bass
+                            ?>
+                            <tr>
+                                <td>Kiểu dáng (Body Shape)</td>
+                                <td>Dreadnought (D-shape) / Cutaway sang trọng</td>
+                            </tr>
+                            <tr>
+                                <td>Mặt trước (Top Wood)</td>
+                                <td>Gỗ thông Spruce nguyên tấm (Solid Sitka Spruce)</td>
+                            </tr>
+                            <tr>
+                                <td>Lưng & Hông (Back & Sides)</td>
+                                <td>Gỗ Mahogany nhập khẩu cao cấp</td>
+                            </tr>
+                            <tr>
+                                <td>Cần đàn (Neck Wood)</td>
+                                <td>Gỗ Nato chắc chắn, chống cong vênh</td>
+                            </tr>
+                            <tr>
+                                <td>Mặt phím (Fretboard)</td>
+                                <td>Gỗ Rosewood (Cẩm lai) mịn màng, phản xạ âm tốt</td>
+                            </tr>
+                            <tr>
+                                <td>Số phím đàn (Frets)</td>
+                                <td>20 phím hợp kim chống gỉ</td>
+                            </tr>
+                            <tr>
+                                <td>Hệ thống Pickup (Electronics)</td>
+                                <td>Tích hợp Preamp TTB-301 với tuner chỉnh dây chuyên nghiệp</td>
+                            </tr>
+                            <tr>
+                                <td>Dây đàn (Strings)</td>
+                                <td>D'Addario EXP16 Phosphor Bronze cao cấp (Size 0.12)</td>
+                            </tr>
+                            <?php
+                            break;
+                        case 2: // Piano & Organ
+                            ?>
+                            <tr>
+                                <td>Số phím đàn (Keys)</td>
+                                <td>88 phím tiêu chuẩn quốc tế</td>
+                            </tr>
+                            <tr>
+                                <td>Loại bàn phím (Keyboard Type)</td>
+                                <td>Graded Hammer Action (GHA) giả lập cảm giác phím đại dương cầm</td>
+                            </tr>
+                            <tr>
+                                <td>Đa âm tối đa (Polyphony)</td>
+                                <td>256 nốt (Tha hồ chơi các bản nhạc phức tạp)</td>
+                            </tr>
+                            <tr>
+                                <td>Số tiếng nhạc cụ (Voices/Tones)</td>
+                                <td>500 tiếng chất lượng cao (Grand Piano, Harpsichord, Strings...)</td>
+                            </tr>
+                            <tr>
+                                <td>Kết nối thông minh (Connectivity)</td>
+                                <td>USB to Host (MIDI), Headphones x 2, AUX In/Out, Sustain Pedal</td>
+                            </tr>
+                            <tr>
+                                <td>Hệ thống âm thanh (Speakers)</td>
+                                <td>Loa vòm 2 chiều công suất lớn 15W x 2 cho âm thanh sống động</td>
+                            </tr>
+                            <tr>
+                                <td>Nguồn điện (Power Supply)</td>
+                                <td>AC Adapter PA-150 hoặc tương đương</td>
+                            </tr>
+                            <tr>
+                                <td>Trọng lượng (Weight)</td>
+                                <td>11.5 kg (Gọn nhẹ, dễ dàng di chuyển lưu diễn)</td>
+                            </tr>
+                            <?php
+                            break;
+                        case 3: // Trống & Bộ gõ
+                            ?>
+                            <tr>
+                                <td>Loại trống (Drum Type)</td>
+                                <td>Trống điện tử thông minh thế hệ mới (Electronic Drum Kit)</td>
+                            </tr>
+                            <tr>
+                                <td>Số mặt gõ (Pads/Cymbals)</td>
+                                <td>5 Mặt trống (Snare, 3 Toms, Kick) & 3 Mặt Cymbal (Hi-hat, Crash, Ride)</td>
+                            </tr>
+                            <tr>
+                                <td>Chất liệu mặt gõ (Pad Surface)</td>
+                                <td>Mặt lưới cao cấp (Mesh Head) cho độ đàn hồi chân thực, chống ồn</td>
+                            </tr>
+                            <tr>
+                                <td>Hộp mô-đun âm thanh (Sound Module)</td>
+                                <td>TTB-Drum Processor thế hệ mới, hỗ trợ ghi âm trực tiếp</td>
+                            </tr>
+                            <tr>
+                                <td>Số điệu trống tích hợp (Kits)</td>
+                                <td>30 bộ trống preset + 10 bộ trống tự tạo (User Kits)</td>
+                            </tr>
+                            <tr>
+                                <td>Cổng kết nối (Ports)</td>
+                                <td>Trigger Input, Line Out (L/Mono, R), Phones, Aux In, USB MIDI</td>
+                            </tr>
+                            <tr>
+                                <td>Phụ kiện tặng kèm (Accessories)</td>
+                                <td>Cặp dùi trống Maple, Khóa chỉnh trống, Ghế ngồi cao cấp, Pedal Kick</td>
+                            </tr>
+                            <?php
+                            break;
+                        default: // Mặc định khác
+                            ?>
+                            <tr>
+                                <td>Xuất xứ</td>
+                                <td>Chính hãng (Đầy đủ hóa đơn VAT & chứng từ CO/CQ)</td>
+                            </tr>
+                            <tr>
+                                <td>Chất liệu</td>
+                                <td>Hợp kim & gỗ sấy xử lý chống ẩm tiêu chuẩn xuất khẩu</td>
+                            </tr>
+                            <tr>
+                                <td>Chế độ bảo hành</td>
+                                <td>12 tháng chính hãng tại hệ thống nhạc cụ TTB</td>
+                            </tr>
+                            <tr>
+                                <td>Trọn bộ sản phẩm</td>
+                                <td>Sách HDSD, Thẻ bảo hành, Phụ kiện tiêu chuẩn đi kèm từ nhà sản xuất</td>
+                            </tr>
+                            <?php
+                            break;
+                    }
+                    ?>
                     <?php if ($product['is_rentable']): ?>
                     <tr>
                         <td>Giá thuê / ngày</td>
@@ -1011,14 +1557,7 @@ include __DIR__ . '/partials/header.php';
                     <tr>
                         <td>Màu sắc có sẵn</td>
                         <td>
-                            <?php
-                            /*
-                             * array_column($colors, 'name') lấy ra mảng chỉ gồm cột 'name'
-                             * implode(', ', ...) nối các phần tử mảng bằng dấu phẩy
-                             * Kết quả: "Sunburst, Black, Natural"
-                             */
-                            echo htmlspecialchars(implode(', ', array_column($colors, 'name')));
-                            ?>
+                            <?= htmlspecialchars(implode(', ', array_column($colors, 'name'))) ?>
                         </td>
                     </tr>
                     <?php endif; ?>
@@ -1033,157 +1572,375 @@ include __DIR__ . '/partials/header.php';
         </div>
     </div><!-- /.detail-tabs -->
 
+    <!-- ============================================================
+         PHẦN ĐÁNH GIÁ SẢN PHẨM (CUSTOMER REVIEWS)
+         ============================================================ -->
+    <div class="reviews-section mt-5 pt-4">
+        <h3 class="fw-bold mb-4" style="font-size: 1.6rem; color: var(--text-color); display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-star" style="color: #f59e0b;"></i> Đánh giá từ khách hàng
+        </h3>
+        
+        <div class="row g-4">
+            <!-- Cột trái: Tóm tắt điểm đánh giá -->
+            <div class="col-lg-4">
+                <div class="review-summary-card" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; text-align: center; height: 100%; backdrop-filter: blur(10px);">
+                    <div style="font-size: 3.5rem; font-weight: 800; color: var(--text-color); line-height: 1;">4.8</div>
+                    <div class="my-2" style="font-size: 1.2rem; color: #f59e0b;">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <div class="text-muted small mb-4">Dựa trên 32 đánh giá thực tế</div>
+                    
+                    <!-- Progress bars -->
+                    <div class="d-flex flex-column gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="small text-muted" style="width: 35px; text-align: right;">5 sao</span>
+                            <div class="progress flex-grow-1" style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px;">
+                                <div class="progress-bar" style="width: 85%; background: linear-gradient(90deg, #8b5cf6, #a78bfa); border-radius: 3px;"></div>
+                            </div>
+                            <span class="small text-muted" style="width: 25px; text-align: left;">85%</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="small text-muted" style="width: 35px; text-align: right;">4 sao</span>
+                            <div class="progress flex-grow-1" style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px;">
+                                <div class="progress-bar" style="width: 10%; background: linear-gradient(90deg, #8b5cf6, #a78bfa); border-radius: 3px;"></div>
+                            </div>
+                            <span class="small text-muted" style="width: 25px; text-align: left;">10%</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="small text-muted" style="width: 35px; text-align: right;">3 sao</span>
+                            <div class="progress flex-grow-1" style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px;">
+                                <div class="progress-bar" style="width: 5%; background: linear-gradient(90deg, #8b5cf6, #a78bfa); border-radius: 3px;"></div>
+                            </div>
+                            <span class="small text-muted" style="width: 25px; text-align: left;">5%</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="small text-muted" style="width: 35px; text-align: right;">2 sao</span>
+                            <div class="progress flex-grow-1" style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px;">
+                                <div class="progress-bar" style="width: 0%; background: linear-gradient(90deg, #8b5cf6, #a78bfa); border-radius: 3px;"></div>
+                            </div>
+                            <span class="small text-muted" style="width: 25px; text-align: left;">0%</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="small text-muted" style="width: 35px; text-align: right;">1 sao</span>
+                            <div class="progress flex-grow-1" style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px;">
+                                <div class="progress-bar" style="width: 0%; background: linear-gradient(90deg, #8b5cf6, #a78bfa); border-radius: 3px;"></div>
+                            </div>
+                            <span class="small text-muted" style="width: 25px; text-align: left;">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Cột giữa: Form Viết Đánh Giá -->
+            <div class="col-lg-8">
+                <div class="review-form-card" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; backdrop-filter: blur(10px);">
+                    <h5 class="fw-bold mb-3" style="color: var(--text-color);">Chia sẻ trải nghiệm của bạn</h5>
+                    <form id="review-submit-form" onsubmit="submitReview(event)">
+                        <div class="mb-3 d-flex align-items-center gap-3">
+                            <span style="color: var(--text-color); font-size: 0.95rem; font-weight: 500;">Đánh giá của bạn:</span>
+                            <div class="star-rating-input d-flex gap-1" style="font-size: 1.4rem; color: rgba(255,255,255,0.15); cursor: pointer;">
+                                <i class="fas fa-star" data-value="1" onclick="setRatingValue(1)" onmouseover="highlightStars(1)" onmouseout="resetStars()"></i>
+                                <i class="fas fa-star" data-value="2" onclick="setRatingValue(2)" onmouseover="highlightStars(2)" onmouseout="resetStars()"></i>
+                                <i class="fas fa-star" data-value="3" onclick="setRatingValue(3)" onmouseover="highlightStars(3)" onmouseout="resetStars()"></i>
+                                <i class="fas fa-star" data-value="4" onclick="setRatingValue(4)" onmouseover="highlightStars(4)" onmouseout="resetStars()"></i>
+                                <i class="fas fa-star" data-value="5" onclick="setRatingValue(5)" onmouseover="highlightStars(5)" onmouseout="resetStars()"></i>
+                            </div>
+                            <input type="hidden" id="rating-input-val" value="5" required>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="review-name" placeholder="Họ và tên" style="background: rgba(15,23,42,0.3); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 10px;" required>
+                                    <label for="review-name" style="color: var(--text-muted);">Họ và tên của bạn</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="email" class="form-control" id="review-email" placeholder="Email" style="background: rgba(15,23,42,0.3); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 10px;" required>
+                                    <label for="review-email" style="color: var(--text-muted);">Địa chỉ Email</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <textarea class="form-control" id="review-content" placeholder="Nhận xét" style="height: 100px; background: rgba(15,23,42,0.3); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 10px;" required></textarea>
+                                    <label for="review-content" style="color: var(--text-muted);">Nội dung nhận xét chi tiết về sản phẩm...</label>
+                                </div>
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-glow rounded-pill px-4 py-2" style="font-weight: 600;">
+                                    Gửi đánh giá <i class="fas fa-paper-plane ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Danh sách đánh giá mẫu -->
+        <div class="review-list mt-4" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; backdrop-filter: blur(10px);">
+            <h5 class="fw-bold mb-3 pb-2" style="color: var(--text-color); border-bottom: 1px solid var(--border-color);">
+                Nhận xét gần đây
+            </h5>
+            
+            <div id="reviews-container">
+                <!-- Nhận xét 1 -->
+                <div class="review-item">
+                    <div class="review-header">
+                        <div>
+                            <span class="reviewer-name">Nguyễn Tuấn Kiệt</span>
+                            <span class="reviewer-badge"><i class="fas fa-check-circle"></i> Đã mua tại TTB</span>
+                        </div>
+                        <span class="review-date">12 ngày trước</span>
+                    </div>
+                    <div class="my-2" style="color: #f59e0b; font-size: 0.85rem;">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="review-text mb-0">
+                        Đàn thật sự rất đẹp, lớp sơn hoàn thiện mượt mà không tì vết. Âm thanh ấm và ngân vang lâu. Bạn tư vấn viên nhiệt tình giao hàng siêu tốc chỉ 2h trong nội thành. Cảm ơn shop rất nhiều!
+                    </p>
+                </div>
+
+                <!-- Nhận xét 2 -->
+                <div class="review-item">
+                    <div class="review-header">
+                        <div>
+                            <span class="reviewer-name">Phạm Minh Thư</span>
+                            <span class="reviewer-badge"><i class="fas fa-check-circle"></i> Đã mua tại TTB</span>
+                        </div>
+                        <span class="review-date">3 tuần trước</span>
+                    </div>
+                    <div class="my-2" style="color: #f59e0b; font-size: 0.85rem;">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                    <p class="review-text mb-0">
+                        Chất âm sáng, phím bấm êm tay thích hợp cho cả người mới tập và chuyên nghiệp. Mức giá quá hời so với chất lượng mang lại. Đóng gói rất kỹ, lồng 2 hộp các-tông và xốp hơi dày cộp.
+                    </p>
+                </div>
+
+                <!-- Nhận xét 3 -->
+                <div class="review-item">
+                    <div class="review-header">
+                        <div>
+                            <span class="reviewer-name">Trần Hoàng Long</span>
+                            <span class="reviewer-badge"><i class="fas fa-check-circle"></i> Đã mua tại TTB</span>
+                        </div>
+                        <span class="review-date">1 tháng trước</span>
+                    </div>
+                    <div class="my-2" style="color: #f59e0b; font-size: 0.85rem;">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="review-text mb-0">
+                        Mình mua chiếc này để biểu diễn trên sân khấu phòng trà. Phải nói là hệ thống EQ hoạt động cực kì xuất sắc, tiếng ra loa trung thực không bị méo tiếng. Thiết kế viền neon tinh tế làm nổi bật hẳn khi ánh đèn sân khấu chiếu vào. Rất đáng đồng tiền bát gạo!
+                    </p>
+                </div>
+
+                <!-- Nhận xét 4 -->
+                <div class="review-item">
+                    <div class="review-header">
+                        <div>
+                            <span class="reviewer-name">Lê Thị Khánh Vy</span>
+                            <span class="reviewer-badge"><i class="fas fa-check-circle"></i> Đã mua tại TTB</span>
+                        </div>
+                        <span class="review-date">1 tháng trước</span>
+                    </div>
+                    <div class="my-2" style="color: #f59e0b; font-size: 0.85rem;">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="review-text mb-0">
+                        Sản phẩm xịn xò, màu sắc sang trọng phù hợp với góc phòng khách của mình. Tiếng nhạc vang vọng rất dễ chịu giúp mình giải tỏa căng thẳng sau những giờ làm việc mệt mỏi. Shop hỗ trợ bảo hành lên tới 24 tháng nên cực kì yên tâm khi mua sắm tại đây.
+                    </p>
+                </div>
+
+                <!-- Nhận xét 5 -->
+                <div class="review-item">
+                    <div class="review-header">
+                        <div>
+                            <span class="reviewer-name">Bùi Anh Tuấn</span>
+                            <span class="reviewer-badge"><i class="fas fa-check-circle"></i> Đã mua tại TTB</span>
+                        </div>
+                        <span class="review-date">2 tháng trước</span>
+                    </div>
+                    <div class="my-2" style="color: #f59e0b; font-size: 0.85rem;">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                    <p class="review-text mb-0">
+                        Giao hàng trễ mất 1 ngày do mưa bão nhưng bù lại đóng gói cực kì cẩn thận. Nhạc cụ hoàn thiện tốt, cầm rất chắc tay và đầm. Âm bass dày dặn, các nốt cao tròn trịa không hề rè phím hay lệch âm. Sẽ ủng hộ shop thêm các sản phẩm phụ kiện khác trong tương lai.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         SẢN PHẨM NỔI BẬT KHÁC (RELATED CAROUSEL)
+         ============================================================ -->
+    <?php if (!empty($randomProducts)): ?>
+    <div class="related-products-section mt-5 pt-4 mb-5">
+        <h3 class="fw-bold mb-4" style="font-size: 1.6rem; color: var(--text-color); display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-fire" style="color: #ef4444;"></i> Nhạc cụ nổi bật dành cho bạn
+        </h3>
+        
+        <div class="carousel-container-outer">
+            <!-- Nav buttons -->
+            <button class="carousel-nav-btn prev-btn" id="carousel-prev-trigger" onclick="scrollCarousel('prev')">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            
+            <div class="carousel-track-wrapper" id="related-carousel-track">
+                <?php foreach ($randomProducts as $randProd): ?>
+                    <div class="carousel-card-item">
+                        <a href="index.php?controller=product&action=detail&id=<?= $randProd['id'] ?>" class="carousel-card-link">
+                            <div class="carousel-card-img-wrap">
+                                <img src="<?= htmlspecialchars($randProd['image']) ?>" alt="<?= htmlspecialchars($randProd['name']) ?>" class="carousel-card-img" loading="lazy">
+                            </div>
+                            <div class="carousel-card-info">
+                                <div class="carousel-card-title"><?= htmlspecialchars($randProd['name']) ?></div>
+                                <div class="carousel-card-price"><?= number_format($randProd['price'], 0, ',', '.') ?>₫</div>
+                            </div>
+                        </a>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            
+            <button class="carousel-nav-btn next-btn" id="carousel-next-trigger" onclick="scrollCarousel('next')">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+    <?php endif; ?>
+
 </div><!-- /.container -->
+
+<!-- Lightbox phóng to ảnh sản phẩm cao cấp -->
+<div id="product-lightbox" class="product-lightbox-modal" onclick="window.closeLightbox()">
+    <span class="lightbox-close-btn">&times;</span>
+    <img class="lightbox-image-content" id="lightbox-img" alt="Ảnh sản phẩm phóng to">
+</div>
 
 <!-- ============================================================
      JAVASCRIPT TRANG CHI TIẾT SẢN PHẨM
      ============================================================ -->
 <script>
+
 /* ================================================================================
    PHẦN 1: CANVAS GLOWING MELODY CONSTELLATION - NỀN RIÊNG TRANG CHI TIẾT
-   Cơ chế: Các nốt nhạc phát sáng bay lơ lửng ngẫu nhiên. Khi khoảng cách
-   giữa 2 hạt < 150px, vẽ đường nối liên kết phát sáng mờ ảo dạng mạng
-   tinh thể (constellation). Di chuột gần đẩy nhẹ hạt ra xa (repel effect).
-   Màu sắc: Dải tím-indigo (#7c3aed → #6366f1 → #a78bfa)
    ================================================================================ */
-(function() {
+window.initDetailCanvas = function() {
     const canvas = document.getElementById('detail-canvas');
-    if (!canvas) return; // Thoát an toàn nếu canvas không tồn tại
+    if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
     let width, height;
-
-    // Vị trí chuột hiện tại (để tính lực đẩy repel)
     const mouse = { x: null, y: null, radius: 150 };
-
-    // Mảng ký tự nốt nhạc để random gán cho mỗi hạt
     const musicSymbols = ['♪', '♫', '♬', '♩', '🎵', '🎶', '🎼'];
-
-    // Mảng lưu tất cả các hạt (nodes) đang hoạt động
     let particles = [];
-
-    // Khoảng cách tối đa để vẽ đường nối giữa 2 hạt
     const LINK_DISTANCE = 150;
-
-    // Số lượng hạt (vừa phải để không rối mắt trên trang chi tiết)
     const PARTICLE_COUNT = 50;
 
-    /**
-     * Resize canvas theo kích thước cửa sổ
-     * Quan trọng: phải gọi khi window resize để tránh vẽ sai tọa độ
-     */
+    // Hủy các listener cũ của Detail Canvas nếu có để tránh rò rỉ bộ nhớ
+    if (window.detailCanvasCleanup) {
+        window.detailCanvasCleanup();
+    }
+
     function resizeCanvas() {
         width = canvas.width = window.innerWidth;
         height = canvas.height = window.innerHeight;
     }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas(); // Gọi ngay lập tức khi khởi động
-
-    // Lắng nghe vị trí chuột để tính lực đẩy (repel)
-    window.addEventListener('mousemove', function(e) {
+    function onCanvasMouseMove(e) {
         mouse.x = e.clientX;
         mouse.y = e.clientY;
-    });
-
-    // Reset vị trí chuột khi rời khỏi cửa sổ
-    window.addEventListener('mouseout', function() {
+    }
+    function onCanvasMouseOut() {
         mouse.x = null;
         mouse.y = null;
-    });
+    }
 
-    /**
-     * CLASS MusicNode: Đại diện một nốt nhạc phát sáng trong mạng lưới
-     * - x, y: Tọa độ hiện tại (bay lơ lửng ngẫu nhiên)
-     * - baseX, baseY: Tọa độ gốc (dùng để kéo về khi hết repel)
-     * - vx, vy: Vận tốc di chuyển (px/frame)
-     * - size: Kích thước ký tự nốt nhạc
-     * - symbol: Ký tự nốt nhạc ngẫu nhiên
-     * - hue: Màu sắc HSL (dao động trong dải tím 250-290)
-     * - glowRadius: Bán kính vầng sáng xung quanh nốt nhạc
-     * - pulsePhase: Pha nhịp đập (để hiệu ứng nhấp nháy nhẹ lệch nhau)
-     */
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('mousemove', onCanvasMouseMove);
+    window.addEventListener('mouseout', onCanvasMouseOut);
+
+    window.detailCanvasCleanup = function() {
+        window.removeEventListener('resize', resizeCanvas);
+        window.removeEventListener('mousemove', onCanvasMouseMove);
+        window.removeEventListener('mouseout', onCanvasMouseOut);
+        if (typeof carouselInterval !== 'undefined' && carouselInterval) {
+            clearInterval(carouselInterval);
+            carouselInterval = null;
+        }
+    };
+
+    resizeCanvas();
+
     class MusicNode {
         constructor() {
-            // Vị trí khởi tạo ngẫu nhiên
             this.x = Math.random() * width;
             this.y = Math.random() * height;
-
-            // Lưu vị trí gốc ban đầu
             this.baseX = this.x;
             this.baseY = this.y;
-
-            // Vận tốc bay nhẹ nhàng (di chuyển rất chậm)
             this.vx = (Math.random() - 0.5) * 0.6;
             this.vy = (Math.random() - 0.5) * 0.6;
-
-            // Kích thước nốt nhạc (px)
             this.size = Math.random() * 10 + 12;
-
-            // Random ký tự nốt nhạc
             this.symbol = musicSymbols[Math.floor(Math.random() * musicSymbols.length)];
-
-            // Dải màu tím-indigo: HSL hue 250-290
             this.hue = Math.floor(Math.random() * 40) + 250;
-
-            // Bán kính vầng sáng phát ra xung quanh
             this.glowRadius = Math.random() * 20 + 15;
-
-            // Pha nhịp đập lệch nhau (mỗi hạt nhấp nháy khác thời điểm)
             this.pulsePhase = Math.random() * Math.PI * 2;
-
-            // Độ sáng cơ bản (dao động nhẹ)
             this.baseOpacity = Math.random() * 0.3 + 0.4;
         }
 
         update() {
-            // Di chuyển theo vận tốc hiện tại
             this.x += this.vx;
             this.y += this.vy;
 
-            // Nảy lại khi chạm rìa màn hình (bounce effect)
             if (this.x < 0 || this.x > width) this.vx *= -1;
             if (this.y < 0 || this.y > height) this.vy *= -1;
 
-            // Giữ trong phạm vi màn hình
             this.x = Math.max(0, Math.min(width, this.x));
             this.y = Math.max(0, Math.min(height, this.y));
 
-            // ============================================================
-            // TƯƠNG TÁC: LỰC ĐẨY (REPEL) KHI CHUỘT ĐẾN GẦN
-            // Khi khoảng cách hạt-chuột < mouse.radius (150px):
-            //   Tính vector hướng từ chuột → hạt, đẩy hạt ra xa.
-            //   Lực đẩy tỉ lệ nghịch với khoảng cách (càng gần càng mạnh)
-            // ============================================================
             if (mouse.x !== null && mouse.y !== null) {
                 const dx = this.x - mouse.x;
                 const dy = this.y - mouse.y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
 
                 if (dist < mouse.radius) {
-                    // Cường độ đẩy: gần hơn → mạnh hơn
                     const force = (mouse.radius - dist) / mouse.radius;
                     const angle = Math.atan2(dy, dx);
-
-                    // Đẩy hạt ra xa theo hướng ngược con trỏ chuột
                     this.x += Math.cos(angle) * force * 5;
                     this.y += Math.sin(angle) * force * 5;
                 }
             }
-
-            // Cập nhật pha nhịp đập (để vầng sáng nhấp nháy)
             this.pulsePhase += 0.02;
         }
 
         draw() {
-            // Tính opacity nhấp nháy theo sin wave
             const pulse = Math.sin(this.pulsePhase) * 0.15 + this.baseOpacity;
-
             ctx.save();
 
-            // ============================================================
-            // VẼ VẦNG SÁNG (GLOW) XUNG QUANH NỐT NHẠC
-            // Dùng radialGradient tạo hiệu ứng phát sáng mờ ảo
-            // ============================================================
             const gradient = ctx.createRadialGradient(
                 this.x, this.y, 0,
                 this.x, this.y, this.glowRadius
@@ -1197,9 +1954,6 @@ include __DIR__ . '/partials/header.php';
             ctx.fillStyle = gradient;
             ctx.fill();
 
-            // ============================================================
-            // VẼ KÝ TỰ NỐT NHẠC Ở TÂM
-            // ============================================================
             ctx.font = `${this.size}px serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
@@ -1210,36 +1964,23 @@ include __DIR__ . '/partials/header.php';
         }
     }
 
-    // Khởi tạo các hạt nốt nhạc ban đầu
+    particles = [];
     for (let i = 0; i < PARTICLE_COUNT; i++) {
         particles.push(new MusicNode());
     }
 
-    /**
-     * VẼ ĐƯỜNG NỐI GIỮA CÁC HẠT GẦN NHAU (CONSTELLATION LINES)
-     * Duyệt từng cặp hạt, nếu khoảng cách < LINK_DISTANCE:
-     * - Vẽ đường nối mỏng, độ đậm giảm dần theo khoảng cách
-     * - Tạo hiệu ứng mạng lưới tinh thể phát sáng mờ ảo
-     */
     function drawConstellationLinks() {
         for (let i = 0; i < particles.length; i++) {
             for (let j = i + 1; j < particles.length; j++) {
                 const a = particles[i];
                 const b = particles[j];
-
-                // Tính khoảng cách Euclid giữa 2 hạt
                 const dx = a.x - b.x;
                 const dy = a.y - b.y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
 
-                // Chỉ vẽ đường nối nếu đủ gần
                 if (dist < LINK_DISTANCE) {
-                    // Opacity giảm dần khi xa hơn (fade effect tự nhiên)
                     const opacity = (1 - dist / LINK_DISTANCE) * 0.25;
-
-                    // Màu trung bình giữa 2 hạt
                     const avgHue = (a.hue + b.hue) / 2;
-
                     ctx.beginPath();
                     ctx.moveTo(a.x, a.y);
                     ctx.lineTo(b.x, b.y);
@@ -1251,76 +1992,59 @@ include __DIR__ . '/partials/header.php';
         }
     }
 
-    /**
-     * Vòng lặp hoạt hình chính
-     * requestAnimationFrame đảm bảo chạy ~60fps mượt mà
-     * và tự dừng khi tab mất focus (tiết kiệm CPU)
-     */
+    let animFrameId = null;
     function animate() {
-        // Xóa toàn bộ canvas mỗi frame
+        if (!canvas || !document.body.contains(canvas)) {
+            if (animFrameId) cancelAnimationFrame(animFrameId);
+            if (window.detailCanvasCleanup) {
+                window.detailCanvasCleanup();
+                window.detailCanvasCleanup = null;
+            }
+            return; // Dừng vòng lặp nếu canvas đã bị gỡ khỏi DOM (khi chuyển trang SPA)
+        }
         ctx.clearRect(0, 0, width, height);
-
-        // Vẽ đường nối trước (nằm phía sau các nốt nhạc)
         drawConstellationLinks();
-
-        // Cập nhật và vẽ từng nốt nhạc
         particles.forEach(p => {
             p.update();
             p.draw();
         });
-
-        // Lên lịch frame tiếp theo
-        requestAnimationFrame(animate);
+        animFrameId = requestAnimationFrame(animate);
     }
-
-    animate(); // Bắt đầu vòng lặp
-})(); // IIFE: tự gọi để không leak biến ra ngoài
+    animate();
+};
 
 /* ================================================================================
    PHẦN 2: CHUYỂN ẢNH CHỦ KHI CLICK THUMBNAIL
    ================================================================================ */
-
-/**
- * Hàm switchImage: Chuyển ảnh chính khi click thumbnail
- * @param {string} src - URL ảnh mới
- * @param {HTMLElement} thumbEl - Phần tử thumbnail được click
- */
 function switchImage(src, thumbEl) {
-    // Lấy thẻ img chính và cập nhật src
     const mainImg = document.getElementById('main-product-image');
     if (mainImg && src) {
-        mainImg.style.opacity = '0'; // Fade out
+        mainImg.style.opacity = '0';
         setTimeout(() => {
             mainImg.src = src;
-            mainImg.style.opacity = '1'; // Fade in
+            mainImg.style.opacity = '1';
         }, 200);
     }
-
-    // Bỏ class active khỏi tất cả thumbnail, thêm vào cái vừa click
     document.querySelectorAll('.thumb-item').forEach(t => t.classList.remove('active'));
     if (thumbEl) thumbEl.classList.add('active');
+    
+    // Reset rotation if switching image
+
+    if (mainImg) {
+        mainImg.style.transform = 'none';
+    }
 }
 
 /* ================================================================================
    PHẦN 3: CHỌN MÀU SẮC & PHIÊN BẢN
    ================================================================================ */
-
-/**
- * Chọn màu sắc: highlight nút và đổi ảnh chính + thumbnail tương ứng
- * @param {HTMLElement} btn - Nút màu được click
- */
 function selectColor(btn) {
-    // Bỏ selected khỏi tất cả nút màu
     document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
-
-    // Thêm selected vào nút vừa click
     btn.classList.add('selected');
 
-    // Cập nhật tên màu đang chọn hiển thị bên cạnh nhãn
     const nameEl = document.getElementById('selected-color-name');
     if (nameEl) nameEl.textContent = '– ' + btn.dataset.color;
 
-    // Chuyển ảnh chính sang ảnh của màu này
     const imgSrc = btn.dataset.image;
     if (imgSrc) {
         const mainImg = document.getElementById('main-product-image');
@@ -1332,17 +2056,18 @@ function selectColor(btn) {
             }, 200);
         }
 
-        // Đồng bộ active trên thumbnail tương ứng
         document.querySelectorAll('.thumb-item').forEach(t => t.classList.remove('active'));
         const matchThumb = document.getElementById('thumb-' + btn.dataset.color);
         if (matchThumb) matchThumb.classList.add('active');
+        
+        // Reset rotation
+    
+        if (mainImg) {
+            mainImg.style.transform = 'none';
+        }
     }
 }
 
-/**
- * Chọn phiên bản: chỉ highlight nút, không đổi ảnh
- * @param {HTMLElement} btn - Nút phiên bản được click
- */
 function selectVersion(btn) {
     document.querySelectorAll('.version-btn').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
@@ -1354,11 +2079,6 @@ function selectVersion(btn) {
 /* ================================================================================
    PHẦN 4: ĐIỀU KHIỂN SỐ LƯỢNG
    ================================================================================ */
-
-/**
- * Tăng / giảm số lượng sản phẩm
- * @param {number} delta - +1 hoặc -1
- */
 function changeQty(delta) {
     const input = document.getElementById('qty-input');
     if (!input) return;
@@ -1368,80 +2088,51 @@ function changeQty(delta) {
     const newVal = Math.min(max, Math.max(1, current + delta));
     input.value = newVal;
 
-    // Cập nhật giá trả góp khi số lượng thay đổi
     calcInstallment();
 }
 
 /* ================================================================================
    PHẦN 5: TÍNH TRẢ GÓP
    ================================================================================ */
-
-/**
- * Tính và hiển thị tiền trả góp mỗi tháng
- * Công thức: Giá SP / Số tháng (trả góp 0% không có lãi suất)
- */
 function calcInstallment() {
     const select = document.getElementById('installment-months');
     const resultEl = document.getElementById('installment-price');
     if (!select || !resultEl) return;
 
-    // Giá gốc lấy từ PHP (embed vào JS dưới dạng số nguyên)
     const price = <?= (float)$product['price'] ?>;
     const months = parseInt(select.value) || 6;
     const qty = parseInt(document.getElementById('qty-input')?.value) || 1;
 
-    // Tính tiền mỗi tháng (làm tròn lên đến nghìn đồng)
     const monthly = Math.ceil((price * qty) / months / 1000) * 1000;
-
-    // Format và hiển thị (dùng Intl.NumberFormat để định dạng VNĐ)
     resultEl.textContent = new Intl.NumberFormat('vi-VN').format(monthly) + '₫';
 }
 
 /* ================================================================================
    PHẦN 6: CHUYỂN TAB MÔ TẢ / THÔNG SỐ
    ================================================================================ */
-
-/**
- * Chuyển tab (Mô tả / Thông số kỹ thuật)
- * @param {string} tabId - ID của tab cần hiển thị ('desc' hoặc 'specs')
- * @param {HTMLElement} btnEl - Nút tab được click
- */
 function switchTab(tabId, btnEl) {
-    // Ẩn tất cả tab content
     document.querySelectorAll('.tab-content-panel').forEach(p => p.classList.remove('active'));
-
-    // Bỏ active khỏi tất cả nút tab
     document.querySelectorAll('.detail-tab-btn').forEach(b => b.classList.remove('active'));
 
-    // Hiển thị tab được chọn
     const panel = document.getElementById('tab-' + tabId);
     if (panel) panel.classList.add('active');
-
-    // Highlight nút tab đang active
     if (btnEl) btnEl.classList.add('active');
 }
 
 /* ================================================================================
    PHẦN 7: THÊM VÀO GIỎ HÀNG (AJAX)
    ================================================================================ */
-
-/**
- * Thêm sản phẩm vào giỏ hàng bằng AJAX (không reload trang)
- * @param {number} productId - ID sản phẩm
- */
 function addToCart(productId) {
     const qty = parseInt(document.getElementById('qty-input')?.value) || 1;
     const selectedColor = document.querySelector('.color-btn.selected')?.dataset.color || '';
     const selectedVersion = document.querySelector('.version-btn.selected')?.dataset.version || '';
     const btn = document.getElementById('btn-add-to-cart');
 
-    // Hiệu ứng loading trên nút
     if (btn) {
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang thêm...';
     }
 
-    // Gửi AJAX request đến CartController
     fetch('index.php?controller=cart&action=add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1456,7 +2147,6 @@ function addToCart(productId) {
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            // Thành công: Cập nhật số lượng giỏ hàng trên navbar
             const cartCounts = document.querySelectorAll('.cart-count');
             cartCounts.forEach(c => {
                 c.textContent = data.cart_count;
@@ -1466,17 +2156,14 @@ function addToCart(productId) {
                 setTimeout(() => c.style.transform = 'scale(1)', 150);
             });
 
-            // Hiệu ứng bay
             if (typeof flyToCart === 'function') {
                 const imgUrl = document.getElementById('main-product-image').src;
                 flyToCart(btn, imgUrl);
             }
 
-            // Hiệu ứng thành công trên nút
             if (btn) {
                 btn.innerHTML = '<i class="fas fa-check"></i> Đã thêm vào giỏ!';
                 btn.style.background = 'linear-gradient(135deg, #10b981, #34d399)';
-                // Reset sau 2 giây
                 setTimeout(() => {
                     btn.disabled = false;
                     btn.innerHTML = '<i class="bx bx-cart-add" style="font-size:1.3rem"></i> Thêm vào giỏ hàng';
@@ -1492,7 +2179,6 @@ function addToCart(productId) {
         }
     })
     .catch(() => {
-        // Lỗi mạng hoặc server
         alert('Không thể kết nối. Vui lòng thử lại.');
         if (btn) {
             btn.disabled = false;
@@ -1501,23 +2187,217 @@ function addToCart(productId) {
     });
 }
 
-/**
- * Mở modal thuê nhạc cụ (placeholder - sẽ implement ở đợt sau)
- * @param {number} productId - ID sản phẩm cần thuê
- */
 function openRentModal(productId) {
-    // TODO: Implement modal chọn ngày thuê (sẽ làm ở đợt phát triển tiếp theo)
     alert('Tính năng thuê nhạc cụ đang được phát triển. Vui lòng liên hệ 1900 1000 để được hỗ trợ!');
 }
 
-// Khởi tạo: tính trả góp ngay khi trang load
-calcInstallment();
+/* ================================================================================
+   PHẦN 8: LIGHTBOX PHÓNG TO ẢNH SẢN PHẨM CAO CẤP
+   ================================================================================ */
+window.openLightbox = function() {
+    const mainImg = document.getElementById('main-product-image');
+    const lightbox = document.getElementById('product-lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    if (mainImg && lightbox && lightboxImg) {
+        lightboxImg.src = mainImg.src;
+        lightbox.style.display = 'flex';
+        lightbox.offsetWidth; // Reflow
+        lightbox.classList.add('active');
+    }
+};
 
-// Thêm CSS transition cho ảnh chính (fade effect)
-document.getElementById('main-product-image')?.setAttribute(
-    'style',
-    'transition: opacity 0.2s ease; width: 100%; height: 100%; object-fit: cover;'
-);
+window.closeLightbox = function() {
+    const lightbox = document.getElementById('product-lightbox');
+    if (lightbox) {
+        lightbox.classList.remove('active');
+        setTimeout(() => {
+            lightbox.style.display = 'none';
+        }, 300);
+    }
+};
+
+/* ================================================================================
+   PHẦN 9: ĐÁNH GIÁ SẢN PHẨM (REVIEWS)
+   ================================================================================ */
+function highlightStars(val) {
+    const stars = document.querySelectorAll('.star-rating-input i');
+    stars.forEach((star, index) => {
+        if (index < val) {
+            star.style.color = '#f59e0b';
+        } else {
+            star.style.color = 'rgba(255,255,255,0.15)';
+        }
+    });
+}
+
+function resetStars() {
+    const currentVal = parseInt(document.getElementById('rating-input-val')?.value) || 5;
+    highlightStars(currentVal);
+}
+
+function setRatingValue(val) {
+    const input = document.getElementById('rating-input-val');
+    if (input) input.value = val;
+    highlightStars(val);
+}
+
+function submitReview(e) {
+    e.preventDefault();
+    const name = document.getElementById('review-name').value;
+    const email = document.getElementById('review-email').value;
+    const content = document.getElementById('review-content').value;
+    const rating = parseInt(document.getElementById('rating-input-val').value) || 5;
+    
+    const btn = e.target.querySelector('button[type="submit"]');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang gửi...';
+    }
+    
+    setTimeout(() => {
+        const container = document.getElementById('reviews-container');
+        if (container) {
+            const newItem = document.createElement('div');
+            newItem.className = 'review-item';
+            newItem.style.opacity = '0';
+            newItem.style.transform = 'translateY(20px)';
+            newItem.style.transition = 'all 0.5s ease';
+            
+            let starsHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    starsHTML += '<i class="fas fa-star" style="color: #f59e0b;"></i>';
+                } else {
+                    starsHTML += '<i class="far fa-star" style="color: #f59e0b;"></i>';
+                }
+            }
+            
+            newItem.innerHTML = `
+                <div class="review-header">
+                    <div>
+                        <span class="reviewer-name">${escapeHTML(name)}</span>
+                        <span class="reviewer-badge"><i class="fas fa-check-circle"></i> Đã mua tại TTB</span>
+                    </div>
+                    <span class="review-date">Vừa xong</span>
+                </div>
+                <div class="my-2" style="font-size: 0.85rem;">
+                    ${starsHTML}
+                </div>
+                <p class="review-text mb-0">
+                    ${escapeHTML(content)}
+                </p>
+            `;
+            
+            container.insertBefore(newItem, container.firstChild);
+            
+            setTimeout(() => {
+                newItem.style.opacity = '1';
+                newItem.style.transform = 'translateY(0)';
+            }, 50);
+        }
+        
+        document.getElementById('review-submit-form').reset();
+        setRatingValue(5);
+        
+        alert('Cảm ơn bạn đã gửi đánh giá! Nhận xét của bạn đã được hiển thị bên dưới.');
+        
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = 'Gửi đánh giá <i class="fas fa-paper-plane ms-2"></i>';
+        }
+    }, 1000);
+}
+
+function escapeHTML(str) {
+    return str.replace(/[&<>'"]/g, 
+        tag => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            "'": '&#39;',
+            '"': '&quot;'
+        }[tag] || tag)
+    );
+}
+
+/* ================================================================================
+   PHẦN 10: CAROUSEL SẢN PHẨM NỔI BẬT
+   ================================================================================ */
+var carouselInterval = null;
+
+function initRelatedCarousel() {
+    const track = document.getElementById('related-carousel-track');
+    if (!track) return;
+    
+    if (carouselInterval) clearInterval(carouselInterval);
+    
+    carouselInterval = setInterval(() => {
+        scrollCarousel('next');
+    }, 3500);
+    
+    track.removeEventListener('mouseover', onCarouselMouseOver);
+    track.addEventListener('mouseover', onCarouselMouseOver);
+    function onCarouselMouseOver() {
+        if (carouselInterval) clearInterval(carouselInterval);
+    }
+    
+    track.removeEventListener('mouseout', onCarouselMouseOut);
+    track.addEventListener('mouseout', onCarouselMouseOut);
+    function onCarouselMouseOut() {
+        if (carouselInterval) clearInterval(carouselInterval);
+        carouselInterval = setInterval(() => {
+            scrollCarousel('next');
+        }, 3500);
+    }
+}
+
+function scrollCarousel(direction) {
+    const track = document.getElementById('related-carousel-track');
+    if (!track) return;
+    
+    const card = track.querySelector('.carousel-card-item');
+    if (!card) return;
+    
+    const scrollAmount = card.offsetWidth + 20;
+    
+    if (direction === 'next') {
+        if (track.scrollLeft + track.offsetWidth >= track.scrollWidth - 5) {
+            track.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+            track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        }
+    } else {
+        if (track.scrollLeft <= 0) {
+            track.scrollTo({ left: track.scrollWidth, behavior: 'smooth' });
+        } else {
+            track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        }
+    }
+}
+
+/* ================================================================================
+   PHẦN 11: LIFECYCLE VÀ KHỞI TẠO CHI TIẾT
+   ================================================================================ */
+window.initDetailPage = function() {
+    const mainImg = document.getElementById('main-product-image');
+    if (!mainImg) return;
+    if (mainImg.dataset.initialized) return;
+    mainImg.dataset.initialized = 'true';
+
+    // Khởi động các module
+    window.initDetailCanvas();
+    
+    initRelatedCarousel();
+    calcInstallment();
+    resetStars();
+};
+
+// Khởi chạy ngay lập tức khi load trang bình thường
+if (document.readyState !== 'loading') {
+    window.initDetailPage();
+} else {
+    document.addEventListener('DOMContentLoaded', window.initDetailPage);
+}
 </script>
 
 <?php

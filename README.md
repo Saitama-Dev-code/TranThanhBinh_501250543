@@ -20,7 +20,7 @@
 ✅: Xem chi tiết từng đơn hàng
 ✅: Đặt hàng
 ✅: Nghe thử âm thanh (Audio Player) mẫu của nhạc cụ
-✅: Xem sản phẩm 360 độ và thu phóng chi tiết
+✅: Phóng to xem ảnh sản phẩm chi tiết bằng Lightbox cao cấp
 ✅: Xem hình ảnh thực tế, số Serial và cân nặng của từng sản phẩm (Guitar Gallery)
 ✅: So sánh thông số kỹ thuật giữa nhiều sản phẩm
 ✅: Gợi ý mua kèm phụ kiện với giá ưu đãi (Combo/Bundle)

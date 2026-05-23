@@ -360,15 +360,10 @@ include __DIR__ . '/partials/header.php';
         border-radius: 24px;
         margin: 80px auto;
         box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
-        /* Tránh bị cắt khung khi chưa xuất hiện */
-        visibility: hidden;
-        opacity: 0;
-        transition: opacity 0.6s ease-out;
-    }
-    
-    .grand-piano-showcase.visible {
+        /* Luôn hiển thị mặc định để tránh khoảng trống làm footer nhảy đè lên */
         visibility: visible;
         opacity: 1;
+        transition: opacity 0.6s ease-out;
     }
     
     /* Nền của banner - Hiệu ứng cuộn Parallax phóng to thu nhỏ động */
@@ -807,41 +802,44 @@ include __DIR__ . '/partials/header.php';
  * - Cập nhật biến CSS --scroll-progress trực tiếp cho CSS xử lý chuyển động.
  * =========================================================================
  */
-document.addEventListener('DOMContentLoaded', function() {
+// Biến lưu trữ trạng thái cuộn để xác định hướng
+var lastScrollY = window.scrollY;
+var scrollDirection = 'down';
+
+window.addEventListener('scroll', function() {
+    const currentScroll = window.scrollY;
+    if (currentScroll > lastScrollY) {
+        scrollDirection = 'down';
+    } else if (currentScroll < lastScrollY) {
+        scrollDirection = 'up';
+    }
+    lastScrollY = currentScroll;
+}, { passive: true });
+
+// Khai báo listener phạm vi ngoài của trang chủ để dễ gỡ bỏ và tránh đệ quy tuần hoàn
+var homeScrollListener = null;
+var homeResizeListener = null;
+
+function initHomePageScroll() {
     const trackedSections = document.querySelectorAll('.scroll-track');
+    if (trackedSections.length === 0) return;
     
     function updateScrollProgress() {
         const viewportHeight = window.innerHeight;
         
         trackedSections.forEach(section => {
             const rect = section.getBoundingClientRect();
-            const elementHeight = rect.height;
             
-            // Điểm bắt đầu xuất hiện (ở mép dưới màn hình)
             const enterStart = viewportHeight;
-            // Điểm hoàn tất xuất hiện hoàn toàn (khoảng 20% từ mép trên màn hình)
             const enterEnd = viewportHeight * 0.20;
-            
-            // Điểm bắt đầu biến mất (khi đỉnh phần tử chạm mép trên màn hình)
-            const exitStart = 0;
-            // Điểm biến mất hoàn toàn (khi phần tử cuộn qua khỏi mép trên màn hình)
-            const exitEnd = -elementHeight * 0.9;
             
             let progress = 0;
             
-            if (rect.top > enterStart) {
-                // Vẫn ở dưới màn hình
-                progress = 0;
-                section.classList.remove('visible');
-            } else if (rect.top <= enterStart && rect.top > enterEnd) {
-                // Đang xuất hiện khi cuộn màn hình xuống: tăng dần từ 0 lên 1.
-                // Hoặc đang biến mất khi cuộn màn hình lên: giảm dần từ 1 về 0.
-                progress = (enterStart - rect.top) / (enterStart - enterEnd);
-                section.classList.add('visible');
-            } else {
-                // Đã xuất hiện đầy đủ hoặc trôi ra ngoài đỉnh màn hình: giữ nguyên 1 (không bị thu lại khi tiếp tục cuộn xuống)
-                progress = 1;
-                section.classList.add('visible');
+            if (rect.top <= enterStart && rect.bottom >= 0) {
+                // Tối ưu hóa: Đạt 100% (progress = 1) khi phần tử trượt lên tới GIỮA màn hình (enterStart * 0.5) thay vì phải cuộn thật sâu
+                const currentDist = enterStart - rect.top;
+                const activeRange = enterStart * 0.5; // Quãng đường từ đáy lên tới giữa màn hình
+                progress = Math.max(0, Math.min(1, currentDist / activeRange));
             }
             
             // Gán giá trị biến CSS cho element tương ứng
@@ -849,9 +847,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Sử dụng RequestAnimationFrame để tối ưu hóa hiệu năng, giảm giật lag khi cuộn
+    // Sử dụng RequestAnimationFrame để tối ưu hóa hiệu năng
     let isScrolling = false;
-    window.addEventListener('scroll', function() {
+    homeScrollListener = function() {
         if (!isScrolling) {
             isScrolling = true;
             window.requestAnimationFrame(function() {
@@ -859,23 +857,35 @@ document.addEventListener('DOMContentLoaded', function() {
                 isScrolling = false;
             });
         }
-    }, { passive: true });
+    };
     
-    // Lắng nghe cả sự kiện thay đổi kích thước cửa sổ
-    window.addEventListener('resize', updateScrollProgress, { passive: true });
+    homeResizeListener = updateScrollProgress;
     
-    // Gọi khởi tạo lần đầu ngay khi trang load xong
+    window.addEventListener('scroll', homeScrollListener, { passive: true });
+    window.addEventListener('resize', homeResizeListener, { passive: true });
+    
+    // Lưu cơ chế hủy listener của scroll/resize trực tiếp
+    window.homePageCleanup = function() {
+        if (homeScrollListener) {
+            window.removeEventListener('scroll', homeScrollListener);
+            homeScrollListener = null;
+        }
+        if (homeResizeListener) {
+            window.removeEventListener('resize', homeResizeListener);
+            homeResizeListener = null;
+        }
+    };
+    
+    // Gọi khởi tạo lần đầu
     updateScrollProgress();
+}
 
-    // =========================================================================
-    // JAVASCRIPT: HIỆU ỨNG 3D TILT LOGO & DISPLACEMENT WARP VIDEO HERO
-    // =========================================================================
+function initHeroEffects() {
     const heroBanner = document.getElementById('hero-banner');
     const heroLogo   = document.getElementById('hero-logo');
     const rippleCircle = document.getElementById('ripple-circle');
     const dispMap    = document.getElementById('warp-displacement-map');
     
-    // XỬ LÝ DI CHUỘT TRÊN HERO BANNER
     if (heroBanner && heroLogo) {
         heroBanner.addEventListener('mousemove', function(e) {
             // Lấy tọa độ tương đối của chuột trong banner
@@ -924,7 +934,31 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-});
+}
+
+window.initHomePage = function() {
+    // 1. Hủy các listener cũ của trang chủ nếu có để giải phóng bộ nhớ
+    if (window.homePageCleanup) {
+        window.homePageCleanup();
+    }
+    
+    // 2. Khởi chạy parallax cuộn trang
+    initHomePageScroll();
+    
+    // 3. Khởi chạy hiệu ứng Hero 3D Tilt & SVG Warp
+    initHeroEffects();
+    
+    // 4. Làm tươi hiệu ứng AOS
+    if (typeof AOS !== 'undefined') {
+        AOS.refresh();
+    }
+};
+
+if (document.readyState !== 'loading') {
+    window.initHomePage();
+} else {
+    document.addEventListener('DOMContentLoaded', window.initHomePage);
+}
 </script>
 
 <?php

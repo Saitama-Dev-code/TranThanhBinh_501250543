@@ -195,6 +195,9 @@ class ProductController extends BaseController {
         $colors   = $variants['colors'];
         $versions = $variants['versions'];
 
+        // Lấy danh sách sản phẩm nổi bật ngẫu nhiên (loại trừ sản phẩm hiện tại)
+        $randomProducts = $productModel->getRandomProducts(6, $productId);
+
         // =================================================================
         // BƯỚC 4: ĐÓNG GÓI DATA VÀ RENDER VIEW
         // =================================================================
@@ -210,11 +213,14 @@ class ProductController extends BaseController {
 
             // Mảng phiên bản (Standard, Premium...)
             'versions'  => $versions,
+
+            // Sản phẩm nổi bật ngẫu nhiên
+            'randomProducts' => $randomProducts,
         ];
 
         // Gọi BaseController::render() → load file app/Views/product_detail.php
         // $data sẽ được extract() thành các biến trong View:
-        //   $pageTitle, $product, $colors, $versions
+        //   $pageTitle, $product, $colors, $versions, $randomProducts
         $this->render('product_detail', $data);
     }
 }

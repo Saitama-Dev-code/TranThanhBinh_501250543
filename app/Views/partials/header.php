@@ -616,6 +616,21 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
             transform: rotate(90deg);
         }
 
+        /* Tối ưu màu sắc cho giỏ hàng ở Light Theme */
+        :root[data-theme="light"] .spa-page#page-cart {
+            background: rgba(255, 255, 255, 0.98) !important;
+        }
+        :root[data-theme="light"] .btn-cart-close {
+            background: rgba(15, 23, 42, 0.05) !important;
+            border-color: #e2e8f0 !important;
+            color: #475569 !important;
+        }
+        :root[data-theme="light"] .btn-cart-close:hover {
+            background: #ef4444 !important;
+            color: white !important;
+            border-color: #ef4444 !important;
+        }
+
         /* Ảnh ảo dùng cho Morph Zoom */
         .morph-temp-image {
             position: fixed;

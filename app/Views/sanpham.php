@@ -74,10 +74,10 @@ include __DIR__ . '/partials/header.php';
     border-radius: 20px;
     padding: 24px;
     margin-bottom: 20px;
-    backdrop-filter: blur(25px); /* Tăng blur cho sang */
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
     position: relative;
     overflow: hidden;
+    transition: box-shadow 0.3s ease;
 }
 
 /* Hiệu ứng viền sáng cho sidebar box */
@@ -85,7 +85,7 @@ include __DIR__ . '/partials/header.php';
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.4), transparent);
+    background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), transparent);
 }
 
 .filter-group {
@@ -373,6 +373,14 @@ include __DIR__ . '/partials/header.php';
 }
 [data-theme="light"] .filter-checkbox input {
     accent-color: #8b5cf6 !important;
+}
+
+/* Tối ưu bóng mờ cho các hộp Sidebar ở Light Theme (ngăn chặn lỗi bóng vuông do Chromium bug) */
+[data-theme="light"] .sidebar-box {
+    box-shadow: 0 10px 30px rgba(124, 58, 237, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+}
+[data-theme="light"] .filter-panel-sidebar.open {
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.03) !important;
 }
 
 /* Panel bộ lọc nâng cao trong sidebar */

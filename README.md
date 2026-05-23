@@ -150,5 +150,3 @@ Lưu lại danh sách các món đồ khách đem về trong một hợp đồng
 -`product_id` (INT, FK): Nhạc cụ nào được thuê (Liên kết bảng products)
 -`quantity` (INT, Not Null): Số lượng thuê
 -`price_per_day` (DECIMAL(10,2), Not Null): Chốt giá thuê/ngày tại thời điểm làm hợp đồng
-
-// Thử nghiệm CodeRabbit

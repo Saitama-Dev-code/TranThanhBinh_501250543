@@ -369,6 +369,14 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
         let prevS = window.pageYOffset;
         const nav = document.getElementById("smartNavbar");
         window.addEventListener('scroll', () => {
+            // Kiểm tra xem trang chi tiết sản phẩm có đang mở không
+            const detailContainer = document.getElementById('page-detail');
+            const isDetailActive = detailContainer && detailContainer.classList.contains('active-sheet');
+            if (isDetailActive) {
+                if (nav) nav.style.top = "0"; // Giữ cố định hiển thị navbar
+                return;
+            }
+
             let currS = window.pageYOffset;
             if(nav) {
                 if (currS <= 50) { nav.style.top = "0"; nav.style.boxShadow = "none"; }
@@ -738,8 +746,8 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                 this.executeScripts(cartContainer);
 
                 // Khởi chạy modal và các logic giỏ hàng
-                if (typeof initCartPage === 'function') {
-                    initCartPage();
+                if (typeof window.initCartPage === 'function') {
+                    window.initCartPage();
                 }
 
                 // Hiển thị overlay trượt xuống
@@ -797,6 +805,16 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                 detailContainer.offsetWidth; // Reflow
                 detailContainer.classList.add('active-sheet');
                 document.body.style.overflow = 'hidden'; // Khóa cuộn trang nền
+
+                // Buộc Navbar hiển thị cố định ngay lập tức khi mở trang chi tiết sản phẩm
+                const nav = document.getElementById("smartNavbar");
+                if (nav) {
+                    nav.style.top = "0";
+                    nav.style.boxShadow = "0 4px 15px rgba(0,0,0,0.1)";
+                    if (typeof window.updateNavHeight === 'function') {
+                        window.updateNavHeight();
+                    }
+                }
 
                 // Khởi tạo lại và làm tươi AOS cho các phần tử động mới chèn vào DOM
                 if (typeof AOS !== 'undefined') {
@@ -1327,6 +1345,9 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                 } else if (activePage.id === 'page-detail') {
                     activePage.classList.add('active-sheet');
                     document.body.style.overflow = 'hidden'; // ✅ Khóa cuộn trang nền dưới sheet
+                    if (typeof window.updateNavHeight === 'function') {
+                        window.updateNavHeight();
+                    }
                 }
             }
         });

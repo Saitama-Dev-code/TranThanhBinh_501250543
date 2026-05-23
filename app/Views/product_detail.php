@@ -35,7 +35,7 @@ include __DIR__ . '/partials/header.php';
     padding: 14px 0;
     position: -webkit-sticky;
     position: sticky;
-    top: 0;
+    top: 0; /* Ghim sát đỉnh của container #page-detail (tức là sát đáy Navbar) */
     background: var(--bg-color);
     border-bottom: 1px solid var(--border-color);
     z-index: 100;
@@ -47,7 +47,7 @@ include __DIR__ . '/partials/header.php';
     border: 1px solid rgba(139, 92, 246, 0.2);
     border-radius: 10px;
     cursor: pointer;
-    transition: background 0.3s, border-color 0.3s, transform 0.3s;
+    transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -65,7 +65,7 @@ include __DIR__ . '/partials/header.php';
 }
 .detail-drag-handle:hover {
     background: rgba(139, 92, 246, 0.25);
-    border-color: rgba(139, 92, 246, 0.5);
+    border-color: rgba(139, 92, 246, 0.6);
     box-shadow: 0 0 12px rgba(139, 92, 246, 0.5);
 }
 .detail-drag-handle:hover::after {
@@ -1835,6 +1835,58 @@ include __DIR__ . '/partials/header.php';
     <?php endif; ?>
 
 </div><!-- /.container -->
+
+<!-- Footer cho trang chi tiết sản phẩm (Bottom Sheet) -->
+<footer class="mt-5 pt-5" style="background-color: var(--card-bg); border-top: 1px solid var(--border-color); padding: 60px 0 20px 0; position: relative; z-index: 10;">
+    <div class="container">
+        <div class="row gy-4">
+            <div class="col-lg-4">
+                <h4 class="fw-bold mb-3"><i class="fas fa-music text-primary me-2"></i>TTB MUSIC</h4>
+                <p class="mb-4" style="color: var(--text-color); opacity: 0.8;">
+                    Hệ thống cung cấp nhạc cụ hàng đầu, nơi khơi nguồn những giai điệu bất hủ và trải nghiệm âm nhạc đỉnh cao.
+                </p>
+                <div class="d-flex gap-3">
+                    <a href="#" class="social-circle-icon fb" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-circle-icon zl" title="Zalo"><i class="fas fa-comment-dots"></i></a>
+                    <a href="#" class="social-circle-icon yt" title="Youtube"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="social-circle-icon ins" title="Instagram"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+
+            <div class="col-lg-2 offset-lg-1 col-md-4">
+                <h5 class="fw-bold mb-3" style="color: var(--text-color);">Cửa hàng</h5>
+                <ul class="list-unstyled footer-link-list">
+                    <li><a href="index.php?controller=product&action=index&category=1">Guitar & Bass</a></li>
+                    <li><a href="index.php?controller=product&action=index&category=2">Piano & Organ</a></li>
+                    <li><a href="index.php?controller=product&action=index&category=3">Trống & Bộ gõ</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-2 col-md-4">
+                <h5 class="fw-bold mb-3" style="color: var(--text-color);">Dịch vụ</h5>
+                <ul class="list-unstyled footer-link-list">
+                    <li><a href="#" class="text-warning fw-bold">Cho Thuê Nhạc Cụ</a></li>
+                    <li><a href="#">Bảo hành tận nơi</a></li>
+                    <li><a href="#">Học viện TTB</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-4">
+                <h5 class="fw-bold mb-3" style="color: var(--text-color);">Liên hệ</h5>
+                <ul class="list-unstyled" style="color: var(--text-color); opacity: 0.8;">
+                    <li class="mb-2"><i class="fas fa-map-marker-alt me-2 text-primary"></i> Quận 1, TP.HCM</li>
+                    <li class="mb-2"><i class="fas fa-phone-alt me-2 text-primary"></i> 1900 1000</li>
+                    <li class="mb-2"><i class="fas fa-envelope me-2 text-primary"></i> contact@ttb.music</li>
+                </ul>
+            </div>
+        </div>
+
+        <hr class="mt-5 mb-4" style="border-color: var(--border-color); opacity: 0.2;">
+        <div class="text-center small pb-3" style="color: var(--text-color); opacity: 0.6;">
+            &copy; 2024 <strong>TTB MUSIC</strong>. Dự án PHP MVC chuẩn hướng đối tượng.
+        </div>
+    </div>
+</footer>
 
 <!-- Lightbox phóng to ảnh sản phẩm cao cấp -->
 <div id="product-lightbox" class="product-lightbox-modal" onclick="window.closeLightbox()">

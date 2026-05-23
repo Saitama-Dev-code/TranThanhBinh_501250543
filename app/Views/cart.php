@@ -1029,6 +1029,13 @@ function showEmptyCart() {
     }
     loop();
 })();
+
+// Tự động khởi chạy logic sự kiện cho giỏ hàng
+if (document.readyState !== 'loading') {
+    window.initCartPage();
+} else {
+    document.addEventListener('DOMContentLoaded', window.initCartPage);
+}
 </script>
 
 <?php

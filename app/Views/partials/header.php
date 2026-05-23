@@ -57,6 +57,9 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
     <script src="https://cdn.lordicon.com/lordicon.js"></script>
 
     <style>
+        :root {
+            --nav-height: 76px; /* Chiều cao mặc định của Navbar */
+        }
         /* ================= BIẾN MÀU SẮC (THEME) ================= */
         :root[data-theme="light"] {
             --bg-color: #f8fafc;
@@ -101,7 +104,7 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
             font-family: 'Segoe UI', sans-serif;
             transition: background-color 0.4s ease, color 0.4s ease;
             overflow-x: hidden;
-            padding-top: 76px;
+            padding-top: var(--nav-height, 76px);
             position: relative;
         }
 
@@ -563,11 +566,12 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
         .spa-page#page-detail {
             display: block !important;
             position: fixed;
-            top: 76px; /* Bắt đầu ngay dưới navbar */
+            top: var(--nav-height, 76px); /* Bắt đầu ngay dưới Navbar */
             left: 0;
             width: 100%;
-            height: calc(100vh - 76px); /* Chiều cao phần còn lại */
+            height: calc(100vh - var(--nav-height, 76px)); /* Chiều cao còn lại dưới Navbar */
             z-index: 1020; /* Nằm dưới navbar (1030) */
+            padding-top: 0; /* Sát khít với Navbar, không cần padding nữa */
             background: var(--bg-color);
             transform: translateY(100vh);
             transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
@@ -580,7 +584,7 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
             display: none;
         }
         .spa-page#page-detail.active-sheet {
-            transform: translateY(0);
+            transform: none;
             pointer-events: auto;
         }
 
@@ -879,6 +883,36 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
             </div>
         </div>
     </nav>
+    <script>
+        // Đo chiều cao thực tế của Navbar động để căn chỉnh khoảng cách các sheet/detail-page
+        window.updateNavHeight = () => {
+            const nav = document.getElementById('smartNavbar');
+            if (nav) {
+                const rect = nav.getBoundingClientRect();
+                const height = rect.height || nav.offsetHeight;
+                if (height > 0) {
+                    document.documentElement.style.setProperty('--nav-height', height + 'px');
+                }
+            }
+        };
+        // Chạy ngay lập tức khi script load
+        window.updateNavHeight();
+        // Chạy khi DOMContentLoaded
+        window.addEventListener('DOMContentLoaded', window.updateNavHeight);
+        // Chạy khi load xong hoàn toàn (ảnh, style...)
+        window.addEventListener('load', window.updateNavHeight);
+        // Chạy khi resize window
+        window.addEventListener('resize', window.updateNavHeight);
+        
+        // Theo dõi sự thay đổi của class/attributes của nav (ví dụ khi scroll hoặc toggle menu)
+        (function() {
+            const navEl = document.getElementById('smartNavbar');
+            if (navEl) {
+                const observer = new MutationObserver(window.updateNavHeight);
+                observer.observe(navEl, { attributes: true, childList: true, subtree: true });
+            }
+        })();
+    </script>
     <div class="main-content-wrapper" style="min-height: 75vh;">
         <div id="spa-viewport">
             <?php

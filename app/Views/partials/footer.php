@@ -806,6 +806,11 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                 detailContainer.classList.add('active-sheet');
                 document.body.style.overflow = 'hidden'; // Khóa cuộn trang nền
 
+                // Cập nhật ngay trạng thái nút Lên đầu trang (ẩn đi vì trang chi tiết đang ở top)
+                if (typeof window.updateScrollToTopBtn === 'function') {
+                    window.updateScrollToTopBtn();
+                }
+
                 // Buộc Navbar hiển thị cố định ngay lập tức khi mở trang chi tiết sản phẩm
                 const nav = document.getElementById("smartNavbar");
                 if (nav) {
@@ -841,6 +846,11 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                     const isCartActive = cartContainer && cartContainer.classList.contains('active-overlay');
                     if (!isCartActive) {
                         document.body.style.overflow = '';
+                    }
+
+                    // Cập nhật lại trạng thái nút Lên đầu trang theo trang cửa hàng/nền phía dưới
+                    if (typeof window.updateScrollToTopBtn === 'function') {
+                        window.updateScrollToTopBtn();
                     }
                     
                     // Dọn dẹp canvas và sự kiện

@@ -85,7 +85,7 @@ include __DIR__ . '/partials/header.php';
 [data-theme="dark"]  { --text-muted: rgba(255,255,255,0.55); --text-faint: rgba(255,255,255,0.35); }
 [data-theme="light"] { --text-muted: rgba(15,23,42,0.55);   --text-faint: rgba(15,23,42,0.35); }
 [data-theme="dark"]  { --variant-btn-bg: rgba(255,255,255,0.06); --variant-btn-border: rgba(255,255,255,0.15); }
-[data-theme="light"] { --variant-btn-bg: rgba(15,23,42,0.05);   --variant-btn-border: rgba(15,23,42,0.18); }
+[data-theme="light"] { --variant-btn-bg: #ffffff; --variant-btn-border: #e2e8f0; }
 
 /* ================================================================================
    ẨN CANVAS NỐT NHẠC RƠI TOÀN CỤC CỦA HEADER (TRANG NÀY DÙNG NỀN RIÊNG)
@@ -771,7 +771,7 @@ include __DIR__ . '/partials/header.php';
 .rating-big-number {
     font-size: 3.5rem;
     font-weight: 900;
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    background: linear-gradient(135deg, #7c3aed, #8b5cf6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     line-height: 1;
@@ -943,7 +943,7 @@ include __DIR__ . '/partials/header.php';
 .carousel-card-price {
     font-size: 0.95rem;
     font-weight: 800;
-    color: #3b82f6;
+    color: #8b5cf6;
 }
 .carousel-nav-btn {
     background: rgba(15, 23, 42, 0.65);
@@ -985,6 +985,19 @@ include __DIR__ . '/partials/header.php';
     .carousel-nav-btn {
         display: none; /* Hide buttons on mobile, rely on swipe */
     }
+}
+
+/* Sửa màu sắc cho các thành phần ở Light Theme để trông cao cấp hơn */
+[data-theme="light"] .installment-select {
+    background: #ffffff !important;
+    border: 1px solid rgba(139, 92, 246, 0.25) !important;
+    color: #1e293b !important;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.05) !important;
+}
+[data-theme="light"] .detail-variant-btn:hover {
+    background: rgba(139, 92, 246, 0.05) !important;
+    border-color: #8b5cf6 !important;
+    color: #8b5cf6 !important;
 }
 </style>
 

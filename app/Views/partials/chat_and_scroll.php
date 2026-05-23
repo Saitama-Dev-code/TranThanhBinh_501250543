@@ -235,6 +235,9 @@
             }
         };
 
+        // Phơi bày hàm ra toàn cục phục vụ SPA Router cập nhật nút khi trượt mở sheet chi tiết
+        window.updateScrollToTopBtn = handleScroll;
+
         window.addEventListener("scroll", handleScroll, { passive: true });
         window.addEventListener("scroll", handleScroll, { capture: true, passive: true });
 

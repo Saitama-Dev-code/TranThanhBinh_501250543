@@ -953,6 +953,13 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                     const isCached = (toContainer !== null);
 
                     if (isCached) {
+                        // Cập nhật class active cho trang đích dưới nền nếu khác biệt
+                        const currentActivePage = document.querySelector('.spa-page.active');
+                        if (currentActivePage && currentActivePage.id !== toContainerId) {
+                            currentActivePage.classList.remove('active');
+                            toContainer.classList.add('active');
+                        }
+
                         this.hideCartOverlay();
                         this.updateNavbar(toUrl);
                         this.isTransitioning = false;
@@ -967,6 +974,12 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                             const parser = new DOMParser();
                             const doc = parser.parseFromString(htmlText, 'text/html');
                             
+                            // Gỡ bỏ active của trang cũ
+                            const currentActivePage = document.querySelector('.spa-page.active');
+                            if (currentActivePage) {
+                                currentActivePage.classList.remove('active');
+                            }
+
                             toContainer = document.createElement('div');
                             toContainer.id = toContainerId;
                             toContainer.className = 'spa-page active';
@@ -1042,6 +1055,13 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                     const isCached = (toContainer !== null);
 
                     if (isCached) {
+                        // Cập nhật class active cho trang đích dưới nền nếu khác biệt
+                        const currentActivePage = document.querySelector('.spa-page.active');
+                        if (currentActivePage && currentActivePage.id !== toContainerId) {
+                            currentActivePage.classList.remove('active');
+                            toContainer.classList.add('active');
+                        }
+
                         // Kịch bản mượt nhất: Trang nền đã có sẵn bên dưới sheet
                         this.hideDetailSheet();
                         this.updateNavbar(toUrl);
@@ -1057,6 +1077,12 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                             const parser = new DOMParser();
                             const doc = parser.parseFromString(htmlText, 'text/html');
                             
+                            // Gỡ bỏ active của trang cũ
+                            const currentActivePage = document.querySelector('.spa-page.active');
+                            if (currentActivePage) {
+                                currentActivePage.classList.remove('active');
+                            }
+
                             toContainer = document.createElement('div');
                             toContainer.id = toContainerId;
                             toContainer.className = 'spa-page active'; // Bật active ngay lập tức dưới nền

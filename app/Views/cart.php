@@ -696,12 +696,13 @@ window.initCartPage = function() {
     const closeCartBtn = document.getElementById('btn-close-cart-overlay');
     if (closeCartBtn) {
         closeCartBtn.addEventListener('click', () => {
+            const fallbackUrl = window.spaBackgroundUrl || 'index.php?controller=home';
             if (typeof window.hideCartOverlaySPA === 'function') {
                 window.hideCartOverlaySPA();
                 if (history.length > 1) {
                     history.back();
                 } else {
-                    window.navigateToSPA('index.php?controller=product&action=index');
+                    window.navigateToSPA(fallbackUrl);
                 }
             } else {
                 const cartPage = document.getElementById('page-cart');
@@ -712,7 +713,7 @@ window.initCartPage = function() {
                         cartPage.style.display = 'none';
                     }, 700);
                 }
-                window.location.href = 'index.php?controller=product&action=index';
+                window.location.href = fallbackUrl;
             }
         });
     }

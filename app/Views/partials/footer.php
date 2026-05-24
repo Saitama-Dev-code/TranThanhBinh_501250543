@@ -13,7 +13,7 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
         </div> <!-- Close spa-viewport -->
     </div> <!-- Close main-content-wrapper -->
 
-    <footer class="mt-5 pt-5" data-aos="fade-up" data-aos-offset="50" data-aos-once="true" style="background-color: var(--card-bg); border-top: 1px solid var(--border-color); padding: 60px 0 20px 0; position: relative; z-index: 10;">
+    <footer class="mt-5 pt-5 footer-loading" data-aos="fade-up" data-aos-offset="50" data-aos-once="true" style="background-color: var(--card-bg); border-top: 1px solid var(--border-color); padding: 60px 0 20px 0; position: relative; z-index: 10;">
         <div class="container">
             <div class="row gy-4">
                 <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
@@ -66,6 +66,12 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
     </footer>
 
     <style>
+        /* 0. ẨN TẠM THỜI TRƯỚC KHI TRANG SẴN SÀNG ĐỂ TRÁNH GIẬT NHẢY FOOTER */
+        footer.footer-loading {
+            opacity: 0 !important;
+            pointer-events: none;
+        }
+
         /* 1. HIỆU ỨNG ICON MXH JELLY */
         .social-circle-icon {
             width: 42px; height: 42px; border-radius: 50%;
@@ -360,12 +366,21 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
             aosResizeObserver.observe(document.body);
         }
 
-        // Chốt chặn cuối cùng khi toàn bộ tài nguyên tải xong
-        window.addEventListener('load', () => {
-            if (typeof AOS !== 'undefined') {
-                AOS.refresh();
+        // Hàm gỡ bỏ class loading để footer sẵn sàng
+        function makeFooterReady() {
+            const footerEl = document.querySelector('footer.footer-loading');
+            if (footerEl) {
+                footerEl.classList.remove('footer-loading');
+                if (typeof AOS !== 'undefined') {
+                    AOS.refresh();
+                }
             }
-        });
+        }
+
+        // Chốt chặn cuối cùng khi toàn bộ tài nguyên tải xong
+        window.addEventListener('load', makeFooterReady);
+        // Hoặc tự động hiện sau tối đa 1.5 giây để tránh chờ quá lâu
+        setTimeout(makeFooterReady, 1500);
 
         // Logic Theme Toggle ổn định
         const themeBtn = document.getElementById('theme-toggle');
@@ -946,6 +961,7 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                     // Lưu URL trang nền hiện tại
                     if (fromContainerId !== 'page-cart') {
                         this.backgroundPageUrl = fromUrl;
+                        window.spaBackgroundUrl = fromUrl;
                     }
                     try {
                         const spaUrl = toUrl + (toUrl.includes('?') ? '&' : '?') + 'spa=1';
@@ -1048,6 +1064,7 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                     // Lưu URL trang nền hiện tại
                     if (fromContainerId !== 'page-detail' && fromContainerId !== 'page-cart') {
                         this.backgroundPageUrl = fromUrl;
+                        window.spaBackgroundUrl = fromUrl;
                     }
                     try {
                         const spaUrl = toUrl + (toUrl.includes('?') ? '&' : '?') + 'spa=1';

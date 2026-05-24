@@ -446,7 +446,7 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
         #spa-viewport {
             position: relative;
             width: 100%;
-            min-height: 75vh;
+            min-height: 150vh;
         }
         .spa-page {
             display: none;
@@ -928,7 +928,7 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
             }
         })();
     </script>
-    <div class="main-content-wrapper" style="min-height: 75vh;">
+    <div class="main-content-wrapper" style="min-height: 150vh;">
         <div id="spa-viewport">
             <?php
             $activePageId = 'page-home';

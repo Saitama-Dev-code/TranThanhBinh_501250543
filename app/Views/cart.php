@@ -699,11 +699,7 @@ window.initCartPage = function() {
             const fallbackUrl = window.spaBackgroundUrl || 'index.php?controller=home';
             if (typeof window.hideCartOverlaySPA === 'function') {
                 window.hideCartOverlaySPA();
-                if (history.length > 1) {
-                    history.back();
-                } else {
-                    window.navigateToSPA(fallbackUrl);
-                }
+                window.navigateToSPA(fallbackUrl);
             } else {
                 const cartPage = document.getElementById('page-cart');
                 if (cartPage && cartPage.classList.contains('active-overlay')) {

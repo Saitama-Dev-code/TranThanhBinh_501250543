@@ -1008,7 +1008,7 @@ include __DIR__ . '/partials/header.php';
      NỘI DUNG CHÍNH TRANG CHI TIẾT
      ============================================================ -->
 <div class="detail-sheet-header">
-    <div class="detail-drag-handle" onclick="if(history.length > 1) { history.back(); } else { window.navigateToSPA('index.php?controller=product&action=index'); }" title="Nhấp để quay lại"></div>
+    <div class="detail-drag-handle" onclick="window.navigateToSPA(window.spaBackgroundUrl || 'index.php?controller=product&action=index');" title="Nhấp để quay lại"></div>
 </div>
 
 <div class="container my-4">

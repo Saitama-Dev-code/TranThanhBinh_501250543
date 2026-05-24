@@ -339,11 +339,14 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     
     <script>
-        const isHomePageInitial = document.querySelector('.spa-page.active')?.id === 'page-home';
-        AOS.init({ 
-            once: !isHomePageInitial, /* Nếu không phải home thì chỉ chạy 1 lần, tránh lặp lại kỳ cục */
-            mirror: isHomePageInitial, /* Chỉ bật mirror cho trang chủ */
-            offset: 100 
+        window.addEventListener('load', () => {
+            const isHomePageInitial = document.querySelector('.spa-page.active')?.id === 'page-home';
+            AOS.init({ 
+                once: !isHomePageInitial, /* Nếu không phải home thì chỉ chạy 1 lần, tránh lặp lại kỳ cục */
+                mirror: isHomePageInitial, /* Chỉ bật mirror cho trang chủ */
+                offset: 100 
+            });
+            AOS.refresh();
         });
 
         // Logic Theme Toggle ổn định

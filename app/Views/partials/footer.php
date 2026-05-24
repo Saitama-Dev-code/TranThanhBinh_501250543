@@ -339,14 +339,32 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     
     <script>
-        window.addEventListener('load', () => {
-            const isHomePageInitial = document.querySelector('.spa-page.active')?.id === 'page-home';
-            AOS.init({ 
-                once: !isHomePageInitial, /* Nếu không phải home thì chỉ chạy 1 lần, tránh lặp lại kỳ cục */
-                mirror: isHomePageInitial, /* Chỉ bật mirror cho trang chủ */
-                offset: 100 
+        const isHomePageInitial = document.querySelector('.spa-page.active')?.id === 'page-home';
+        AOS.init({ 
+            once: !isHomePageInitial, /* Nếu không phải home thì chỉ chạy 1 lần, tránh lặp lại kỳ cục */
+            mirror: isHomePageInitial, /* Chỉ bật mirror cho trang chủ */
+            offset: 100 
+        });
+
+        // Sử dụng ResizeObserver để tự động làm mới tọa độ AOS ngay khi kích thước trang thay đổi (ảnh/banner load xong)
+        if (typeof ResizeObserver !== 'undefined') {
+            let aosResizeTimeout;
+            const aosResizeObserver = new ResizeObserver(() => {
+                clearTimeout(aosResizeTimeout);
+                aosResizeTimeout = setTimeout(() => {
+                    if (typeof AOS !== 'undefined') {
+                        AOS.refresh();
+                    }
+                }, 100);
             });
-            AOS.refresh();
+            aosResizeObserver.observe(document.body);
+        }
+
+        // Chốt chặn cuối cùng khi toàn bộ tài nguyên tải xong
+        window.addEventListener('load', () => {
+            if (typeof AOS !== 'undefined') {
+                AOS.refresh();
+            }
         });
 
         // Logic Theme Toggle ổn định

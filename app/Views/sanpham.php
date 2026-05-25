@@ -557,6 +557,7 @@ include __DIR__ . '/partials/header.php';
 
 .badge-stock.low {
     background: rgba(239, 68, 68, 0.9);
+    color: #fff !important;
     animation: pulse 2s infinite;
 }
 
@@ -675,6 +676,19 @@ include __DIR__ . '/partials/header.php';
 .product-price .currency {
     font-size: 0.85rem;
     font-weight: 600;
+}
+
+.product-rent-price {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+}
+.product-rent-price i {
+    color: #eab308;
 }
 
 .btn-add-cart {

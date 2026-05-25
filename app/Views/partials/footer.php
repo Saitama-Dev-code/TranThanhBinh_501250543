@@ -266,7 +266,7 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
             background: rgba(10, 8, 20, 0.88); /* Nền tối sâu */
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            transform: translateY(100%);
+            transform: translateY(-100%);
             transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
             overflow-y: auto;
             pointer-events: none;
@@ -367,15 +367,15 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
             box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
         }
 
-        /* Form slide transitions */
+        /* Form slide transitions (Mở rộng thành 4 panels: login, register, forgot, reset) */
         .auth-form-wrapper {
             display: flex;
-            width: 200%;
+            width: 400%;
             transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
         }
         
         .auth-form-pane {
-            width: 50%;
+            width: 25%;
             transition: opacity 0.45s ease;
         }
         
@@ -435,10 +435,8 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                     <button type="button" class="auth-tab-btn" id="btn-tab-register" onclick="window.switchAuthTab('register')">Đăng ký</button>
                 </div>
                 
-                <!-- Vùng chứa 2 form dạng trượt mượt mà -->
                 <div style="overflow: hidden; width: 100%;">
                     <div class="auth-form-wrapper" id="auth-form-wrapper">
-                        
                         <!-- FORM ĐĂNG NHẬP -->
                         <div class="auth-form-pane" id="pane-login">
                             <div class="alert alert-danger d-none mx-0 mb-3" id="ajaxLoginError" style="border-radius: 0.5rem; font-size: 0.9rem;"></div>
@@ -453,15 +451,15 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                                     <input type="password" class="form-control modern-input" id="logPass" name="password" placeholder=" " required>
                                     <label for="logPass">Mật khẩu</label>
                                 </div>
-
+ 
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="remMe">
+                                        <input class="form-check-input" type="checkbox" id="remMe" name="remember" value="1">
                                         <label class="form-check-label small" for="remMe" style="color: var(--text-color); opacity: 0.8;">Nhớ mật khẩu</label>
                                     </div>
-                                    <a href="index.php?controller=auth&action=forgot" class="text-primary text-decoration-none small fw-bold">Quên mật khẩu?</a>
+                                    <a href="javascript:void(0)" onclick="window.switchAuthTab('forgot')" class="text-primary text-decoration-none small fw-bold">Quên mật khẩu?</a>
                                 </div>
-
+ 
                                 <button type="submit" class="btn btn-glow btn-lg w-100 fw-bold rounded-pill text-white py-3">ĐĂNG NHẬP <i class="fas fa-sign-in-alt ms-2"></i></button>
                             </form>
                             
@@ -505,7 +503,7 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                                     <input type="password" class="form-control modern-input" id="regConfirmPass" name="confirm_password" placeholder=" " required>
                                     <label for="regConfirmPass">Xác nhận mật khẩu</label>
                                 </div>
-
+ 
                                 <button type="submit" class="btn btn-glow btn-lg w-100 fw-bold rounded-pill text-white py-3">ĐĂNG KÝ NGAY <i class="fas fa-user-plus ms-2"></i></button>
                             </form>
                             
@@ -519,7 +517,60 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                                 <button class="btn social-btn w-50 rounded-pill py-2 fw-semibold"><i class="fab fa-facebook-f me-2 text-primary"></i> Facebook</button>
                             </div>
                         </div>
-                        
+
+                        <!-- FORM QUÊN MẬT KHẨU (Pane 3) -->
+                        <div class="auth-form-pane inactive" id="pane-forgot">
+                            <div class="alert alert-danger d-none mx-0 mb-3" id="ajaxForgotError" style="border-radius: 0.5rem; font-size: 0.9rem;"></div>
+                            <div class="alert alert-success d-none mx-0 mb-3" id="ajaxForgotSuccess" style="border-radius: 0.5rem; font-size: 0.9rem;"></div>
+                            
+                            <form id="forgotForm" action="index.php?controller=auth&action=forgotSubmit" method="POST">
+                                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+                                <div class="custom-floating mb-4">
+                                    <input type="email" class="form-control modern-input" id="forgotEmail" name="email" placeholder=" " required>
+                                    <label for="forgotEmail">Email đã đăng ký</label>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-glow btn-lg w-100 fw-bold rounded-pill text-white py-3" id="btnSubmitForgot">GỬI YÊU CẦU <i class="fas fa-paper-plane ms-2"></i></button>
+                            </form>
+                            
+                            <p class="text-center mt-4 mb-0 small">
+                                <a href="javascript:void(0)" onclick="window.switchAuthTab('login')" class="text-primary fw-bold text-decoration-none">
+                                    <i class="fas fa-arrow-left me-1"></i> Quay lại đăng nhập
+                                </a>
+                            </p>
+                        </div>
+
+                        <!-- FORM NHẬP OTP & ĐẶT LẠI MẬT KHẨU (Pane 4) -->
+                        <div class="auth-form-pane inactive" id="pane-reset">
+                            <div class="alert alert-danger d-none mx-0 mb-3" id="ajaxResetError" style="border-radius: 0.5rem; font-size: 0.9rem;"></div>
+                            <div class="alert alert-success d-none mx-0 mb-3" id="ajaxResetSuccess" style="border-radius: 0.5rem; font-size: 0.9rem;"></div>
+                            
+                            <form id="resetForm" action="index.php?controller=auth&action=resetPasswordSubmit" method="POST">
+                                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+                                <input type="hidden" name="email" id="resetEmailHidden">
+                                
+                                <div class="custom-floating mb-3">
+                                    <input type="text" class="form-control modern-input" id="resetOtp" name="otp" placeholder=" " required autocomplete="off">
+                                    <label for="resetOtp">Mã xác thực OTP (6 chữ số)</label>
+                                </div>
+                                <div class="custom-floating mb-3">
+                                    <input type="password" class="form-control modern-input" id="resetNewPass" name="password" placeholder=" " required>
+                                    <label for="resetNewPass">Mật khẩu mới (tối thiểu 6 ký tự)</label>
+                                </div>
+                                <div class="custom-floating mb-4">
+                                    <input type="password" class="form-control modern-input" id="resetConfirmPass" name="confirm_password" placeholder=" " required>
+                                    <label for="resetConfirmPass">Xác nhận mật khẩu mới</label>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-glow btn-lg w-100 fw-bold rounded-pill text-white py-3" id="btnSubmitReset">XÁC NHẬN ĐỔI MẬT KHẨU <i class="fas fa-check-circle ms-2"></i></button>
+                            </form>
+                            
+                            <p class="text-center mt-4 mb-0 small">
+                                <a href="javascript:void(0)" onclick="window.switchAuthTab('forgot')" class="text-primary fw-bold text-decoration-none">
+                                    Nhập lại email khác
+                                </a>
+                            </p>
+                        </div>
                     </div>
                 </div>
                 
@@ -1117,6 +1168,63 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                 }
             },
 
+            // Xử lý trang cá nhân khách hàng (Profile) sheet trượt lên
+            showProfileSheet(url, htmlContent) {
+                let profileContainer = document.getElementById('page-profile');
+                if (!profileContainer) {
+                    profileContainer = document.createElement('div');
+                    profileContainer.id = 'page-profile';
+                    profileContainer.className = 'spa-page';
+                    document.getElementById('spa-viewport').appendChild(profileContainer);
+                }
+
+                // Tiêm nội dung mới
+                profileContainer.innerHTML = htmlContent;
+                this.executeScripts(profileContainer);
+
+                // Cuộn lên đầu
+                profileContainer.scrollTo({ top: 0 });
+
+                // Khởi chạy các logic của trang Profile
+                if (typeof window.initProfilePage === 'function') {
+                    window.initProfilePage();
+                }
+
+                // Hiển thị sheet trượt lên
+                profileContainer.style.display = 'block';
+                profileContainer.offsetWidth; // Reflow
+                profileContainer.classList.add('active-sheet');
+                document.body.style.overflow = 'hidden'; // Khóa cuộn trang nền
+
+                this.isTransitioning = false;
+            },
+
+            hideProfileSheet() {
+                const profileContainer = document.getElementById('page-profile');
+                if (profileContainer && profileContainer.classList.contains('active-sheet')) {
+                    profileContainer.classList.remove('active-sheet');
+                    
+                    // Chỉ mở khóa cuộn body nếu không có page-detail hay page-cart active bên dưới
+                    const detailContainer = document.getElementById('page-detail');
+                    const isDetailActive = detailContainer && detailContainer.classList.contains('active-sheet');
+                    const cartContainer = document.getElementById('page-cart');
+                    const isCartActive = cartContainer && cartContainer.classList.contains('active-overlay');
+                    if (!isDetailActive && !isCartActive) {
+                        document.body.style.overflow = '';
+                    }
+                    
+                    // Dọn dẹp canvas và giải phóng tài nguyên
+                    if (typeof window.profileCanvasCleanup === 'function') {
+                        try { window.profileCanvasCleanup(); } catch(e) { console.error(e); }
+                    }
+
+                    setTimeout(() => {
+                        profileContainer.style.display = 'none';
+                        profileContainer.innerHTML = ''; // Dọn sạch nội dung để tránh rác DOM
+                    }, 700);
+                }
+            },
+
             async navigateTo(url, isBack = false) {
                 if (this.isTransitioning) return;
                 
@@ -1279,6 +1387,33 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                     }
                 }
 
+                // Xử lý riêng nếu đích đến là Trang cá nhân (Sheet trượt từ dưới lên)
+                if (toContainerId === 'page-profile') {
+                    if (fromContainerId !== 'page-profile' && fromContainerId !== 'page-cart' && fromContainerId !== 'page-detail') {
+                        this.backgroundPageUrl = fromUrl;
+                        window.spaBackgroundUrl = fromUrl;
+                    }
+                    try {
+                        const cleanToUrl = this.cleanUrl(toUrl);
+                        const spaUrl = cleanToUrl + (cleanToUrl.includes('?') ? '&' : '?') + 'spa=1';
+                        const res = await fetch(spaUrl);
+                        const htmlText = await res.text();
+                        
+                        const doc = new DOMParser().parseFromString(htmlText, 'text/html');
+                        const titleMeta = doc.querySelector('title-meta');
+                        if (titleMeta) {
+                            document.title = titleMeta.getAttribute('data-title') || document.title;
+                        }
+                        
+                        this.showProfileSheet(toUrl, htmlText);
+                    } catch (e) {
+                        console.error("Lỗi AJAX tải trang cá nhân:", e);
+                        this.isTransitioning = false;
+                        window.location.href = toUrl; // fallback
+                    }
+                    return;
+                }
+
                 // Xử lý riêng nếu đích đến là Chi tiết sản phẩm (Sheet trượt từ dưới lên)
                 if (toContainerId === 'page-detail') {
                     // Lưu URL trang nền hiện tại
@@ -1382,6 +1517,83 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                             this.isTransitioning = false;
                         } catch (e) {
                             console.error("Lỗi AJAX tải trang nền khi đóng sheet:", e);
+                            this.isTransitioning = false;
+                            window.location.href = toUrl; // fallback
+                        }
+                        return;
+                    }
+                }
+
+                // Nếu đang ở Trang cá nhân và đi tới trang khác
+                if (fromContainerId === 'page-profile') {
+                    // Xem trang đích đã có trong DOM chưa
+                    let toContainer = document.getElementById(toContainerId);
+                    const isCached = (toContainer !== null);
+
+                    if (isCached) {
+                        // Cập nhật class active cho trang đích dưới nền nếu khác biệt
+                        const currentActivePage = document.querySelector('.spa-page.active');
+                        if (currentActivePage && currentActivePage.id !== toContainerId) {
+                            currentActivePage.classList.remove('active');
+                            toContainer.classList.add('active');
+                        }
+
+                        this.hideProfileSheet();
+                        this.updateNavbar(toUrl);
+                        this.isTransitioning = false;
+                        return;
+                    } else {
+                        // Phải tải trang nền chèn xuống dưới sheet
+                        try {
+                            const cleanToUrl = this.cleanUrl(toUrl);
+                            const spaUrl = cleanToUrl + (cleanToUrl.includes('?') ? '&' : '?') + 'spa=1';
+                            const res = await fetch(spaUrl);
+                            const htmlText = await res.text();
+
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(htmlText, 'text/html');
+                            
+                            // Gỡ bỏ active của trang cũ
+                            const currentActivePage = document.querySelector('.spa-page.active');
+                            if (currentActivePage) {
+                                currentActivePage.classList.remove('active');
+                            }
+
+                            toContainer = document.createElement('div');
+                            toContainer.id = toContainerId;
+                            toContainer.className = 'spa-page active';
+                            
+                            const titleMeta = doc.querySelector('title-meta');
+                            if (titleMeta) {
+                                const pageTitle = titleMeta.getAttribute('data-title') || document.title;
+                                document.title = pageTitle;
+                                toContainer.setAttribute('data-page-title', pageTitle);
+                            }
+                            
+                            toContainer.innerHTML = htmlText;
+                            
+                            // Chèn trước page-profile
+                            const viewport = document.getElementById('spa-viewport');
+                            const profileSheet = document.getElementById('page-profile');
+                            if (profileSheet) {
+                                viewport.insertBefore(toContainer, profileSheet);
+                            } else {
+                                viewport.appendChild(toContainer);
+                            }
+                            
+                            this.executeScripts(toContainer);
+                            
+                            if (toContainerId === 'page-shop' && typeof window.initShopPage === 'function') {
+                                window.initShopPage();
+                            } else if (toContainerId === 'page-home' && typeof window.initHomePage === 'function') {
+                                window.initHomePage();
+                            }
+
+                            this.hideProfileSheet();
+                            this.updateNavbar(toUrl);
+                            this.isTransitioning = false;
+                        } catch (e) {
+                            console.error("Lỗi AJAX tải trang nền khi đóng profile sheet:", e);
                             this.isTransitioning = false;
                             window.location.href = toUrl; // fallback
                         }
@@ -1649,6 +1861,35 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                     if (typeof window.updateNavHeight === 'function') {
                         window.updateNavHeight();
                     }
+                } else if (activePage.id === 'page-profile') {
+                    activePage.classList.add('active-sheet');
+                    document.body.style.overflow = 'hidden'; // Khóa cuộn body
+                    
+                    // Tự động khởi chạy logic của trang profile
+                    if (typeof window.initProfilePage === 'function') {
+                        window.initProfilePage();
+                    }
+                    
+                    // Nếu là F5 trực tiếp tại trang Profile, tải ngầm trang Home làm nền dưới
+                    const viewport = document.getElementById('spa-viewport');
+                    if (viewport && viewport.querySelectorAll('.spa-page').length === 1) {
+                        fetch('index.php?controller=home&spa=1')
+                        .then(res => res.text())
+                        .then(html => {
+                            const homeContainer = document.createElement('div');
+                            homeContainer.id = 'page-home';
+                            homeContainer.className = 'spa-page';
+                            homeContainer.innerHTML = html;
+                            viewport.insertBefore(homeContainer, activePage);
+                            
+                            // Thực thi scripts của trang Home
+                            SPARouter.executeScripts(homeContainer);
+                            if (typeof window.initHomePage === 'function') {
+                                window.initHomePage();
+                            }
+                        })
+                        .catch(err => console.error("Lỗi nạp nền trang chủ:", err));
+                    }
                 }
             }
         });
@@ -1755,12 +1996,21 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
 
         window.switchAuthTab = (tab) => {
             const wrapper = document.getElementById('auth-form-wrapper');
-            const tabs = document.querySelectorAll('.auth-tab-btn');
+            const authTabs = document.querySelector('.auth-tabs');
             const title = document.getElementById('auth-card-title');
             const subtitle = document.getElementById('auth-card-subtitle');
             
             const paneLogin = document.getElementById('pane-login');
             const paneRegister = document.getElementById('pane-register');
+            const paneForgot = document.getElementById('pane-forgot');
+            const paneReset = document.getElementById('pane-reset');
+            
+            // Đặt lại các pane
+            if (authTabs) authTabs.style.display = 'flex';
+            if (paneLogin) paneLogin.classList.add('inactive');
+            if (paneRegister) paneRegister.classList.add('inactive');
+            if (paneForgot) paneForgot.classList.add('inactive');
+            if (paneReset) paneReset.classList.add('inactive');
             
             if (tab === 'login') {
                 if (wrapper) wrapper.style.transform = 'translateX(0)';
@@ -1768,18 +2018,26 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                 document.getElementById('btn-tab-register').classList.remove('active');
                 if (title) title.innerHTML = '<i class="fas fa-user-circle text-primary me-2"></i>Đăng Nhập';
                 if (subtitle) subtitle.textContent = 'Kết nối đam mê tại TTB Music.';
-                
                 if (paneLogin) paneLogin.classList.remove('inactive');
-                if (paneRegister) paneRegister.classList.add('inactive');
-            } else {
-                if (wrapper) wrapper.style.transform = 'translateX(-50%)';
+            } else if (tab === 'register') {
+                if (wrapper) wrapper.style.transform = 'translateX(-25%)';
                 document.getElementById('btn-tab-login').classList.remove('active');
                 document.getElementById('btn-tab-register').classList.add('active');
                 if (title) title.innerHTML = '<i class="fas fa-user-plus text-primary me-2"></i>Đăng Ký';
                 if (subtitle) subtitle.textContent = 'Tạo tài khoản mới và bắt đầu trải nghiệm.';
-                
-                if (paneLogin) paneLogin.classList.add('inactive');
                 if (paneRegister) paneRegister.classList.remove('inactive');
+            } else if (tab === 'forgot') {
+                if (wrapper) wrapper.style.transform = 'translateX(-50%)';
+                if (authTabs) authTabs.style.display = 'none'; // Ẩn tabs chọn chế độ
+                if (title) title.innerHTML = '<i class="fas fa-key text-warning me-2"></i>Quên Mật Khẩu';
+                if (subtitle) subtitle.textContent = 'Nhập email để nhận mã OTP khôi phục.';
+                if (paneForgot) paneForgot.classList.remove('inactive');
+            } else if (tab === 'reset') {
+                if (wrapper) wrapper.style.transform = 'translateX(-75%)';
+                if (authTabs) authTabs.style.display = 'none'; // Ẩn tabs chọn chế độ
+                if (title) title.innerHTML = '<i class="fas fa-lock text-success me-2"></i>Đặt Lại Mật Khẩu';
+                if (subtitle) subtitle.textContent = 'Nhập OTP và mật khẩu mới của bạn.';
+                if (paneReset) paneReset.classList.remove('inactive');
             }
         };
 
@@ -1952,10 +2210,128 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                 });
             });
         }
+        // AJAX QUÊN MẬT KHẨU
+        const forgotForm = document.getElementById('forgotForm');
+        const forgotErrorAlert = document.getElementById('ajaxForgotError');
+        const forgotSuccessAlert = document.getElementById('ajaxForgotSuccess');
+        
+        if (forgotForm) {
+            forgotForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (forgotErrorAlert) forgotErrorAlert.classList.add('d-none');
+                if (forgotSuccessAlert) forgotSuccessAlert.classList.add('d-none');
+                
+                const submitBtn = document.getElementById('btnSubmitForgot');
+                const originalBtnHTML = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang gửi...';
+                
+                const formData = new FormData(forgotForm);
+                fetch('index.php?controller=auth&action=forgotSubmit&ajax=1', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnHTML;
+                    
+                    if (data.success) {
+                        if (forgotSuccessAlert) {
+                            forgotSuccessAlert.textContent = data.message;
+                            forgotSuccessAlert.classList.remove('d-none');
+                        }
+                        
+                        // Lưu email sang form reset
+                        const hiddenEmail = document.getElementById('resetEmailHidden');
+                        if (hiddenEmail) hiddenEmail.value = data.email;
+                        
+                        // Tự động chuyển sang form nhập OTP sau 3 giây
+                        setTimeout(() => {
+                            window.switchAuthTab('reset');
+                            if (forgotSuccessAlert) forgotSuccessAlert.classList.add('d-none');
+                            forgotForm.reset();
+                        }, 3000);
+                    } else {
+                        if (forgotErrorAlert) {
+                            forgotErrorAlert.textContent = data.message;
+                            forgotErrorAlert.classList.remove('d-none');
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnHTML;
+                    if (forgotErrorAlert) {
+                        forgotErrorAlert.textContent = 'Lỗi kết nối máy chủ!';
+                        forgotErrorAlert.classList.remove('d-none');
+                    }
+                });
+            });
+        }
+
+        // AJAX RESET MẬT KHẨU
+        const resetForm = document.getElementById('resetForm');
+        const resetErrorAlert = document.getElementById('ajaxResetError');
+        
+        if (resetForm) {
+            resetForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (resetErrorAlert) resetErrorAlert.classList.add('d-none');
+                
+                const submitBtn = document.getElementById('btnSubmitReset');
+                const originalBtnHTML = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xác thực...';
+                
+                const formData = new FormData(resetForm);
+                fetch('index.php?controller=auth&action=resetPasswordSubmit&ajax=1', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnHTML;
+                    
+                    if (data.success) {
+                        alert(data.message); // Báo thành công
+                        resetForm.reset();
+                        window.switchAuthTab('login'); // Quay lại màn hình login
+                        
+                        // Đổi màu cảnh báo ở form login sang thành công để báo user đăng nhập
+                        const loginErrorAlert = document.getElementById('ajaxLoginError');
+                        if (loginErrorAlert) {
+                            loginErrorAlert.textContent = 'Đặt lại mật khẩu thành công! Vui lòng đăng nhập.';
+                            loginErrorAlert.className = 'alert alert-success mx-0 mb-3';
+                            loginErrorAlert.classList.remove('d-none');
+                        }
+                    } else {
+                        if (resetErrorAlert) {
+                            resetErrorAlert.textContent = data.message;
+                            resetErrorAlert.classList.remove('d-none');
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnHTML;
+                    if (resetErrorAlert) {
+                        resetErrorAlert.textContent = 'Lỗi kết nối máy chủ!';
+                        resetErrorAlert.classList.remove('d-none');
+                    }
+                });
+            });
+        }
 
         // Xuất ra phạm vi toàn cục để tiện sử dụng ở các trang con
         window.navigateToSPA = (url) => SPARouter.navigateTo(url);
         window.hideCartOverlaySPA = () => SPARouter.hideCartOverlay();
+        window.hideProfileSheet = () => SPARouter.hideProfileSheet();
     })();
     </script>
 </body>

@@ -588,6 +588,65 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
             pointer-events: auto;
         }
 
+        /* ================= PROFILE SLIDE SHEET OVERLAY ================= */
+        .spa-page#page-profile {
+            display: block !important;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 1045; /* Đè lên navbar (1030) và dưới Auth Sheet (1060) */
+            background: rgba(10, 8, 20, 0.94); /* Nền tối sâu cho profile */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            transform: translateY(100%);
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
+            pointer-events: none;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .spa-page#page-profile::-webkit-scrollbar {
+            display: none;
+        }
+        .spa-page#page-profile.active-sheet {
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* Canvas vẽ bong bóng hào quang phát sáng (Glowing Ripple Bubbles) */
+        #profile-bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .profile-glass-card {
+            position: relative;
+            background: rgba(25, 20, 45, 0.6) !important;
+            backdrop-filter: blur(25px) !important;
+            -webkit-backdrop-filter: blur(25px) !important;
+            border: 1px solid rgba(6, 182, 212, 0.35) !important;
+            border-radius: 24px !important;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4),
+                        0 0 20px rgba(139, 92, 246, 0.25),
+                        0 0 10px rgba(6, 182, 212, 0.15) !important;
+            z-index: 2;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        :root[data-theme="light"] .profile-glass-card {
+            background: rgba(255, 255, 255, 0.85) !important;
+            border-color: rgba(139, 92, 246, 0.25) !important;
+            box-shadow: 0 15px 35px rgba(139, 92, 246, 0.15) !important;
+        }
+
         /* Thêm nút Đóng giỏ hàng ở vị trí nổi bật */
         .cart-close-btn-wrapper {
             position: absolute;
@@ -790,11 +849,17 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
         @keyframes navControlMorph {
             0% {
                 opacity: 0;
-                transform: scale(0.92);
+                transform: scale(0.85) translateY(-6px);
+                filter: blur(6px);
+            }
+            50% {
+                opacity: 0.5;
+                filter: blur(3px);
             }
             100% {
                 opacity: 1;
-                transform: scale(1);
+                transform: scale(1) translateY(0);
+                filter: blur(0);
             }
         }
 
@@ -1176,8 +1241,12 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                         }
                         
                         // If currently on profile page, redirect to home page via SPA
-                        const activePage = document.querySelector('.spa-page.active');
-                        if (activePage && activePage.id === 'page-profile') {
+                        const profilePage = document.getElementById('page-profile');
+                        const isProfileActive = profilePage && (profilePage.classList.contains('active-sheet') || profilePage.classList.contains('active') || profilePage.innerHTML.trim() !== '');
+                        if (isProfileActive) {
+                            if (window.hideProfileSheet) {
+                                window.hideProfileSheet();
+                            }
                             if (window.navigateToSPA) {
                                 window.navigateToSPA('index.php?controller=home');
                             } else {

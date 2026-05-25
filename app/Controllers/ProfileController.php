@@ -3,6 +3,7 @@
 
 require_once ROOT_PATH . '/core/BaseController.php';
 require_once ROOT_PATH . '/app/Models/Order.php';
+require_once ROOT_PATH . '/app/Models/Rental.php';
 
 class ProfileController extends BaseController {
 
@@ -20,11 +21,16 @@ class ProfileController extends BaseController {
         $orderModel = new Order();
         $orders = $orderModel->getOrdersByUser($user['id']);
 
-        // 3. Render ra giao diện Profile
+        // 3. Khởi tạo Rental Model để lấy danh sách hợp đồng thuê của user này
+        $rentalModel = new Rental();
+        $rentals = $rentalModel->getRentalsByUser($user['id']);
+
+        // 4. Render ra giao diện Profile
         $this->render('profile', [
             'pageTitle' => 'Quản lý Tài khoản - TTB Music',
             'user' => $user,
-            'orders' => $orders
+            'orders' => $orders,
+            'rentals' => $rentals
         ]);
     }
 }

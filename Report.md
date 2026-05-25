@@ -1,5 +1,25 @@
 # Nhật ký Cập nhật Dự án (Changelog)
 
+**Ngày cập nhật:** 25/05/2026
+
+## 🚀 Cập Nhật Lần 15 (Nâng cấp Auth Sheet Trượt & Sửa Lỗi Tương Phản Dark Theme)
+
+### 1. Nâng cấp Auth Sheet Trượt mượt mà từ dưới lên
+- **Auth Sheet Overlay:** Thay thế hoàn toàn Bootstrap Modal đăng nhập cũ bằng `#page-auth-overlay` trượt lên toàn màn hình (tương tự Detail Sheet) với hiệu ứng transition trượt cao cấp.
+- **Canvas Sóng Nhạc Neon:** Tích hợp Canvas vẽ 3 đường sóng âm thanh phát sáng (Audio Waveform) chuyển động lệch pha sinh động làm nền phía sau.
+- **Nút Quay Lại Tiện Dụng:** Thiết kế nút "Quay lại trang trước" nổi bật ở dưới cùng của thẻ đăng nhập giúp đóng sheet nhanh chóng.
+- **Tab Đăng nhập / Đăng ký Trượt Ngang:** Sử dụng cấu trúc flex và `transform: translateX` để chuyển đổi mượt mà giữa hai form trên cùng một thẻ.
+
+### 2. AJAX hóa 100% Xác thực & Morph Navbar
+- **AJAX Đăng ký:** AJAX hóa hoàn toàn cả hai form Đăng ký (`registerSubmit`) và Đăng nhập (`loginSubmit`) để phản hồi tức thì mà không reload trang.
+- **Navbar Morph Transition:** Đồng bộ container `#navbar-user-control` với hiệu ứng morph transition (`fade-scale`) mượt mà khi chuyển từ Đăng nhập sang tài khoản khách hàng hoặc ngược lại khi Đăng xuất.
+- **Đổi mới màu sắc Navbar:** Nút Đăng nhập trên navbar đổi thành màu xanh dương gradient có bóng đổ phát sáng; Dropdown tài khoản khách đổi sang Glassmorphism tím-xanh ngọc có viền neon.
+
+### 3. Sửa lỗi hiển thị chữ tối (Contrast Dark Theme)
+- **CSS Tương phản:** Thêm thuộc tính CSS cho `:root[data-theme="dark"] .text-muted` để tăng độ tương phản của chữ xám trong Dark Theme của Cửa hàng, đảm bảo đọc rõ nội dung.
+
+---
+
 **Ngày cập nhật:** 21/05/2026
 
 ## 🚀 Cập Nhật Lần 13 (Hoàn Thiện Flow Thanh toán, Xác thực & Quản lý Đơn hàng)

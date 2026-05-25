@@ -999,6 +999,15 @@ include __DIR__ . '/partials/header.php';
     border-color: #8b5cf6 !important;
     color: #8b5cf6 !important;
 }
+
+/* CSS override for date inputs and custom styling for rent modal */
+.custom-floating .modern-input[type="date"] ~ label {
+    top: 0;
+    transform: translateY(-50%) scale(0.85);
+    color: #3b82f6;
+    opacity: 1;
+    font-weight: 600;
+}
 </style>
 
 <!-- Canvas nền Ripple Sóng Âm - RIÊNG của trang chi tiết -->
@@ -1907,6 +1916,104 @@ include __DIR__ . '/partials/header.php';
     <img class="lightbox-image-content" id="lightbox-img" alt="Ảnh sản phẩm phóng to">
 </div>
 
+<!-- Modal Cho Thuê Nhạc Cụ (Glassmorphism) -->
+<div class="modal fade" id="rentModal" tabindex="-1" aria-hidden="true" 
+     data-product-id="<?= (int)$product['id'] ?>"
+     data-price-day="<?= (float)($product['rent_price_day'] ?? 0) ?>"
+     data-deposit="<?= (float)($product['deposit_price'] ?? 0) ?>">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-transparent border-0">
+            <div class="animated-border-wrapper">
+                <div class="glass-panel p-4">
+                    <div class="form-watermark">RENT</div>
+                    <div class="modal-body-content">
+                        <!-- Modal header -->
+                        <div class="modal-header border-0 pb-3 px-0 position-relative d-flex justify-content-between align-items-center">
+                            <h3 class="modal-title fw-bolder mb-0" style="color: var(--text-color);">
+                                <i class="fas fa-calendar-alt text-primary me-2"></i>Thuê Nhạc Cụ
+                            </h3>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: var(--close-btn-filter);"></button>
+                        </div>
+                        
+                        <!-- Modal body -->
+                        <div class="modal-body px-0">
+                            <!-- Product Summary -->
+                            <div class="d-flex align-items-center gap-3 p-3 mb-4 rounded-3" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color);">
+                                <img src="<?= htmlspecialchars($product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>" style="width: 70px; height: 70px; object-fit: cover; border-radius: 8px;">
+                                <div>
+                                    <h5 class="fw-bold mb-1" style="color: var(--text-color);"><?= htmlspecialchars($product['name']) ?></h5>
+                                    <p class="mb-0 text-muted small">
+                                        Giá thuê: <span class="text-primary fw-bold"><?= number_format($product['rent_price_day'], 0, ',', '.') ?> ₫/ngày</span>
+                                        <br>Đặt cọc: <span class="text-warning fw-bold"><?= number_format($product['deposit_price'], 0, ',', '.') ?> ₫</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Rent Form -->
+                            <form id="rentForm">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="custom-floating mb-3">
+                                            <input type="date" class="form-control modern-input" id="rentStartDate" name="start_date" required min="<?= date('Y-m-d') ?>" value="<?= date('Y-m-d') ?>">
+                                            <label for="rentStartDate">Ngày bắt đầu thuê</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="custom-floating mb-3">
+                                            <input type="date" class="form-control modern-input" id="rentEndDate" name="end_date" required min="<?= date('Y-m-d', strtotime('+1 day')) ?>">
+                                            <label for="rentEndDate">Ngày kết thúc thuê</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="custom-floating mb-3">
+                                            <input type="text" class="form-control modern-input" id="rentPhone" name="phone" placeholder=" " value="<?= htmlspecialchars($_SESSION['user']['phone'] ?? '') ?>" required>
+                                            <label for="rentPhone">Số điện thoại nhận hàng</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="custom-floating mb-3">
+                                            <textarea class="form-control modern-input" id="rentAddress" name="address" placeholder=" " rows="2" style="height: auto;" required><?= htmlspecialchars($_SESSION['user']['address'] ?? '') ?></textarea>
+                                            <label for="rentAddress">Địa chỉ giao nhạc cụ</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Cost estimation panel -->
+                                <div class="p-3 my-4 rounded-3" style="background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.15);">
+                                    <h6 class="fw-bold mb-3 text-primary"><i class="fas fa-calculator me-2"></i>Tóm tắt chi phí dự tính</h6>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-muted">Số ngày thuê:</span>
+                                        <span id="rentDaysCount" class="fw-bold text-color">0 ngày</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-muted">Tổng phí thuê:</span>
+                                        <span id="rentTotalFee" class="fw-bold text-color">0 ₫</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-muted">Tiền đặt cọc (hoàn trả sau):</span>
+                                        <span id="rentDepositFee" class="fw-bold text-warning">0 ₫</span>
+                                    </div>
+                                    <hr style="border-color: var(--border-color); opacity: 0.2;">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="fw-bold text-color">Thanh toán ban đầu:</span>
+                                        <span id="rentTotalPayment" class="fs-5 fw-bold text-primary">0 ₫</span>
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-danger d-none" id="rentErrorAlert"></div>
+
+                                <button type="submit" class="btn btn-glow btn-lg w-100 fw-bold rounded-pill text-white py-3" id="btnSubmitRent">
+                                    XÁC NHẬN THUÊ NGAY <i class="fas fa-check ms-2"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- ============================================================
      JAVASCRIPT TRANG CHI TIẾT SẢN PHẨM
      ============================================================ -->
@@ -2252,9 +2359,210 @@ function addToCart(productId) {
     });
 }
 
-function openRentModal(productId) {
-    alert('Tính năng thuê nhạc cụ đang được phát triển. Vui lòng liên hệ 1900 1000 để được hỗ trợ!');
-}
+window.openRentModal = function(productId) {
+    const isLoggedIn = <?= isset($_SESSION['user']) ? 'true' : 'false' ?>;
+    if (!isLoggedIn) {
+        // Mở Auth Sheet trượt từ dưới lên thay vì Modal cũ để đăng nhập
+        if (window.showAuthSheet) {
+            window.showAuthSheet();
+        } else {
+            alert('Bạn cần đăng nhập để thuê nhạc cụ!');
+        }
+        return;
+    }
+    
+    const rentModalEl = document.getElementById('rentModal');
+    if (rentModalEl) {
+        const rentModal = new bootstrap.Modal(rentModalEl);
+        rentModal.show();
+        
+        // Populate initial dates and trigger calculation
+        const today = new Date();
+        const tomorrow = new Date();
+        tomorrow.setDate(today.getDate() + 1);
+        
+        const formatDate = (date) => date.toISOString().split('T')[0];
+        
+        const startInput = document.getElementById('rentStartDate');
+        const endInput = document.getElementById('rentEndDate');
+        
+        if (startInput) {
+            startInput.value = formatDate(today);
+            startInput.min = formatDate(today);
+        }
+        if (endInput) {
+            endInput.value = formatDate(tomorrow);
+            endInput.min = formatDate(tomorrow);
+        }
+        
+        calculateRentCosts();
+    }
+};
+
+window.calculateRentCosts = function() {
+    const rentModalEl = document.getElementById('rentModal');
+    if (!rentModalEl) return;
+
+    const pricePerDay = parseFloat(rentModalEl.getAttribute('data-price-day')) || 0;
+    const depositAmount = parseFloat(rentModalEl.getAttribute('data-deposit')) || 0;
+
+    const startInput = document.getElementById('rentStartDate');
+    const endInput = document.getElementById('rentEndDate');
+    if (!startInput || !endInput) return;
+
+    const startVal = startInput.value;
+    const endVal = endInput.value;
+
+    const daysCountEl = document.getElementById('rentDaysCount');
+    const totalFeeEl = document.getElementById('rentTotalFee');
+    const depositFeeEl = document.getElementById('rentDepositFee');
+    const totalPaymentEl = document.getElementById('rentTotalPayment');
+    const submitBtn = document.getElementById('btnSubmitRent');
+    const errorAlert = document.getElementById('rentErrorAlert');
+
+    if (!startVal || !endVal) {
+        return;
+    }
+
+    const startDate = new Date(startVal);
+    const endDate = new Date(endVal);
+
+    errorAlert.classList.add('d-none');
+    errorAlert.textContent = '';
+    submitBtn.disabled = false;
+
+    const diffTime = endDate.getTime() - startDate.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays <= 0) {
+        daysCountEl.textContent = '0 ngày';
+        totalFeeEl.textContent = '0 ₫';
+        depositFeeEl.textContent = '0 ₫';
+        totalPaymentEl.textContent = '0 ₫';
+        
+        errorAlert.textContent = 'Ngày kết thúc thuê phải sau ngày bắt đầu thuê ít nhất 1 ngày!';
+        errorAlert.classList.remove('d-none');
+        submitBtn.disabled = true;
+        return;
+    }
+
+    const totalRentFee = diffDays * pricePerDay;
+    const totalPayment = totalRentFee + depositAmount;
+
+    const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
+            .format(amount)
+            .replace(/\s?₫/g, ' ₫');
+    };
+
+    daysCountEl.textContent = `${diffDays} ngày`;
+    totalFeeEl.textContent = formatCurrency(totalRentFee);
+    depositFeeEl.textContent = formatCurrency(depositAmount);
+    totalPaymentEl.textContent = formatCurrency(totalPayment);
+};
+
+window.initRentFormEvents = function() {
+    const startInput = document.getElementById('rentStartDate');
+    const endInput = document.getElementById('rentEndDate');
+    const rentForm = document.getElementById('rentForm');
+
+    if (startInput) {
+        startInput.addEventListener('change', () => {
+            if (startInput.value) {
+                const startDate = new Date(startInput.value);
+                const minEndDate = new Date(startDate);
+                minEndDate.setDate(startDate.getDate() + 1);
+                
+                const formatDate = (date) => date.toISOString().split('T')[0];
+                if (endInput) {
+                    endInput.min = formatDate(minEndDate);
+                    if (!endInput.value || new Date(endInput.value) < minEndDate) {
+                        endInput.value = formatDate(minEndDate);
+                    }
+                }
+            }
+            calculateRentCosts();
+        });
+    }
+
+    if (endInput) {
+        endInput.addEventListener('change', calculateRentCosts);
+    }
+
+    if (rentForm) {
+        if (rentForm.dataset.listenerAttached) return;
+        rentForm.dataset.listenerAttached = 'true';
+
+        rentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('btnSubmitRent');
+            const errorAlert = document.getElementById('rentErrorAlert');
+            const rentModalEl = document.getElementById('rentModal');
+            
+            const productId = parseInt(rentModalEl.getAttribute('data-product-id'));
+            const startDate = document.getElementById('rentStartDate').value;
+            const endDate = document.getElementById('rentEndDate').value;
+            const phone = document.getElementById('rentPhone').value;
+            const address = document.getElementById('rentAddress').value;
+
+            if (!startDate || !endDate || !phone || !address) {
+                errorAlert.textContent = 'Vui lòng nhập đầy đủ các trường thông tin!';
+                errorAlert.classList.remove('d-none');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xử lý...';
+            errorAlert.classList.add('d-none');
+
+            fetch('index.php?controller=rental&action=create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    start_date: startDate,
+                    end_date: endDate,
+                    phone: phone,
+                    address: address
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const modalInstance = bootstrap.Modal.getInstance(rentModalEl);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+                    
+                    alert(data.message || 'Đăng ký thuê nhạc cụ thành công!');
+                    
+                    if (window.navigateToSPA) {
+                        window.navigateToSPA('index.php?controller=profile&action=index');
+                    } else {
+                        window.location.href = 'index.php?controller=profile&action=index';
+                    }
+                } else {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'XÁC NHẬN THUÊ NGAY <i class="fas fa-check ms-2"></i>';
+                    
+                    errorAlert.textContent = data.message || 'Đã xảy ra lỗi, vui lòng thử lại!';
+                    errorAlert.classList.remove('d-none');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'XÁC NHẬN THUÊ NGAY <i class="fas fa-check ms-2"></i>';
+                
+                errorAlert.textContent = 'Lỗi kết nối máy chủ. Vui lòng kiểm tra lại đường truyền mạng!';
+                errorAlert.classList.remove('d-none');
+            });
+        });
+    }
+};
 
 /* ================================================================================
    PHẦN 8: LIGHTBOX PHÓNG TO ẢNH SẢN PHẨM CAO CẤP
@@ -2455,6 +2763,10 @@ window.initDetailPage = function() {
     initRelatedCarousel();
     calcInstallment();
     resetStars();
+    
+    if (typeof window.initRentFormEvents === 'function') {
+        window.initRentFormEvents();
+    }
 };
 
 // Khởi chạy ngay lập tức khi load trang bình thường

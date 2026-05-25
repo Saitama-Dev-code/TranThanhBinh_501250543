@@ -668,6 +668,182 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
         .spa-page.morph-entering-active {
             opacity: 1;
         }
+
+        /* ================================================================================
+           USER DROPDOWN ACCOUNT MENU (HOVER EFFECT & GLASSMORPHISM)
+           ================================================================================ */
+        .user-dropdown-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .user-dropdown-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .user-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 12px;
+            width: 260px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 15px 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1050;
+        }
+        
+        .user-dropdown-wrapper:hover .user-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .user-dropdown-header {
+            padding: 0 20px 10px;
+            text-align: left;
+        }
+        
+        .user-dropdown-header .user-name {
+            font-weight: 700;
+            color: var(--text-color);
+            font-size: 0.95rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .user-dropdown-header .user-email {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .user-dropdown-menu .dropdown-divider {
+            border-top: 1px solid var(--border-color);
+            margin: 8px 0;
+            opacity: 0.3;
+        }
+        
+        .user-dropdown-menu .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            color: var(--text-color);
+            font-size: 0.88rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.25s ease;
+        }
+        
+        .user-dropdown-menu .dropdown-item i {
+            color: var(--text-muted);
+            width: 20px;
+            text-align: center;
+            transition: color 0.25s ease;
+        }
+        
+        .user-dropdown-menu .dropdown-item:hover {
+            background: rgba(59, 130, 246, 0.08);
+            color: #3b82f6 !important;
+            padding-left: 25px;
+        }
+        
+        .user-dropdown-menu .dropdown-item:hover i {
+            color: #3b82f6 !important;
+        }
+        
+        .user-dropdown-menu .dropdown-item.logout-item:hover {
+            background: rgba(239, 68, 68, 0.08);
+            color: #ef4444 !important;
+        }
+        
+        .user-dropdown-menu .dropdown-item.logout-item:hover i {
+            color: #ef4444 !important;
+        }
+
+        /* ================================================================================
+           CẬP NHẬT GIAO DIỆN TÀI KHOẢN & ĐĂNG NHẬP MỚI
+           ================================================================================ */
+
+        /* 1. Tăng độ tương phản chữ xám (text-muted) trong Dark Theme của Cửa hàng */
+        :root[data-theme="dark"] .text-muted {
+            color: rgba(255, 255, 255, 0.6) !important;
+        }
+
+        /* 2. Hiệu ứng Morph mượt mà (Fade-in và Scale) khi chuyển trạng thái đăng nhập/đăng xuất */
+        .nav-user-control-morph {
+            animation: navControlMorph 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        @keyframes navControlMorph {
+            0% {
+                opacity: 0;
+                transform: scale(0.92);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* 3. Style Nút Đăng nhập mới: Xanh dương Gradient cao cấp */
+        .navbar-login-btn {
+            background: linear-gradient(135deg, #2563eb, #3b82f6) !important;
+            border: none !important;
+            color: #ffffff !important;
+            font-weight: 600 !important;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.35) !important;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+        }
+        .navbar-login-btn:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5) !important;
+            background: linear-gradient(135deg, #1d4ed8, #2563eb) !important;
+        }
+
+        /* 4. Style Dropdown Khách hàng: Viền Neon & Glassmorphism Tím-Xanh Ngọc */
+        .user-dropdown-wrapper .user-dropdown-btn {
+            background: rgba(139, 92, 246, 0.12) !important;
+            border: 1px solid rgba(6, 182, 212, 0.45) !important;
+            color: var(--text-color) !important;
+            font-weight: 600 !important;
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.2), 0 0 5px rgba(6, 182, 212, 0.2) !important;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+        }
+        .user-dropdown-wrapper:hover .user-dropdown-btn {
+            background: rgba(139, 92, 246, 0.22) !important;
+            border-color: rgba(6, 182, 212, 0.75) !important;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.45), 0 0 8px rgba(6, 182, 212, 0.4) !important;
+            transform: translateY(-1px);
+        }
+        
+        .user-dropdown-menu.glass-dropdown {
+            background: rgba(20, 15, 40, 0.85) !important;
+            backdrop-filter: blur(25px) !important;
+            -webkit-backdrop-filter: blur(25px) !important;
+            border: 1px solid rgba(6, 182, 212, 0.5) !important;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4), 
+                        0 0 15px rgba(139, 92, 246, 0.35), 
+                        0 0 5px rgba(6, 182, 212, 0.25) !important;
+        }
+        
+        :root[data-theme="light"] .user-dropdown-menu.glass-dropdown {
+            background: rgba(250, 245, 255, 0.92) !important;
+            border: 1px solid rgba(139, 92, 246, 0.25) !important;
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.15) !important;
+        }
     </style>
 </head>
 
@@ -891,9 +1067,43 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                         <i class="fas fa-shopping-cart"></i>
                         <span class="cart-count"><?= $cartCount ?></span>
                     </a>
-                    <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#loginModal">
-                        <i class="fas fa-user"></i> Đăng nhập
-                    </button>
+                    <div id="navbar-user-control" style="display: inline-block;">
+                        <?php if (isset($_SESSION['user'])): ?>
+                            <!-- Dropdown tài khoản khách hàng khi đã đăng nhập (sử dụng Morph transition và Glassmorphism tím-xanh ngọc) -->
+                            <div class="user-dropdown-wrapper nav-user-control-morph">
+                                <a href="index.php?controller=profile&action=index" class="btn rounded-pill px-4 user-dropdown-btn">
+                                    <i class="fas fa-user-circle" style="font-size: 1.1rem;"></i> 
+                                    <span><?= htmlspecialchars($_SESSION['user']['full_name']) ?></span>
+                                    <i class="fas fa-chevron-down ms-1" style="font-size: 0.8rem;"></i>
+                                </a>
+                                <div class="user-dropdown-menu glass-dropdown">
+                                    <div class="user-dropdown-header">
+                                        <div class="user-name"><?= htmlspecialchars($_SESSION['user']['full_name']) ?></div>
+                                        <div class="user-email"><?= htmlspecialchars($_SESSION['user']['email']) ?></div>
+                                    </div>
+                                    <hr class="dropdown-divider">
+                                    <a href="index.php?controller=profile&action=index" class="dropdown-item">
+                                        <i class="fas fa-history me-2"></i> Đơn mua hàng
+                                    </a>
+                                    <a href="index.php?controller=profile&action=index#rentals-pane" class="dropdown-item">
+                                        <i class="fas fa-calendar-alt me-2"></i> Hợp đồng thuê
+                                    </a>
+                                    <a href="index.php?controller=profile&action=index#password-pane" class="dropdown-item">
+                                        <i class="fas fa-key me-2"></i> Đổi mật khẩu
+                                    </a>
+                                    <hr class="dropdown-divider">
+                                    <a href="index.php?controller=auth&action=logout" class="dropdown-item logout-item" data-no-spa>
+                                        <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
+                                    </a>
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <!-- Nút Đăng nhập dạng xanh dương gradient chuyển động khi chưa đăng nhập (khi click sẽ gọi window.showAuthSheet) -->
+                            <button type="button" class="btn navbar-login-btn rounded-pill px-4 nav-user-control-morph" onclick="if(window.showAuthSheet) { window.showAuthSheet(); } else { console.error('showAuthSheet is not defined'); }">
+                                <i class="fas fa-user"></i> Đăng nhập
+                            </button>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
         </div>
@@ -927,6 +1137,65 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                 observer.observe(navEl, { attributes: true, childList: true, subtree: true });
             }
         })();
+
+        // Global listener for dropdown tab links and AJAX logout
+        document.addEventListener('click', (e) => {
+            // 1. Tab switches for profile dropdown items
+            const item = e.target.closest('.user-dropdown-menu .dropdown-item');
+            if (item && item.getAttribute('href')) {
+                const href = item.getAttribute('href');
+                if (href.includes('#')) {
+                    const hash = href.substring(href.indexOf('#'));
+                    const tabEl = document.querySelector(`button[data-bs-target="${hash}"]`);
+                    if (tabEl) {
+                        const tab = new bootstrap.Tab(tabEl);
+                        tab.show();
+                    }
+                }
+            }
+
+            // 2. AJAX Logout handling (No Page Reload)
+            const logoutBtn = e.target.closest('.logout-item, .logout-btn');
+            if (logoutBtn) {
+                e.preventDefault();
+                
+                logoutBtn.style.pointerEvents = 'none';
+                
+                fetch('index.php?controller=auth&action=logout&ajax=1')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        // Replace user dropdown with login button in navbar
+                        const container = document.getElementById('navbar-user-control');
+                        if (container) {
+                            container.innerHTML = `
+                                <button type="button" class="btn navbar-login-btn rounded-pill px-4 nav-user-control-morph" onclick="if(window.showAuthSheet) { window.showAuthSheet(); } else { console.error('showAuthSheet is not defined'); }">
+                                    <i class="fas fa-user"></i> Đăng nhập
+                                </button>
+                            `;
+                        }
+                        
+                        // If currently on profile page, redirect to home page via SPA
+                        const activePage = document.querySelector('.spa-page.active');
+                        if (activePage && activePage.id === 'page-profile') {
+                            if (window.navigateToSPA) {
+                                window.navigateToSPA('index.php?controller=home');
+                            } else {
+                                window.location.href = 'index.php?controller=home';
+                            }
+                        }
+                    } else {
+                        alert('Đăng xuất thất bại. Vui lòng thử lại!');
+                        logoutBtn.style.pointerEvents = '';
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Lỗi kết nối máy chủ!');
+                    logoutBtn.style.pointerEvents = '';
+                });
+            }
+        });
     </script>
     <div class="main-content-wrapper" style="min-height: 150vh;">
         <div id="spa-viewport">
@@ -940,6 +1209,10 @@ if (isset($_GET['spa']) && $_GET['spa'] == '1') {
                 }
             } else if ($currentController === 'cart') {
                 $activePageId = 'page-cart';
+            } else if ($currentController === 'profile') {
+                $activePageId = 'page-profile';
+            } else if ($currentController === 'auth') {
+                $activePageId = 'page-auth';
             }
             ?>
             <div id="<?= $activePageId ?>" class="spa-page active">

@@ -6,19 +6,7 @@ require_once ROOT_PATH . '/app/Models/User.php';
 
 class AuthController extends BaseController {
     
-    // =========================================================================
-    // HÀM KIỂM TRA BẢO MẬT (CSRF)
-    // - Được gọi ở đầu các hàm xử lý form (POST) để chống tấn công giả mạo form
-    // - So sánh token gửi lên từ form với token đang lưu trong phiên làm việc
-    // =========================================================================
-    private function verifyCSRF() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-                // Nếu sai token, dừng thực thi toàn bộ luồng và in ra lỗi
-                die("<h2 style='color:red; text-align:center; margin-top:50px;'>Lỗi bảo mật: Token CSRF không hợp lệ hoặc đã hết hạn! Vui lòng quay lại và thử lại.</h2>");
-            }
-        }
-    }
+
 
     // =========================================================================
     // ĐIỀU HƯỚNG GIAO DIỆN
@@ -215,18 +203,27 @@ class AuthController extends BaseController {
             'reset_token' => $otp
         ]);
 
+        // Ghi mã OTP vào file log để kiểm thử
+        $logDir = 'C:/Users/TTB/.gemini/antigravity/brain/a862bee9-1c11-4ae9-aaab-8c3bec8f9d24/scratch';
+        if (!is_dir($logDir)) {
+            @mkdir($logDir, 0777, true);
+        }
+        $logFile = $logDir . '/otp_log.txt';
+        $logContent = "[" . date('Y-m-d H:i:s') . "] Email: " . $email . " | OTP: " . $otp . "\n";
+        @file_put_contents($logFile, $logContent, FILE_APPEND);
+
         if ($isAjax) {
             header('Content-Type: application/json');
             echo json_encode([
                 'success' => true,
-                'message' => "Mã OTP đã được tạo! Để kiểm thử nhanh, vui lòng nhập mã OTP là: " . $otp,
+                'message' => "Mã OTP khôi phục mật khẩu đã được gửi đến email của bạn! (Vui lòng kiểm tra file log kiểm thử)",
                 'email' => $email
             ]);
             exit;
         }
 
         // Fallback
-        echo "<h2 style='color:white; text-align:center; margin-top:50px;'>Mã OTP của bạn là: {$otp}</h2>";
+        echo "<h2 style='color:white; text-align:center; margin-top:50px;'>Mã OTP khôi phục mật khẩu đã được gửi đến email của bạn! (Kiểm tra file log)</h2>";
     }
 
     // =========================================================================

@@ -108,5 +108,31 @@ class Rental extends BaseModel {
             return false;
         }
     }
+
+    /**
+     * HÀM: Kiểm tra tổng số lượng sản phẩm nhạc cụ đang bị thuê trùng lặp trong khoảng thời gian
+     * @param int $productId ID sản phẩm
+     * @param string $startDate Ngày bắt đầu thuê mới
+     * @param string $endDate Ngày kết thúc thuê mới
+     * @return int Tổng số lượng sản phẩm đã bị thuê kín trong khoảng thời gian đó
+     */
+    public function checkOverlapRental($productId, $startDate, $endDate) {
+        $sql = "SELECT SUM(rd.quantity) as rented 
+                FROM rentals r 
+                JOIN rental_details rd ON r.id = rd.rental_id 
+                WHERE rd.product_id = :product_id 
+                  AND r.status IN ('active', 'pending') 
+                  AND r.start_date <= :end_date 
+                  AND r.end_date >= :start_date";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':product_id', $productId, PDO::PARAM_INT);
+        $stmt->bindValue(':start_date', $startDate, PDO::PARAM_STR);
+        $stmt->bindValue(':end_date', $endDate, PDO::PARAM_STR);
+        $stmt->execute();
+        
+        $row = $stmt->fetch();
+        return (int)($row['rented'] ?? 0);
+    }
 }
 ?>

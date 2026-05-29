@@ -93,6 +93,26 @@ class RentalController extends BaseController {
             exit;
         }
 
+        // Kiểm tra hàng tồn kho còn để thuê hay không
+        if ($product['stock'] <= 0) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Xin lỗi, sản phẩm nhạc cụ này hiện đã hết hàng trong kho!'
+            ]);
+            exit;
+        }
+
+        // Kiểm tra trùng lịch thuê trong khoảng thời gian khách chọn
+        $rentalModel = new Rental();
+        $overlapRented = $rentalModel->checkOverlapRental($productId, $startDate, $endDate);
+        if ($overlapRented + 1 > $product['stock']) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Sản phẩm này đã được đặt thuê hết trong khoảng thời gian từ ngày ' . date('d/m/Y', $timeStart) . ' đến ' . date('d/m/Y', $timeEnd) . '! Vui lòng chọn khoảng thời gian khác.'
+            ]);
+            exit;
+        }
+
         // 6. Tính toán chi phí bảo mật tại Server-side
         $days = (int)ceil(($timeEnd - $timeStart) / 86400);
         if ($days < 1) {
@@ -106,7 +126,6 @@ class RentalController extends BaseController {
         $depositAmount = $depositPrice;
 
         // 7. Gọi Model lưu dữ liệu an toàn
-        $rentalModel = new Rental();
         $rentalId = $rentalModel->saveRental(
             $user['id'],
             $productId,

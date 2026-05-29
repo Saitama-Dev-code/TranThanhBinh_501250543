@@ -14,11 +14,19 @@ class BaseController {
 
         $viewFile = __DIR__ . '/../app/Views/' . $view . '.php';
         
-        // Kiểm tra xem file giao diện có tồn tại không trước khi load
         if (file_exists($viewFile)) {
             require_once $viewFile;
-        } else {
-            die("Lỗi kiến trúc MVC: Không tìm thấy file View -> " . $view);
+        }
+    }
+
+    /**
+     * Xác thực Token CSRF cho các yêu cầu POST nhạy cảm
+     */
+    protected function verifyCSRF() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+                die("<h2 style='color:red; text-align:center; margin-top:50px;'>Lỗi bảo mật: Token CSRF không hợp lệ hoặc đã hết hạn! Vui lòng tải lại trang và thử lại.</h2>");
+            }
         }
     }
 }

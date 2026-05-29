@@ -19,26 +19,15 @@ class OrderDetail extends BaseModel {
         
         $stmt = $this->db->prepare($sql);
         
-        // Bắt đầu transaction để đảm bảo an toàn toàn vẹn dữ liệu
-        $this->db->beginTransaction();
-        
-        try {
-            foreach ($cartItems as $item) {
-                $stmt->bindValue(':order_id', $orderId, PDO::PARAM_INT);
-                $stmt->bindValue(':product_id', $item['id'], PDO::PARAM_INT);
-                $stmt->bindValue(':quantity', $item['quantity'], PDO::PARAM_INT);
-                $stmt->bindValue(':price', $item['price'], PDO::PARAM_STR);
-                
-                $stmt->execute();
-            }
-            // Nếu không có lỗi, lưu thay đổi
-            $this->db->commit();
-            return true;
-        } catch (Exception $e) {
-            // Nếu có 1 lỗi xảy ra, lùi lại (rollback) toàn bộ để không bị rác dữ liệu
-            $this->db->rollBack();
-            return false;
+        foreach ($cartItems as $item) {
+            $stmt->bindValue(':order_id', $orderId, PDO::PARAM_INT);
+            $stmt->bindValue(':product_id', $item['id'], PDO::PARAM_INT);
+            $stmt->bindValue(':quantity', $item['quantity'], PDO::PARAM_INT);
+            $stmt->bindValue(':price', $item['price'], PDO::PARAM_STR);
+            
+            $stmt->execute();
         }
+        return true;
     }
 }
 ?>

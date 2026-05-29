@@ -12,6 +12,28 @@ if (empty($_SESSION['csrf_token'])) {
 
 define('ROOT_PATH', dirname(__DIR__));
 
+// Tự động đăng nhập qua Cookie Remember Me
+if (!isset($_SESSION['user']) && isset($_COOKIE['remember_me'])) {
+    $parts = explode('|', $_COOKIE['remember_me']);
+    if (count($parts) === 2) {
+        $userId = $parts[0];
+        $hash = $parts[1];
+        if ($hash === md5($userId . 'TTB_MUSIC_SECRET_KEY')) {
+            require_once ROOT_PATH . '/app/Models/User.php';
+            $userModel = new User();
+            $user = $userModel->getById((int)$userId);
+            if ($user) {
+                $_SESSION['user'] = [
+                    'id' => $user['id'],
+                    'full_name' => $user['full_name'],
+                    'email' => $user['email'],
+                    'role' => $user['role']
+                ];
+            }
+        }
+    }
+}
+
 // Lấy tên Controller và Action từ URL (Mặc định là Home và index)
 $controllerName = isset($_GET['controller']) ? ucfirst($_GET['controller']) . 'Controller' : 'HomeController';
 $actionName = isset($_GET['action']) ? $_GET['action'] : 'index';

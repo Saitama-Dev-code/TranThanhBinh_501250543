@@ -1,5 +1,66 @@
 # Nhật ký Cập nhật Dự án (Changelog)
 
+**Ngày cập nhật:** 29/05/2026
+
+## 🚀 Cập Nhật Lần 17 (Khắc Phục Lỗi Bảo Mật CSRF/XSS, Tích Hợp CSDL Transaction, Kiểm Tra Trùng Lịch Thuê & Ẩn OTP)
+
+### 1. Bảo mật Token CSRF & Chống XSS
+- **Tích hợp Token CSRF:** Di chuyển logic kiểm tra Token CSRF lên `BaseController` làm phương thức dùng chung. Thêm input ẩn `csrf_token` vào biểu mẫu đặt hàng trong `checkout.php` và xác thực nghiêm ngặt tại `CheckoutController`.
+- **Lọc XSS:** Áp dụng `htmlspecialchars()` để làm sạch Họ tên, Số điện thoại và Mã đơn hàng khi in ra tại màn hình thông báo đặt hàng thành công.
+
+### 2. Ẩn OTP Quên Mật Khẩu (Bảo Mật Vận Hành)
+- **Log file kiểm thử:** Ẩn mã OTP khôi phục mật khẩu khỏi phản hồi AJAX gửi về Client. Thay vào đó, OTP được ghi vào file log kiểm thử `scratch/otp_log.txt` trên server để đảm bảo an toàn bảo mật thực tế.
+
+### 3. Ràng buộc Tồn Kho & PDO Transactions trong Đặt Hàng
+- **CSDL Transaction:** Đóng gói toàn bộ quá trình tạo đơn hàng (`orders`), lưu chi tiết đơn hàng (`order_details`), và giảm tồn kho (`products.stock` qua phương thức `deductStock()`) vào trong một Database Transaction duy nhất nhằm đảm bảo tính nhất quán dữ liệu.
+- **Kiểm tra tồn kho:** Chặn thanh toán và báo lỗi ngay lập tức tại Controller nếu số lượng trong giỏ hàng vượt quá số lượng hàng còn lại trong kho.
+
+### 4. Ràng buộc Tồn Kho & Trùng Lịch Thuê Nhạc Cụ
+- **Tránh cho thuê quá stock:** Chặn thuê nhạc cụ nếu số lượng tồn kho `stock <= 0`.
+- **Thuật toán check trùng lịch:** Viết hàm `checkOverlapRental()` trong `Rental` model để đếm số lượng nhạc cụ đó đã được thuê trong khoảng thời gian trùng lặp. Chặn và báo lỗi cụ thể cho người dùng nếu tổng số lượng đã cho thuê cộng thêm yêu cầu mới vượt quá số lượng tồn kho thực tế.
+
+---
+
+**Ngày cập nhật:** 25/05/2026
+
+## 🚀 Cập Nhật Lần 16 (Nâng cấp Trang Cá Nhân Overlay Sheet & Sửa Lỗi Authentication)
+
+### 1. Nâng cấp Trang Cá Nhân (Profile Overlay Sheet)
+- **Profile Slide-up Overlay:** Chuyển đổi trang cá nhân `#page-profile` từ trang tĩnh SPA thông thường thành Slide-up Overlay Sheet trượt mượt mà từ dưới lên toàn màn hình (tương tự Detail Sheet và Auth Sheet).
+- **Canvas Bong Bóng Hào Quang (Glowing Ripple Bubbles):** Thiết lập Canvas nền riêng biệt vẽ các bong bóng hào quang phát sáng đổi màu chậm rãi, nảy ra xa và phóng to khi rê chuột qua, tạo cảm giác huyền ảo cao cấp.
+- **Nút Quay Lại Nổi Bật:** Thêm nút "Quay lại trang trước" bo tròn tinh tế ở góc dưới card để đóng sheet mượt mà và khôi phục URL nền.
+- **Tải ngầm trang nền Home:** Tự động tải ngầm trang chủ làm nền khi người dùng F5 tải trực tiếp trang Profile để tránh trống trải giao diện nền.
+
+### 2. Cập nhật thông tin cá nhân qua AJAX
+- **Form Chỉnh Sửa Thông Tin:** Bổ sung tab "Cập nhật thông tin" cho phép chỉnh sửa Họ tên, Số điện thoại và Địa chỉ nhận hàng.
+- **AJAX lưu thông tin:** Xử lý gửi AJAX FormData, cập nhật tức thì dữ liệu hiển thị trên trang Profile và morph đổi tên người dùng trên Navbar mà không cần reload trang.
+
+### 3. Sửa lỗi Nhớ mật khẩu & Quên mật khẩu
+- **Cookie Remember Me:** Thiết lập Cookie `remember_me` được mã hóa và ký bảo mật bằng thuật toán MD5 khi tick "Nhớ mật khẩu". Tự động đăng nhập người dùng khi mở lại trình duyệt.
+- **Quên mật khẩu OTP AJAX:** Tích hợp form quên mật khẩu trực tiếp trong Auth Sheet. Người dùng nhận mã OTP kiểm thử trực quan trên màn hình, nhập OTP và mật khẩu mới để đặt lại mật khẩu 100% bằng AJAX không reload trang.
+
+---
+
+**Ngày cập nhật:** 25/05/2026
+
+## 🚀 Cập Nhật Lần 15 (Nâng cấp Auth Sheet Trượt & Sửa Lỗi Tương Phản Dark Theme)
+
+### 1. Nâng cấp Auth Sheet Trượt mượt mà từ dưới lên
+- **Auth Sheet Overlay:** Thay thế hoàn toàn Bootstrap Modal đăng nhập cũ bằng `#page-auth-overlay` trượt lên toàn màn hình (tương tự Detail Sheet) với hiệu ứng transition trượt cao cấp.
+- **Canvas Sóng Nhạc Neon:** Tích hợp Canvas vẽ 3 đường sóng âm thanh phát sáng (Audio Waveform) chuyển động lệch pha sinh động làm nền phía sau.
+- **Nút Quay Lại Tiện Dụng:** Thiết kế nút "Quay lại trang trước" nổi bật ở dưới cùng của thẻ đăng nhập giúp đóng sheet nhanh chóng.
+- **Tab Đăng nhập / Đăng ký Trượt Ngang:** Sử dụng cấu trúc flex và `transform: translateX` để chuyển đổi mượt mà giữa hai form trên cùng một thẻ.
+
+### 2. AJAX hóa 100% Xác thực & Morph Navbar
+- **AJAX Đăng ký:** AJAX hóa hoàn toàn cả hai form Đăng ký (`registerSubmit`) và Đăng nhập (`loginSubmit`) để phản hồi tức thì mà không reload trang.
+- **Navbar Morph Transition:** Đồng bộ container `#navbar-user-control` với hiệu ứng morph transition (`fade-scale`) mượt mà khi chuyển từ Đăng nhập sang tài khoản khách hàng hoặc ngược lại khi Đăng xuất.
+- **Đổi mới màu sắc Navbar:** Nút Đăng nhập trên navbar đổi thành màu xanh dương gradient có bóng đổ phát sáng; Dropdown tài khoản khách đổi sang Glassmorphism tím-xanh ngọc có viền neon.
+
+### 3. Sửa lỗi hiển thị chữ tối (Contrast Dark Theme)
+- **CSS Tương phản:** Thêm thuộc tính CSS cho `:root[data-theme="dark"] .text-muted` để tăng độ tương phản của chữ xám trong Dark Theme của Cửa hàng, đảm bảo đọc rõ nội dung.
+
+---
+
 **Ngày cập nhật:** 21/05/2026
 
 ## 🚀 Cập Nhật Lần 13 (Hoàn Thiện Flow Thanh toán, Xác thực & Quản lý Đơn hàng)

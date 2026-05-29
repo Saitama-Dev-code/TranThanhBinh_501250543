@@ -275,5 +275,19 @@ class Product extends BaseModel {
         $stmt->execute();
         return $stmt->fetchAll();
     }
+
+    /**
+     * HÀM: Cập nhật giảm số lượng hàng tồn kho của sản phẩm khi bán
+     * @param int $productId ID sản phẩm
+     * @param int $quantity Số lượng bán
+     * @return bool
+     */
+    public function deductStock($productId, $quantity) {
+        $sql = "UPDATE {$this->table} SET stock = stock - :quantity WHERE id = :product_id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':quantity', (int)$quantity, PDO::PARAM_INT);
+        $stmt->bindValue(':product_id', (int)$productId, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
 }
 ?>

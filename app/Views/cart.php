@@ -34,7 +34,7 @@ include __DIR__ . '/partials/header.php';
 .cart-title {
     font-size: 2rem;
     font-weight: 800;
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    background: linear-gradient(135deg, #7c3aed, #8b5cf6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -92,7 +92,7 @@ include __DIR__ . '/partials/header.php';
     height: 90px;
     border-radius: 12px;
     flex-shrink: 0;
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    background: linear-gradient(135deg, #7c3aed, #8b5cf6);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -119,7 +119,7 @@ include __DIR__ . '/partials/header.php';
 .cart-item-price {
     font-size: 1rem;
     font-weight: 700;
-    color: #3b82f6;
+    color: #7c3aed;
 }
 
 /* Điều khiển số lượng */
@@ -144,9 +144,9 @@ include __DIR__ . '/partials/header.php';
     transition: all 0.2s;
 }
 .qty-btn:hover {
-    background: #3b82f6;
+    background: #7c3aed;
     color: white;
-    border-color: #3b82f6;
+    border-color: #7c3aed;
 }
 .qty-display {
     min-width: 32px;
@@ -216,7 +216,7 @@ include __DIR__ . '/partials/header.php';
 }
 .summary-total-price {
     font-size: 1.3rem;
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    background: linear-gradient(135deg, #7c3aed, #8b5cf6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -225,7 +225,7 @@ include __DIR__ . '/partials/header.php';
 .btn-checkout {
     width: 100%;
     padding: 14px;
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    background: linear-gradient(135deg, #7c3aed, #6366f1);
     border: none;
     border-radius: 12px;
     color: white;
@@ -242,7 +242,7 @@ include __DIR__ . '/partials/header.php';
 }
 .btn-checkout:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(59,130,246,0.4);
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.35);
     color: white;
 }
 
@@ -266,8 +266,8 @@ include __DIR__ . '/partials/header.php';
     text-decoration: none;
 }
 .btn-continue:hover {
-    border-color: #3b82f6;
-    color: #3b82f6;
+    border-color: #7c3aed;
+    color: #7c3aed;
 }
 
 /* ---- Giỏ trống ---- */
@@ -598,7 +598,7 @@ include __DIR__ . '/partials/header.php';
 </div>
 
 <!-- Custom Confirmation Modal (Khung câu hỏi xóa sản phẩm) -->
-<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true" style="backdrop-filter: blur(8px); z-index: 1060;">
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false" style="background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px); z-index: 1060;">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content glass-panel p-4" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 1.5rem; box-shadow: 0 15px 35px rgba(0,0,0,0.4); color: var(--text-color) !important;">
             <div class="modal-body text-center">
@@ -696,13 +696,10 @@ window.initCartPage = function() {
     const closeCartBtn = document.getElementById('btn-close-cart-overlay');
     if (closeCartBtn) {
         closeCartBtn.addEventListener('click', () => {
+            const fallbackUrl = window.spaBackgroundUrl || 'index.php?controller=home';
             if (typeof window.hideCartOverlaySPA === 'function') {
                 window.hideCartOverlaySPA();
-                if (history.length > 1) {
-                    history.back();
-                } else {
-                    window.navigateToSPA('index.php?controller=product&action=index');
-                }
+                window.navigateToSPA(fallbackUrl);
             } else {
                 const cartPage = document.getElementById('page-cart');
                 if (cartPage && cartPage.classList.contains('active-overlay')) {
@@ -712,7 +709,7 @@ window.initCartPage = function() {
                         cartPage.style.display = 'none';
                     }, 700);
                 }
-                window.location.href = 'index.php?controller=product&action=index';
+                window.location.href = fallbackUrl;
             }
         });
     }
@@ -1029,6 +1026,13 @@ function showEmptyCart() {
     }
     loop();
 })();
+
+// Tự động khởi chạy logic sự kiện cho giỏ hàng
+if (document.readyState !== 'loading') {
+    window.initCartPage();
+} else {
+    document.addEventListener('DOMContentLoaded', window.initCartPage);
+}
 </script>
 
 <?php

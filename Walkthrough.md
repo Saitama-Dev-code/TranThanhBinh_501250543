@@ -1,33 +1,45 @@
-# Đợt 14: Tối ưu Trải nghiệm Xác thực và Giỏ hàng
+# Đợt 17: Sửa Lỗi Bảo Mật, Nghiệp Vụ & Dữ Liệu Thực Tế
+
+Đợt cập nhật này tập trung khắc phục hoàn toàn các lỗ hổng bảo mật (CSRF, XSS), sửa đổi logic dữ liệu (trừ tồn kho khi mua, transaction toàn vẹn, kiểm tra trùng lịch thuê nhạc cụ), và nâng cao độ an toàn vận hành thực tế (mật khẩu guest ngẫu nhiên, ẩn mã OTP vào file log nội bộ).
+
+---
 
 ## Các thay đổi đã thực hiện
 
-### 1. Hệ thống Xác thực (Authentication)
-* **Khắc phục lỗi mật khẩu tài khoản Admin cũ:** Sửa `loginSubmit` trong `AuthController`. Bổ sung điều kiện kiểm tra mật khẩu bằng chữ thường (plaintext) ở DB cũ. Nếu khớp, tự động đăng nhập và băm lại mật khẩu bằng Bcrypt cập nhật vào DB.
-* **Cải thiện trải nghiệm Đăng ký:** Chuyển từ cơ chế báo lỗi bằng `die()` sang session flash message hiển thị đẹp mắt ngay trong thẻ div. Tự động lưu giá trị input (Họ tên, Email) khi đăng ký sai mật khẩu.
-* **Tự động Đăng nhập:** Sau khi đăng ký thành công, tự động lưu thông tin vào `$_SESSION['user']` và chuyển thẳng về trang chủ mà không bắt đăng nhập lại.
-* **Hiển thị lỗi Modal Đăng nhập:** Hiển thị thông báo sai email/mật khẩu ngay trong modal ở trang chủ, thay vì thông báo bằng text xấu xí.
-* **Bảo mật và Validations đầy đủ:** Thêm các kiểm tra email định dạng hợp lệ, độ dài mật khẩu >= 6, và so sánh khớp mật khẩu xác nhận trong `registerSubmit`.
+### 1. Hệ thống Bảo mật (CSRF & XSS)
+* **Verify CSRF dùng chung:** Di chuyển phương thức `verifyCSRF()` lên [BaseController.php](file:///c:/laragon/www/PHP2/TranThanhBinh_501250543/core/BaseController.php) và xóa bỏ khai báo trùng lặp ở [AuthController.php](file:///c:/laragon/www/PHP2/TranThanhBinh_501250543/app/Controllers/AuthController.php).
+* **Token CSRF trong Checkout:** Thêm input ẩn `csrf_token` trong form thanh toán [checkout.php](file:///c:/laragon/www/PHP2/TranThanhBinh_501250543/app/Views/checkout.php) và gọi xác thực token ngay đầu action `process()` của [CheckoutController.php](file:///c:/laragon/www/PHP2/TranThanhBinh_501250543/app/Controllers/CheckoutController.php).
+* **Lọc XSS:** Áp dụng `htmlspecialchars()` để làm sạch Họ tên, SĐT, và Mã đơn hàng khi in ra ở trang đặt hàng thành công của [CheckoutController.php](file:///c:/laragon/www/PHP2/TranThanhBinh_501250543/app/Controllers/CheckoutController.php).
 
-### 2. Trải nghiệm Giỏ hàng (Cart UX)
-* **Cải tiến logic xóa sản phẩm trong `cart.php`:** Trước đây, khi xóa sản phẩm cuối cùng, trang web sẽ tải lại (reload) toàn bộ để chuyển sang giao diện "Giỏ trống". Hiện tại, giao diện giỏ trống được hiển thị mượt mà bằng Javascript và CSS transition (Opacity & Translation) mà không cần tải lại trang.
-* **Khung câu hỏi xóa sản phẩm (Delete Confirmation Modal):** Thêm một modal xác nhận thiết kế chuẩn Glassmorphism trong `cart.php`. Khi người dùng click nút "Xóa" hoặc giảm số lượng về 0, modal sẽ hiển thị để xác nhận hành vi trước khi xóa.
-* **Cập nhật dòng chữ phụ đề giỏ hàng:** Đồng bộ hóa số lượng sản phẩm trong giỏ hàng real-time qua JavaScript và hiển thị thông tin ở phụ đề mà không cần tải lại trang.
+### 2. An Toàn Vận Hành (OTP & Guest Password)
+* **Ghi OTP vào File Log:** Sửa hàm `forgotSubmit()` để ghi mã OTP quên mật khẩu vào file log kiểm thử `scratch/otp_log.txt` trên server thay vì trả trực tiếp về giao diện cho client, giúp giả lập an toàn việc gửi mail thực tế.
+* **Mật khẩu Guest ngẫu nhiên:** Tài khoản khách vãng lai tự tạo khi checkout sẽ được cấp một mật khẩu ngẫu nhiên dài 8 ký tự an toàn (thay vì lấy số điện thoại dễ bị đoán) và hiển thị cụ thể tại trang đặt hàng thành công để họ lưu lại.
 
-### 3. Hiệu ứng Bay Giỏ hàng (Flying to Cart Animation)
-* **Viết thư viện JS dùng chung:** Bổ sung hàm `flyToCart()` và `addToCartAJAX()` vào `partials/footer.php` để dùng chung.
-* **Tối ưu hóa GPU-Accelerated Animation:** Sử dụng thuộc tính `transform: translate(dx, dy) scale(0.15)` thay vì thay đổi thuộc tính `left` và `top` để giảm thiểu hiện tượng Reflow của trình duyệt, giúp animation hoạt động cực kỳ mượt mà ở mức 60/120 FPS.
-* **Bắt đầu bay từ ảnh sản phẩm:** Cải tiến hàm `flyToCart` tự động tìm kiếm hình ảnh sản phẩm trong card hoặc ảnh chi tiết để làm điểm bắt đầu bay thay vì bay từ nút bấm, tạo cảm giác hình ảnh sản phẩm thu nhỏ và bay vào giỏ hàng.
-* **Bảo vệ sự kiện:** Thêm điều kiện kiểm tra sự kiện `event` trước khi gọi `event.preventDefault()` trong `addToCartAJAX`.
+### 3. Toàn Vẹn Dữ Liệu Đặt Hàng (Database Transaction)
+* **Trừ tồn kho khi mua:** Viết hàm `deductStock()` trong [Product.php](file:///c:/laragon/www/PHP2/TranThanhBinh_501250543/app/Models/Product.php) để giảm số lượng trong kho sản phẩm khi bán thành công.
+* **Database Transaction:** Loại bỏ transaction nội bộ của [OrderDetail.php](file:///c:/laragon/www/PHP2/TranThanhBinh_501250543/app/Models/OrderDetail.php). Thay vào đó bọc toàn bộ luồng tạo đơn hàng, lưu chi tiết đơn hàng, và trừ tồn kho vào một PDO Transaction duy nhất tại [CheckoutController.php](file:///c:/laragon/www/PHP2/TranThanhBinh_501250543/app/Controllers/CheckoutController.php) để tránh rác dữ liệu nếu có lỗi xảy ra.
+* **Kiểm tra tồn kho trước:** Chặn đặt hàng và báo lỗi tại Controller nếu số lượng mua vượt quá số lượng còn lại trong kho.
 
-### 4. Sửa lỗi tương thích trình duyệt (Browser Compatibility)
-* **Fix Canvas Mouse Events trên Firefox:** Thay đổi thuộc tính `e.x`/`e.y` thành `e.clientX`/`e.clientY` trong script của `header.php` để tương thích hoàn toàn với trình duyệt Firefox.
-* **Dọn dẹp Badge phụ:** Xóa bỏ hoàn toàn badge đỏ phụ (`.cart-badge` / `#cart-badge`) ở góc trên phải nút giỏ hàng, chỉ giữ lại số lượng ở giữa nút để tránh trùng lặp thông tin.
-* **Khôi phục hiển thị Footer:** Loại bỏ thuộc tính `data-aos` khỏi các cột footer trong `footer.php` để tránh hiện tượng footer bị ẩn vĩnh viễn trên trang chủ nếu scroll tracker tính toán sai lệch.
+### 4. Logic Thuê Nhạc Cụ & Tránh Trùng Lịch
+* **Check trùng lịch thuê:** Thêm hàm `checkOverlapRental()` trong [Rental.php](file:///c:/laragon/www/PHP2/TranThanhBinh_501250543/app/Models/Rental.php) truy vấn DB đếm số lượng sản phẩm đó đã được thuê trong khoảng ngày chọn.
+* **Ràng buộc tồn kho:** Chặn và báo lỗi cụ thể tại [RentalController.php](file:///c:/laragon/www/PHP2/TranThanhBinh_501250543/app/Controllers/RentalController.php) nếu nhạc cụ hết hàng hoặc tổng số lượng đang thuê trùng lịch cộng thêm yêu cầu mới vượt quá số lượng tồn kho của nhạc cụ đó.
 
-## Kết quả Kiểm tra
-* **[Thành công]** Đăng ký tài khoản lỗi (thiếu trường, sai trường). Báo lỗi mượt mà trên UI.
-* **[Thành công]** Đăng ký đúng, đăng nhập ngay, thẻ navbar hiển thị "Tài Khoản".
-* **[Thành công]** Click mua sản phẩm ở Trang chủ, Sản phẩm, Chi tiết: Sản phẩm tạo avatar nhỏ, bay thẳng vào Icon Giỏ ở góc trên bên phải màn hình.
-* **[Thành công]** Vào trang Giỏ Hàng, xóa sản phẩm hoặc giảm về 0: Hiển thị modal glassmorphism xác nhận xóa.
-* **[Thành công]** Đồng ý xóa sản phẩm duy nhất: Form 2 cột ẩn đi, khung Giỏ Hàng Trống hiện lên mượt mà và cập nhật phụ đề số lượng sản phẩm.
+---
+
+## Hướng dẫn Kiểm tra (Manual Verification)
+
+1. **Kiểm thử OTP Quên mật khẩu**:
+   - Nhập email quên mật khẩu trên giao diện. Xác nhận không thấy OTP hiện ra ở client.
+   - Mở file log `scratch/otp_log.txt` trên máy chủ, lấy OTP và điền vào form để đặt lại mật khẩu mới thành công.
+
+2. **Kiểm thử CSRF**:
+   - F12 sửa/xóa input ẩn `csrf_token` trong form checkout rồi bấm Đặt hàng.
+   - Xác nhận: Hệ thống chặn đứng và báo lỗi bảo mật *"Token CSRF không hợp lệ"*.
+
+3. **Kiểm thử Trừ Tồn Kho & Transaction**:
+   - Đặt mua sản phẩm thành công -> Xác nhận số lượng tồn kho giảm tương ứng.
+   - Thử gây lỗi lưu chi tiết -> Xác nhận đơn hàng lớn ở bảng `orders` tự động rollback sạch sẽ.
+
+4. **Kiểm thử Trùng lịch thuê**:
+   - Cho thuê 1 sản phẩm có stock = 1 trong khoảng ngày `01/06/2026 - 10/06/2026`.
+   - Thuê tiếp chính sản phẩm đó từ `05/06/2026 - 12/06/2026` -> Xác nhận: Hệ thống báo lỗi trùng lịch chi tiết và chặn cho thuê.

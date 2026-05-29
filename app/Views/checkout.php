@@ -125,6 +125,7 @@ require_once ROOT_PATH . '/app/Views/partials/header.php';
                 <?php endif; ?>
 
                 <form action="index.php?controller=checkout&action=process" method="POST">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                     <div class="mb-4">
                         <label class="form-label">Họ và Tên <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" name="fullname" placeholder="Nhập họ và tên người nhận" required 

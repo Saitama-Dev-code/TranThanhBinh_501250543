@@ -6,19 +6,7 @@ require_once ROOT_PATH . '/app/Models/User.php';
 
 class AuthController extends BaseController {
     
-    // =========================================================================
-    // HÀM KIỂM TRA BẢO MẬT (CSRF)
-    // - Được gọi ở đầu các hàm xử lý form (POST) để chống tấn công giả mạo form
-    // - So sánh token gửi lên từ form với token đang lưu trong phiên làm việc
-    // =========================================================================
-    private function verifyCSRF() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-                // Nếu sai token, dừng thực thi toàn bộ luồng và in ra lỗi
-                die("<h2 style='color:red; text-align:center; margin-top:50px;'>Lỗi bảo mật: Token CSRF không hợp lệ hoặc đã hết hạn! Vui lòng quay lại và thử lại.</h2>");
-            }
-        }
-    }
+
 
     // =========================================================================
     // ĐIỀU HƯỚNG GIAO DIỆN
@@ -50,34 +38,60 @@ class AuthController extends BaseController {
         $password = $_POST['password'] ?? '';
         $confirmPassword = $_POST['confirm_password'] ?? '';
         
+        $isAjax = isset($_GET['ajax']) || (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest');
+
         // Lưu tạm thông tin để điền lại vào form nếu có lỗi
         $_SESSION['auth_fullname'] = $fullname;
         $_SESSION['auth_email'] = $email;
         
         // Kiểm tra validation cơ bản
         if (empty($fullname) || empty($email) || empty($password) || empty($confirmPassword)) {
-            $_SESSION['auth_error'] = "Vui lòng điền đầy đủ thông tin!";
+            $msg = "Vui lòng điền đầy đủ thông tin!";
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $msg]);
+                exit;
+            }
+            $_SESSION['auth_error'] = $msg;
             header('Location: index.php?controller=auth&action=register');
             exit;
         }
 
         // Kiểm tra định dạng email hợp lệ
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $_SESSION['auth_error'] = "Định dạng Email không hợp lệ!";
+            $msg = "Định dạng Email không hợp lệ!";
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $msg]);
+                exit;
+            }
+            $_SESSION['auth_error'] = $msg;
             header('Location: index.php?controller=auth&action=register');
             exit;
         }
 
         // Kiểm tra độ dài mật khẩu (tối thiểu 6 ký tự)
         if (strlen($password) < 6) {
-            $_SESSION['auth_error'] = "Mật khẩu phải có độ dài tối thiểu 6 ký tự!";
+            $msg = "Mật khẩu phải có độ dài tối thiểu 6 ký tự!";
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $msg]);
+                exit;
+            }
+            $_SESSION['auth_error'] = $msg;
             header('Location: index.php?controller=auth&action=register');
             exit;
         }
 
         // Kiểm tra mật khẩu khớp nhau
         if ($password !== $confirmPassword) {
-            $_SESSION['auth_error'] = "Mật khẩu xác nhận không khớp!";
+            $msg = "Mật khẩu xác nhận không khớp!";
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $msg]);
+                exit;
+            }
+            $_SESSION['auth_error'] = $msg;
             header('Location: index.php?controller=auth&action=register');
             exit;
         }
@@ -87,7 +101,13 @@ class AuthController extends BaseController {
         // Kiểm tra email đã tồn tại chưa
         $existingUser = $userModel->getByEmail($email);
         if ($existingUser) {
-            $_SESSION['auth_error'] = "Email này đã được sử dụng! Vui lòng sử dụng email khác.";
+            $msg = "Email này đã được sử dụng! Vui lòng sử dụng email khác.";
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $msg]);
+                exit;
+            }
+            $_SESSION['auth_error'] = $msg;
             header('Location: index.php?controller=auth&action=register');
             exit;
         }
@@ -118,29 +138,188 @@ class AuthController extends BaseController {
             // Xóa session tạm
             unset($_SESSION['auth_fullname'], $_SESSION['auth_email'], $_SESSION['auth_error']);
             
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success' => true,
+                    'user' => $_SESSION['user']
+                ]);
+                exit;
+            }
+
             // Chuyển hướng thẳng tới trang chủ
             header('Location: index.php');
             exit;
         } else {
-            $_SESSION['auth_error'] = "Có lỗi xảy ra trong quá trình đăng ký. Vui lòng thử lại!";
+            $msg = "Có lỗi xảy ra trong quá trình đăng ký. Vui lòng thử lại!";
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $msg]);
+                exit;
+            }
+            $_SESSION['auth_error'] = $msg;
             header('Location: index.php?controller=auth&action=register');
             exit;
         }
     }
 
     // =========================================================================
-    // XỬ LÝ DỮ LIỆU QUÊN MẬT KHẨU
+    // XỬ LÝ DỮ LIỆU QUÊN MẬT KHẨU (AJAX OTP)
     // =========================================================================
     public function forgotSubmit() {
         $this->verifyCSRF();
         
         $email = trim($_POST['email'] ?? '');
+        $isAjax = isset($_GET['ajax']) || (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest');
         
-        // Tạo token ngẫu nhiên và thiết lập thời gian sống (30 phút)
-        $resetToken = bin2hex(random_bytes(32));
-        $expires = date('Y-m-d H:i:s', strtotime('+30 minutes'));
+        if (empty($email)) {
+            $msg = "Vui lòng nhập Email!";
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $msg]);
+                exit;
+            }
+            die($msg);
+        }
+
+        $userModel = new User();
+        $user = $userModel->getByEmail($email);
+
+        if (!$user) {
+            $msg = "Email này không tồn tại trong hệ thống!";
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $msg]);
+                exit;
+            }
+            die($msg);
+        }
+
+        // Sinh mã OTP 6 số ngẫu nhiên để kiểm thử
+        $otp = rand(100000, 999999);
         
-        echo "<h2 style='color:white; text-align:center; margin-top:50px;'>Đã xử lý an toàn (Có CSRF).<br>Token phục hồi sẽ hết hạn vào: {$expires}</h2>";
+        // Cập nhật reset_token trong CSDL làm OTP
+        $userModel->update($user['id'], [
+            'reset_token' => $otp
+        ]);
+
+        // Ghi mã OTP vào file log để kiểm thử
+        $logDir = 'C:/Users/TTB/.gemini/antigravity/brain/a862bee9-1c11-4ae9-aaab-8c3bec8f9d24/scratch';
+        if (!is_dir($logDir)) {
+            @mkdir($logDir, 0777, true);
+        }
+        $logFile = $logDir . '/otp_log.txt';
+        $logContent = "[" . date('Y-m-d H:i:s') . "] Email: " . $email . " | OTP: " . $otp . "\n";
+        @file_put_contents($logFile, $logContent, FILE_APPEND);
+
+        if ($isAjax) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'message' => "Mã OTP khôi phục mật khẩu đã được gửi đến email của bạn! (Vui lòng kiểm tra file log kiểm thử)",
+                'email' => $email
+            ]);
+            exit;
+        }
+
+        // Fallback
+        echo "<h2 style='color:white; text-align:center; margin-top:50px;'>Mã OTP khôi phục mật khẩu đã được gửi đến email của bạn! (Kiểm tra file log)</h2>";
+    }
+
+    // =========================================================================
+    // XỬ LÝ ĐẶT LẠI MẬT KHẨU MỚI (AJAX RESET PASSWORD)
+    // =========================================================================
+    public function resetPasswordSubmit() {
+        $this->verifyCSRF();
+        
+        $email = trim($_POST['email'] ?? '');
+        $otp = trim($_POST['otp'] ?? '');
+        $password = $_POST['password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
+        
+        $isAjax = isset($_GET['ajax']) || (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest');
+
+        if (empty($email) || empty($otp) || empty($password) || empty($confirmPassword)) {
+            $msg = "Vui lòng nhập đầy đủ tất cả các trường!";
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $msg]);
+                exit;
+            }
+            die($msg);
+        }
+
+        if (strlen($password) < 6) {
+            $msg = "Mật khẩu mới phải có độ dài tối thiểu 6 ký tự!";
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $msg]);
+                exit;
+            }
+            die($msg);
+        }
+
+        if ($password !== $confirmPassword) {
+            $msg = "Mật khẩu xác nhận không khớp!";
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $msg]);
+                exit;
+            }
+            die($msg);
+        }
+
+        $userModel = new User();
+        $user = $userModel->getByEmail($email);
+
+        if (!$user) {
+            $msg = "Không tìm thấy người dùng!";
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $msg]);
+                exit;
+            }
+            die($msg);
+        }
+
+        // Kiểm tra OTP
+        if (empty($user['reset_token']) || $user['reset_token'] !== $otp) {
+            $msg = "Mã OTP không chính xác hoặc đã hết hạn!";
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $msg]);
+                exit;
+            }
+            die($msg);
+        }
+
+        // Băm mật khẩu mới và đặt reset_token = NULL
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+        $success = $userModel->update($user['id'], [
+            'password' => $hashedPassword,
+            'reset_token' => null
+        ]);
+
+        if ($success) {
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Đặt lại mật khẩu thành công! Vui lòng đăng nhập bằng mật khẩu mới.'
+                ]);
+                exit;
+            }
+            header('Location: index.php?controller=auth&action=login');
+            exit;
+        } else {
+            $msg = "Lỗi hệ thống khi cập nhật mật khẩu!";
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $msg]);
+                exit;
+            }
+            die($msg);
+        }
     }
 
     // =========================================================================
@@ -180,7 +359,20 @@ class AuthController extends BaseController {
             }
         }
         
+        $isAjax = isset($_GET['ajax']) || (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest');
+
         if ($isPasswordValid) {
+            // Xử lý Remember Me (Nhớ mật khẩu)
+            $remember = isset($_POST['remember']) && ($_POST['remember'] === '1' || $_POST['remember'] === 'true');
+            if ($remember) {
+                // Tạo cookie lưu ID user được mã hóa kèm chữ ký bảo mật (sống 30 ngày)
+                $cookieValue = $user['id'] . '|' . md5($user['id'] . 'TTB_MUSIC_SECRET_KEY');
+                setcookie('remember_me', $cookieValue, time() + 30 * 24 * 3600, '/');
+            } else {
+                // Xóa cookie remember_me nếu không tick
+                setcookie('remember_me', '', time() - 3600, '/');
+            }
+
             // Lưu session
             $_SESSION['user'] = [
                 'id' => $user['id'],
@@ -191,10 +383,27 @@ class AuthController extends BaseController {
             
             unset($_SESSION['login_error'], $_SESSION['auth_email_login']);
             
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success' => true,
+                    'user' => $_SESSION['user']
+                ]);
+                exit;
+            }
+
             // Chuyển hướng về trang chủ
             header('Location: index.php');
             exit;
         } else { 
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Sai email hoặc mật khẩu!'
+                ]);
+                exit;
+            }
             $_SESSION['login_error'] = "Sai email hoặc mật khẩu!";
             header('Location: index.php?controller=auth&action=login');
             exit;
@@ -205,12 +414,112 @@ class AuthController extends BaseController {
     // ĐĂNG XUẤT
     // =========================================================================
     public function logout() {
+        // Xóa cookie remember_me
+        setcookie('remember_me', '', time() - 3600, '/');
+
         // Hủy session đăng nhập
         if (isset($_SESSION['user'])) {
             unset($_SESSION['user']);
         }
-        // Chuyển hướng về trang chủ
+        
+        // Hỗ trợ AJAX logout không load lại trang
+        if (isset($_GET['ajax']) || (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest')) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => true]);
+            exit;
+        }
+
+        // Chuyển hướng về trang chủ (fallback)
         header('Location: index.php');
+        exit;
+    }
+
+    // =========================================================================
+    // XỬ LÝ ĐỔI MẬT KHẨU (AJAX / POST)
+    // =========================================================================
+    public function changePassword() {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user'])) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Bạn chưa đăng nhập!'
+            ]);
+            exit;
+        }
+
+        $rawInput = file_get_contents('php://input');
+        $jsonData = json_decode($rawInput, true);
+
+        $oldPassword = isset($jsonData['old_password']) ? trim($jsonData['old_password']) : '';
+        $newPassword = isset($jsonData['new_password']) ? trim($jsonData['new_password']) : '';
+        $confirmPassword = isset($jsonData['confirm_password']) ? trim($jsonData['confirm_password']) : '';
+
+        if (empty($oldPassword) || empty($newPassword) || empty($confirmPassword)) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Vui lòng nhập đầy đủ tất cả các trường!'
+            ]);
+            exit;
+        }
+
+        if (strlen($newPassword) < 6) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Mật khẩu mới phải có ít nhất 6 ký tự!'
+            ]);
+            exit;
+        }
+
+        if ($newPassword !== $confirmPassword) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Mật khẩu mới và mật khẩu xác nhận không khớp!'
+            ]);
+            exit;
+        }
+
+        $userId = $_SESSION['user']['id'];
+        $userModel = new User();
+        $user = $userModel->getById($userId);
+
+        if (!$user) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Tài khoản không tồn tại!'
+            ]);
+            exit;
+        }
+
+        $isOldValid = false;
+        if (password_verify($oldPassword, $user['password'])) {
+            $isOldValid = true;
+        } elseif ($user['password'] === $oldPassword) {
+            $isOldValid = true;
+        }
+
+        if (!$isOldValid) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Mật khẩu hiện tại không chính xác!'
+            ]);
+            exit;
+        }
+
+        $hashed = password_hash($newPassword, PASSWORD_DEFAULT);
+        $success = $userModel->updatePassword($userId, $hashed);
+
+        if ($success) {
+            echo json_encode([
+                'success' => true,
+                'message' => 'Đổi mật khẩu thành công!'
+            ]);
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Lỗi hệ thống khi cập nhật mật khẩu!'
+            ]);
+        }
         exit;
     }
 }

@@ -33,7 +33,7 @@ include __DIR__ . '/partials/header.php';
 
 /* Nền nút biến thể (màu/phiên bản) */
 [data-theme="dark"]  { --variant-btn-bg: rgba(255,255,255,0.07); --variant-btn-border: rgba(255,255,255,0.14); }
-[data-theme="light"] { --variant-btn-bg: rgba(15,23,42,0.06);   --variant-btn-border: rgba(15,23,42,0.18); }
+[data-theme="light"] { --variant-btn-bg: #ffffff; --variant-btn-border: #e2e8f0; }
 
 /* ================================================================================
    PHẦN 1: CSS CHO BỐ CỤC MỚI (SIDEBAR 280PX + MAIN)
@@ -74,10 +74,10 @@ include __DIR__ . '/partials/header.php';
     border-radius: 20px;
     padding: 24px;
     margin-bottom: 20px;
-    backdrop-filter: blur(25px); /* Tăng blur cho sang */
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
     position: relative;
     overflow: hidden;
+    transition: box-shadow 0.3s ease;
 }
 
 /* Hiệu ứng viền sáng cho sidebar box */
@@ -85,7 +85,7 @@ include __DIR__ . '/partials/header.php';
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.4), transparent);
+    background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), transparent);
 }
 
 .filter-group {
@@ -98,7 +98,7 @@ include __DIR__ . '/partials/header.php';
 .filter-title {
     font-size: 0.95rem;
     font-weight: 800;
-    color: #3b82f6;
+    color: #8b5cf6;
     margin-bottom: 18px;
     display: flex;
     align-items: center;
@@ -127,13 +127,13 @@ include __DIR__ . '/partials/header.php';
 }
 .filter-checkbox:hover { 
     opacity: 1; 
-    background: rgba(59, 130, 246, 0.1);
-    color: #3b82f6;
+    background: rgba(139, 92, 246, 0.08);
+    color: #8b5cf6;
 }
 .filter-checkbox input {
     width: 18px;
     height: 18px;
-    accent-color: #3b82f6;
+    accent-color: #8b5cf6;
     border-radius: 4px;
 }
 
@@ -174,7 +174,7 @@ include __DIR__ . '/partials/header.php';
     position: relative;
     width: 100%;
     height: 6px;
-    background: rgba(59, 130, 246, 0.15);
+    background: rgba(139, 92, 246, 0.15);
     border-radius: 3px;
     margin-bottom: 15px;
     margin-top: 15px;
@@ -184,7 +184,7 @@ include __DIR__ . '/partials/header.php';
     position: absolute;
     top: 0; left: 0;
     height: 100%;
-    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    background: linear-gradient(90deg, #7c3aed, #a78bfa);
     border-radius: 3px;
     pointer-events: none;
 }
@@ -205,7 +205,7 @@ include __DIR__ . '/partials/header.php';
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    background: #3b82f6;
+    background: #8b5cf6;
     border: 3px solid #fff;
     box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     cursor: pointer;
@@ -215,7 +215,7 @@ include __DIR__ . '/partials/header.php';
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    background: #3b82f6;
+    background: #8b5cf6;
     border: 3px solid #fff;
     box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     cursor: pointer;
@@ -225,24 +225,24 @@ include __DIR__ . '/partials/header.php';
     text-align: center;
     font-size: 0.85rem;
     font-weight: 700;
-    color: #3b82f6;
+    color: #8b5cf6;
     padding: 8px 0;
 }
 
 .btn-apply-filter {
     width: 100%;
     padding: 14px;
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    background: linear-gradient(135deg, #7c3aed, #6366f1);
     border: none;
     border-radius: 12px;
     color: #fff;
     font-weight: 700;
-    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
     transition: all 0.3s;
 }
 .btn-apply-filter:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5);
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.5);
 }
 
 .btn-clear-filter {
@@ -281,8 +281,8 @@ include __DIR__ . '/partials/header.php';
 }
 .search-input-sidebar:focus {
     outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
 }
 .search-input-sidebar::placeholder {
     color: var(--text-muted);
@@ -291,7 +291,7 @@ include __DIR__ . '/partials/header.php';
 .btn-search-sidebar {
     width: 42px;
     height: 42px;
-    background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    background: linear-gradient(135deg, #7c3aed, #8b5cf6);
     border: none;
     border-radius: 10px;
     color: #fff;
@@ -304,7 +304,7 @@ include __DIR__ . '/partials/header.php';
 }
 .btn-search-sidebar:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
 }
 
 /* Nút bật bộ lọc nâng cao */
@@ -325,17 +325,62 @@ include __DIR__ . '/partials/header.php';
 }
 .btn-filter-toggle-sidebar:hover,
 .btn-filter-toggle-sidebar.open {
-    background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(139,92,246,0.1));
-    border-color: rgba(59,130,246,0.4);
-    color: #3b82f6;
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.08), rgba(99, 102, 241, 0.08));
+    border-color: rgba(124, 58, 237, 0.3);
+    color: #8b5cf6;
 }
 .btn-filter-toggle-sidebar .chevron {
     transition: transform 0.3s;
     font-size: 0.8rem;
-    color: #60a5fa;
+    color: #8b5cf6;
 }
 .btn-filter-toggle-sidebar.open .chevron {
     transform: rotate(180deg);
+}
+
+/* ================================================================================
+   BỔ SUNG STYLE CAO CẤP CHO LIGHT THEME (NỀN SÁNG)
+   ================================================================================ */
+[data-theme="light"] .btn-filter-toggle-sidebar {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #475569 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03) !important;
+}
+[data-theme="light"] .btn-filter-toggle-sidebar:hover,
+[data-theme="light"] .btn-filter-toggle-sidebar.open {
+    background: rgba(139, 92, 246, 0.05) !important;
+    border-color: rgba(139, 92, 246, 0.3) !important;
+    color: #8b5cf6 !important;
+}
+[data-theme="light"] .btn-filter-toggle-sidebar .chevron {
+    color: #8b5cf6 !important;
+}
+
+[data-theme="light"] .cat-link:hover {
+    background: rgba(139, 92, 246, 0.05) !important;
+    color: #8b5cf6 !important;
+}
+[data-theme="light"] .cat-link.active {
+    background: rgba(139, 92, 246, 0.08) !important;
+    color: #8b5cf6 !important;
+}
+
+/* Đổi accent color của checkbox ở Light Theme sang màu tím */
+[data-theme="light"] .filter-checkbox:hover {
+    background: rgba(139, 92, 246, 0.05) !important;
+    color: #8b5cf6 !important;
+}
+[data-theme="light"] .filter-checkbox input {
+    accent-color: #8b5cf6 !important;
+}
+
+/* Tối ưu bóng mờ cho các hộp Sidebar ở Light Theme (ngăn chặn lỗi bóng vuông do Chromium bug) */
+[data-theme="light"] .sidebar-box {
+    box-shadow: 0 10px 30px rgba(124, 58, 237, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+}
+[data-theme="light"] .filter-panel-sidebar.open {
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.03) !important;
 }
 
 /* Panel bộ lọc nâng cao trong sidebar */
@@ -380,8 +425,8 @@ include __DIR__ . '/partials/header.php';
     margin-bottom: 2px;
     cursor: pointer;
 }
-.cat-link:hover { background:rgba(59,130,246,0.1); color:#3b82f6; padding-left:16px; }
-.cat-link.active { background:rgba(59,130,246,0.12); color:#3b82f6; font-weight:700; }
+.cat-link:hover { background:rgba(139, 92, 246, 0.08); color:#8b5cf6; padding-left:16px; }
+.cat-link.active { background:rgba(139, 92, 246, 0.12); color:#8b5cf6; font-weight:700; }
 .cat-link i { font-size:0.85rem; width:16px; text-align:center; flex-shrink:0; }
 
 /* Grid hiển thị sản phẩm - 3 cột */
@@ -454,8 +499,8 @@ include __DIR__ . '/partials/header.php';
 
 .product-wrapper:hover .product-card {
     transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    border-color: rgba(59, 130, 246, 0.5);
+    box-shadow: 0 20px 40px rgba(124, 58, 237, 0.15);
+    border-color: rgba(124, 58, 237, 0.4);
 }
 
 .product-image-container {
@@ -463,7 +508,7 @@ include __DIR__ . '/partials/header.php';
     height: 200px;
     overflow: hidden !important;
     border-radius: 16px 16px 0 0;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.04), rgba(99, 102, 241, 0.04));
 }
 
 .product-image {
@@ -488,11 +533,12 @@ include __DIR__ . '/partials/header.php';
 }
 
 .badge-rent {
-    background: linear-gradient(135deg, #f59e0b, #fbbf24);
-    color: #000;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    color: #d97706;
     font-size: 0.7rem;
     font-weight: 700;
-    padding: 4px 10px;
+    padding: 3px 9px;
     border-radius: 20px;
     display: inline-flex;
     align-items: center;
@@ -500,16 +546,18 @@ include __DIR__ . '/partials/header.php';
 }
 
 .badge-stock {
-    background: rgba(16, 185, 129, 0.9);
-    color: white;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    color: #059669;
     font-size: 0.7rem;
-    font-weight: 600;
-    padding: 4px 10px;
+    font-weight: 700;
+    padding: 3px 9px;
     border-radius: 20px;
 }
 
 .badge-stock.low {
     background: rgba(239, 68, 68, 0.9);
+    color: #fff !important;
     animation: pulse 2s infinite;
 }
 
@@ -562,17 +610,17 @@ include __DIR__ . '/partials/header.php';
 }
 
 .variant-btn:hover {
-    background: rgba(59, 130, 246, 0.3);
-    border-color: rgba(59, 130, 246, 0.5);
-    color: #fff;
+    background: rgba(124, 58, 237, 0.15);
+    border-color: rgba(124, 58, 237, 0.35);
+    color: #8b5cf6;
     transform: scale(1.05);
 }
 
 .variant-btn.selected {
-    background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    background: linear-gradient(135deg, #7c3aed, #8b5cf6);
     border-color: transparent;
     color: white;
-    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
 }
 
 .variant-btn .color-dot {
@@ -594,7 +642,7 @@ include __DIR__ . '/partials/header.php';
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: #60a5fa;
+    color: #a78bfa;
     margin-bottom: 6px;
 }
 
@@ -619,7 +667,7 @@ include __DIR__ . '/partials/header.php';
 .product-price {
     font-size: 1.25rem;
     font-weight: 800;
-    color: #3b82f6;
+    color: #7c3aed;
     display: flex;
     align-items: baseline;
     gap: 4px;
@@ -630,11 +678,24 @@ include __DIR__ . '/partials/header.php';
     font-weight: 600;
 }
 
+.product-rent-price {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+}
+.product-rent-price i {
+    color: #eab308;
+}
+
 .btn-add-cart {
     width: 100%;
     padding: 12px;
     margin-top: 14px;
-    background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    background: linear-gradient(135deg, #7c3aed, #6366f1);
     border: none;
     border-radius: 10px;
     color: white;
@@ -650,7 +711,7 @@ include __DIR__ . '/partials/header.php';
 
 .btn-add-cart:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
 }
 
 /* ================================================================================
@@ -671,7 +732,7 @@ include __DIR__ . '/partials/header.php';
     width: 40px;
     height: 40px;
     border: 3px solid var(--border-color);
-    border-top-color: #3b82f6;
+    border-top-color: #7c3aed;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
     margin: 0 auto 15px;
@@ -694,9 +755,9 @@ include __DIR__ . '/partials/header.php';
 .btn-load-more-inner {
     padding: 14px 40px;
     background: transparent;
-    border: 2px solid #3b82f6;
+    border: 2px solid #7c3aed;
     border-radius: 30px;
-    color: #3b82f6;
+    color: #7c3aed;
     font-weight: 600;
     font-size: 0.9rem;
     cursor: pointer;
@@ -707,7 +768,8 @@ include __DIR__ . '/partials/header.php';
 }
 
 .btn-load-more-inner:hover {
-    background: #3b82f6;
+    background: linear-gradient(135deg, #7c3aed, #6366f1);
+    border-color: transparent;
     color: white;
     transform: scale(1.05);
 }
@@ -731,8 +793,8 @@ include __DIR__ . '/partials/header.php';
 
     <!-- TIÊU ĐỀ TRANG -->
     <div class="text-center mb-4">
-        <h2 class="fw-bold mb-2" style="font-size:2rem; background:linear-gradient(135deg,#3b82f6,#60a5fa); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">
-            <i class="fas fa-music me-2"></i> SHOP NHẠC CỤ TTB
+        <h2 class="fw-bold mb-2" style="font-size:2rem; background:linear-gradient(135deg,#7c3aed,#6366f1); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">
+            <i class="fas fa-music me-2" style="color: #7c3aed;"></i> SHOP NHẠC CỤ TTB
         </h2>
         <p class="text-muted">Khám phá những giai điệu tuyệt vời nhất</p>
     </div>
@@ -772,8 +834,8 @@ include __DIR__ . '/partials/header.php';
                 <button type="button" class="btn-filter-toggle-sidebar" id="btn-filter-toggle">
                     <i class="fas fa-sliders-h"></i>
                     Bộ lọc nâng cao
-                    <span id="active-filter-count" class="badge bg-primary rounded-pill"
-                          style="display:none; font-size:0.7rem;">0</span>
+                    <span id="active-filter-count" class="badge rounded-pill"
+                          style="display:none; font-size:0.7rem; background: linear-gradient(135deg, #7c3aed, #6366f1) !important;">0</span>
                     <i class="fas fa-chevron-down chevron ms-auto"></i>
                 </button>
             </div>
@@ -905,11 +967,11 @@ include __DIR__ . '/partials/header.php';
         <div class="shop-products-main">
             <!-- THÔNG BÁO KẾT QUẢ TÌM KIẾM (Chỉ hiện khi có từ khóa) -->
             <?php if (!empty($currentKeyword)): ?>
-            <div id="search-result-msg" class="mb-4 p-3 rounded-4" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2);">
-                <i class="fas fa-search me-2 text-primary"></i>
+            <div id="search-result-msg" class="mb-4 p-3 rounded-4" style="background: rgba(124, 58, 237, 0.08); border: 1px solid rgba(124, 58, 237, 0.15);">
+                <i class="fas fa-search me-2" style="color: #7c3aed;"></i>
                 <span class="text-muted">Kết quả tìm kiếm cho: </span>
-                <span class="fw-bold text-primary">"<?= htmlspecialchars($currentKeyword) ?>"</span>
-                <a href="index.php?controller=product&action=index" class="ms-3 small text-decoration-none text-muted hover-primary">
+                <span class="fw-bold" style="color: #7c3aed;">"<?= htmlspecialchars($currentKeyword) ?>"</span>
+                <a href="index.php?controller=product&action=index" class="ms-3 small text-decoration-none text-muted" style="transition: color 0.2s;" onmouseover="this.style.color='#7c3aed'" onmouseout="this.style.color='var(--text-muted)'">
                     <i class="fas fa-times me-1"></i> Xóa tìm kiếm
                 </a>
             </div>
@@ -1229,11 +1291,11 @@ window.initShopPage = function() {
             if (!msgContainer) {
                 // Nếu chưa có div thông báo thì tạo mới
                 const html = `
-                    <div id="search-result-msg" class="mb-4 p-3 rounded-4" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2);">
-                        <i class="fas fa-search me-2 text-primary"></i>
+                    <div id="search-result-msg" class="mb-4 p-3 rounded-4" style="background: rgba(124, 58, 237, 0.08); border: 1px solid rgba(124, 58, 237, 0.15);">
+                        <i class="fas fa-search me-2" style="color: #7c3aed;"></i>
                         <span class="text-muted">Kết quả tìm kiếm cho: </span>
-                        <span class="fw-bold text-primary">"${keyword}"</span>
-                        <a href="index.php?controller=product&action=index" class="ms-3 small text-decoration-none text-muted hover-primary">
+                        <span class="fw-bold" style="color: #7c3aed;">"${keyword}"</span>
+                        <a href="index.php?controller=product&action=index" class="ms-3 small text-decoration-none text-muted" style="transition: color 0.2s;" onmouseover="this.style.color='#7c3aed'" onmouseout="this.style.color='var(--text-muted)'">
                             <i class="fas fa-times me-1"></i> Xóa tìm kiếm
                         </a>
                     </div>`;

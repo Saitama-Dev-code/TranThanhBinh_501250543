@@ -214,18 +214,41 @@
         // --- LOGIC: LÊN ĐẦU TRANG ---
         const scrollBtn = document.getElementById("scrollToTopBtn");
         
-        // Hiện nút khi cuộn xuống 300px
-        window.addEventListener("scroll", function() {
-            if (window.scrollY > 300) {
+        // Hàm kiểm tra container cuộn hiện tại (nếu đang ở trang chi tiết sản phẩm thì cuộn chi tiết, ngược lại cuộn window)
+        function getScrollContainer() {
+            const detailContainer = document.getElementById('page-detail');
+            const isDetailActive = detailContainer && (detailContainer.classList.contains('active-sheet') || detailContainer.classList.contains('active'));
+            if (isDetailActive) {
+                return detailContainer;
+            }
+            return window;
+        }
+
+        // Lắng nghe sự kiện scroll (dùng capture: true để bắt được sự kiện scroll của container con #page-detail)
+        const handleScroll = () => {
+            const container = getScrollContainer();
+            const scrollTop = container === window ? window.scrollY : container.scrollTop;
+            if (scrollTop > 300) {
                 scrollBtn.classList.add("show");
             } else {
                 scrollBtn.classList.remove("show");
             }
-        });
+        };
 
-        // Click để cuộn mượt mà lên top = 0
+        // Phơi bày hàm ra toàn cục phục vụ SPA Router cập nhật nút khi trượt mở sheet chi tiết
+        window.updateScrollToTopBtn = handleScroll;
+
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        window.addEventListener("scroll", handleScroll, { capture: true, passive: true });
+
+        // Click để cuộn mượt mà lên đầu container tương ứng
         scrollBtn.addEventListener("click", function() {
-            window.scrollTo({ top: 0, behavior: "smooth" });
+            const container = getScrollContainer();
+            if (container === window) {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            } else {
+                container.scrollTo({ top: 0, behavior: "smooth" });
+            }
         });
 
 
